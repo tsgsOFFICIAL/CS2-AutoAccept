@@ -25,6 +25,13 @@ The program won't help you stay afk, once you are in a match.
 <br>
 You should be able to download it [HERE](https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCSGO-AutoAccept.exe%2Ftree%2Fmain%2FCSGO-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86).
 Simply extract it from the zip file, and you should be ready to go.
+I recommend to extract it to %ProgramFiles(x86)%\CSGO AutoAccepter, to do this follow these steps:
+1. Press Windows key + R key at the same time (opens RUN).
+2. Type %ProgramFiles(x86)% and press ENTER key.
+3. Create a new folder called CSGO AutoAccepter
+4. Extract the ZIP file inside this folder
+5. Create a shortcut to the application by dragging the "CSGO-AutoAccept.exe" file somewhere else, like your desktop and holding CTRL and SHIFT while letting it go.
+6. Enjoy
 
 **How do I report an issue?**
 <br>
