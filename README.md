@@ -3,6 +3,10 @@ A program to automatically find and press "ACCEPT" for you, when entering a comp
 <br>
 ## FAQ
 
+**How does it work?**
+<br>
+![](https://github.com/tsgsOFFICIAL/CSGO-AutoAccept.exe/blob/main/VID_20230907215625.gif)
+
 **Does this work with Panorama UI?**
 <br>
 Not sure, but try it out and report errors :)
