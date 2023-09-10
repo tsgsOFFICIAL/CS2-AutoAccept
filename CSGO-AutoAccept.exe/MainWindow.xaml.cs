@@ -191,7 +191,7 @@ namespace CSGO_AutoAccept.exe
             List<int> _serverVersion = new List<int>();
             int[] _clientVersion = new int[4];
             string[] version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion!.Split('.');
-            string serverVersion = await client.GetStringAsync("https://raw.githubusercontent.com/tsgsOFFICIAL/CSGO-AutoAccept.exe/master/version.txt");
+            string serverVersion = await client.GetStringAsync("https://raw.githubusercontent.com/tsgsOFFICIAL/CSGO-AutoAccept.exe/main/CSGO-AutoAccept.exe/version.txt");
 
             for (int i = 0; i < version.Length; i++)
             {
