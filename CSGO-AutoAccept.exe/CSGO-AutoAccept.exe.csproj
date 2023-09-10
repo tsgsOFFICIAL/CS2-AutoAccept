@@ -537,6 +537,7 @@
     <None Include="bin\Release\net6.0-windows\publish\win-x86\zh-Hant\UIAutomationTypes.resources.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\zh-Hant\WindowsBase.resources.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\zh-Hant\WindowsFormsIntegration.resources.dll" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml.user" />
   </ItemGroup>
 
   <ItemGroup>
