@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
 
-namespace CSGO_AutoAccept.exe
+namespace CSGO_AutoAccept
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

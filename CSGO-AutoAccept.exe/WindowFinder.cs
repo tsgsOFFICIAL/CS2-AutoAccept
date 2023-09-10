@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 
-namespace CSGO_AutoAccept.exe
+namespace CSGO_AutoAccept
 {
     internal static class WindowFinder
     {
