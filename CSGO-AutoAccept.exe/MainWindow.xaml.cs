@@ -84,7 +84,7 @@ namespace CSGO_AutoAccept
 
             if (UpdateAvailable)
             {
-                Process.Start("https://github.com/tsgsOFFICIAL/CSGO-AutoAccept.exe/blob/master/CSGO%20AutoAccepter.zip");
+                Process.Start("https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCSGO-AutoAccept.exe%2Ftree%2Fmain%2FCSGO-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86");
             }
         }
         /// <summary>
