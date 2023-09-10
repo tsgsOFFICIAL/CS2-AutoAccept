@@ -1,11 +1,18 @@
 # CSGO-AutoAccept.exe
 A program to automatically find and press "ACCEPT" for you, when entering a competitive match in CS:GO.
 <br>
+
+**Live demo**
+<br>
+![](https://github.com/tsgsOFFICIAL/CSGO-AutoAccept.exe/blob/main/VID_20230907215625.gif)
+<br>
+
 ## FAQ
 
 **How does it work?**
 <br>
-![](https://github.com/tsgsOFFICIAL/CSGO-AutoAccept.exe/blob/main/VID_20230907215625.gif)
+It works by capturing a tiny region where the accept button will appear, on the screen that CS:GO is running on every second, and using [OCR](https://aws.amazon.com/what-is/ocr/) to read the text of the buttons.<br>
+If it finds the accept button, it takes over your mouse, points it at the button and clicks it, accepting your match for you.
 
 **Does this work with Panorama UI?**
 <br>
