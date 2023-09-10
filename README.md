@@ -31,7 +31,7 @@ I recommend to extract it to %ProgramFiles(x86)%\CSGO AutoAccepter, to do this f
 3. Create a new folder called CSGO AutoAccept.
 4. Extract the ZIP file inside this folder.
 5. Create a shortcut to the application by dragging the "CSGO-AutoAccept.exe" file somewhere else, like your desktop and holding CTRL and SHIFT while letting it go.
-6. Enjoy
+6. Enjoy :)
 
 **How do I report an issue?**
 <br>
