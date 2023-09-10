@@ -23,7 +23,7 @@ The program won't help you stay afk, once you are in a match.
 
 **Where can I download this?**
 <br>
-You should be able to download it [HERE](https://github.com/tsgsOFFICIAL/CSGO-AutoAccept.exe/blob/master/CSGO%20AutoAccepter.zip).
+You should be able to download it [HERE](https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCSGO-AutoAccept.exe%2Ftree%2Fmain%2FCSGO-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86).
 Simply extract it from the zip file, and you should be ready to go.
 
 **How do I report an issue?**
