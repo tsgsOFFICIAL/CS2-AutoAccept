@@ -97,7 +97,8 @@ namespace CSGO_AutoAccept
 
             if (UpdateAvailable)
             {
-                Process.Start("https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCSGO-AutoAccept.exe%2Ftree%2Fmain%2FCSGO-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86");
+                LaunchWeb("https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCSGO-AutoAccept.exe%2Ftree%2Fmain%2FCSGO-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86");
+                LaunchWeb("https://github.com/tsgsOFFICIAL/CSGO-AutoAccept.exe#where-can-i-download-this");
             }
         }
         /// <summary>
@@ -288,6 +289,11 @@ namespace CSGO_AutoAccept
             // PrintToLog("{UpdateHeaderVersion}");
             // Create a new instance of WebClient, and search for the current version
             HttpClient client = new HttpClient();
+            client.CancelPendingRequests();
+
+            // disable caching
+            client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+
             List<int> _serverVersion = new List<int>();
             int[] _clientVersion = new int[4];
             string[] version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion!.Split('.');

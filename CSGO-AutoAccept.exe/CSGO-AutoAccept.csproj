@@ -11,7 +11,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Description>A program to automatically find and press "ACCEPT" for you, when entering a competitive match in CS:GO.</Description>
     <Copyright>©️ tsgsOFFICIAL - 2023</Copyright>
-    <FileVersion>2.0.6.0</FileVersion>
+    <FileVersion>2.0.7.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
