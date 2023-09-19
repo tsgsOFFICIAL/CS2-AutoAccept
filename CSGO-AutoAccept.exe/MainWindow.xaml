@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CSGO_AutoAccept"
         mc:Ignorable="d"
-        Title="CS:GO AutoAccepter by tsgsOFFICIAL" Height="450" Width="800"
+        Title="CS:GO AutoAccept by tsgsOFFICIAL" Height="450" Width="800"
         ResizeMode="CanResize"
         WindowStyle="None"
         Background="#353535"
@@ -102,13 +102,15 @@
         <!-- Custom header -->
         <TextBlock Background="#1c1b1b" VerticalAlignment="Top" Height="30" MouseLeftButtonDown="WindowHeader_Mousedown"/>
         <Image Source="/logo.png" MaxHeight="26" Margin="0,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" MouseLeftButtonDown="WindowHeader_Mousedown"/>
-        <TextBlock x:Name="HeaderTextBlock" Text="CS:GO AutoAccepter" FontFamily="Roboto" FontSize="15" Foreground="GhostWhite" Margin="30,2,0,420" MouseLeftButtonDown="WindowHeader_Mousedown"/>
+        <TextBlock x:Name="HeaderTextBlock" Text="CS:GO AutoAccept" FontFamily="Roboto" FontSize="15" Foreground="GhostWhite" Margin="30,2,0,420" MouseLeftButtonDown="WindowHeader_Mousedown"/>
         <TextBlock Text="by tsgsOFFICIAL" FontFamily="Roboto" FontSize="12" Foreground="GhostWhite" Margin="30,16,675,414" MouseLeftButtonDown="WindowHeader_Mousedown"/>
         <Button Background="Transparent" Content="&#x1F5D5;" FontSize="18" VerticalAlignment="Top" ToolTip="Minimize" Click="Button_Click_Minimize" Foreground="GhostWhite" BorderBrush="Transparent" Height="31" Width="30" HorizontalAlignment="Right" Margin="0,0,30,0" Style="{DynamicResource NavButtons}"/>
         <Button Background="Transparent" Content="&#10006;" ToolTip="Close" Click="Button_Click_Close" Foreground="GhostWhite" BorderBrush="Transparent" Margin="770 0 0 420" Style="{DynamicResource CloseBtn}"/>
 
         <!-- Controls -->
-        <CheckBox x:Name="Program_state" Content="AutoAccept (OFF)" IsChecked="False" Margin="30,41,646,390" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Program_state_Checked" Unchecked="Program_state_Unchecked"/>
+        <CheckBox x:Name="Program_state" Content="AutoAccept (OFF)" ToolTip="Will find the ACCEPT button, only for the current match" IsChecked="False" Margin="30,41,646,390" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Program_state_Checked" Unchecked="Program_state_Unchecked"/>
+        <CheckBox x:Name="Run_at_startup_state" Content="Run at startup (OFF)" ToolTip="Automatically start this app when your pc launches" IsChecked="False" Margin="30,71,632,360" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Run_at_startup_state_Checked" Unchecked="Run_at_startup_state_Unchecked"/>
+        <CheckBox x:Name="Program_state_continuously" Content="Auto Accept Every Match (OFF)" ToolTip="Will find the ACCEPT button for all matches, this will consume more cpu power while in game!" IsChecked="False" Margin="30,101,570,330" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Program_state_continuously_Checked" Unchecked="Program_state_continuously_Unchecked"/>
         <!--<CheckBox x:Name="Panorama_state" Content="Panorama (NO)" IsChecked="False" Margin="30,60,646,374" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Panorama_state_Checked" Unchecked="Panorama_state_Unchecked"/>-->
         <TextBlock x:Name="TextBlock_Monitor" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="13,340,428,89"/>
         <TextBlock x:Name="TextBlock_MonitorSize" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="13,365,569,64"/>

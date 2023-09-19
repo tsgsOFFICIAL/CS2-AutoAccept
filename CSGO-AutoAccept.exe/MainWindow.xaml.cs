@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
+using Microsoft.Win32;
+using System.Windows.Shapes;
 
 namespace CSGO_AutoAccept
 {
@@ -34,6 +36,7 @@ namespace CSGO_AutoAccept
         private Screen? _activeScreen;
         private Thread? _scannerThread;
         private CancellationTokenSource? cts;
+        private bool _run_Continuously = false;
         private int _acceptPosX;
         private int _acceptPosY;
         private int _acceptWidth;
@@ -51,6 +54,16 @@ namespace CSGO_AutoAccept
             Thread GameRunningThread = new Thread(IsGameRunning);
             GameRunningThread.Start();
             GameRunningThread.IsBackground = true;
+
+            try
+            {
+                RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
+                Run_at_startup_state.IsChecked = key.GetValue("CSGO-AutoAccept.exe") != null;
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "CS:GO AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
         #region EventHandlers
         /// <summary>
@@ -144,6 +157,93 @@ namespace CSGO_AutoAccept
             cts!.Cancel();
             Program_state.Foreground = new SolidColorBrush(Colors.Red);
             Program_state.Content = "AutoAccept (OFF)";
+        }
+        /// <summary>
+        /// 24/7 State ON event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Program_state_continuously_Checked(object sender, RoutedEventArgs e)
+        {
+            // PrintToLog("{Program_state_continuously_Checked}");
+            Program_state.IsChecked = true;
+
+            // Change to a brighter color
+            Program_state_continuously.Foreground = new SolidColorBrush(Colors.LawnGreen);
+            Program_state_continuously.Content = "Auto Accept Every Match (ON)";
+            _run_Continuously = true;
+        }
+        /// <summary>
+        /// 24/7 State OFF event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Program_state_continuously_Unchecked(object sender, RoutedEventArgs e)
+        {
+            // PrintToLog("{Program_state_continuously_Unchecked}");
+            Program_state.IsChecked = false;
+
+            // Change to a darker color
+            Program_state_continuously.Foreground = new SolidColorBrush(Colors.Red);
+            Program_state_continuously.Content = "Auto Accept Every Match (OFF)";
+            _run_Continuously = false;
+        }
+        /// <summary>
+        /// Run at startup State ON event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Run_at_startup_state_Checked(object sender, RoutedEventArgs e)
+        {
+            // PrintToLog("{Run_at_startup_state_Checked}");
+            string exeLocation = $"{AppContext.BaseDirectory}CSGO-AutoAccept.exe";
+            try
+            {
+                RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
+
+                if (key.GetValue("CSGO-AutoAccept.exe") == null)
+                {
+                    key.SetValue("CSGO-AutoAccept.exe", exeLocation);
+                }
+
+                key.Close();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "CS:GO AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            // Change to a brighter color
+            Run_at_startup_state.Foreground = new SolidColorBrush(Colors.LawnGreen);
+            Run_at_startup_state.Content = "Run at startup (ON)";
+        }
+        /// <summary>
+        /// Run at startup State OFF event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Run_at_startup_state_Unchecked(object sender, RoutedEventArgs e)
+        {
+            // PrintToLog("{Run_at_startup_state_Unchecked}");
+            try
+            {
+                RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
+                
+                if (key.GetValue("CSGO-AutoAccept.exe") != null)
+                {
+                    key.DeleteValue("CSGO-AutoAccept.exe");
+                }
+
+                key.Close();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "CS:GO AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            // Change to a darker color
+            Run_at_startup_state.Foreground = new SolidColorBrush(Colors.Red);
+            Run_at_startup_state.Content = "Run at startup (OFF)";
         }
         #endregion
         /// <summary>
@@ -264,6 +364,7 @@ namespace CSGO_AutoAccept
                         // Append the appropriate strings
                         TextBlock_Monitor.Foreground = new SolidColorBrush(Colors.GhostWhite);
                         Program_state.IsEnabled = true;
+                        Program_state_continuously.IsEnabled = true;
                         TextBlock_Monitor.Text = $"CS:GO is running on: {formattedString}";
                         TextBlock_MonitorSize.Text = $"Display size: {_activeScreen.Bounds.Width}x{_activeScreen.Bounds.Height} ({AspectRatio()})";
                         Button_LaunchCSGO.Visibility = Visibility.Collapsed;
@@ -281,6 +382,8 @@ namespace CSGO_AutoAccept
                         TextBlock_MonitorSize.Text = "";
                         Program_state.IsChecked = false;
                         Program_state.IsEnabled = false;
+                        Program_state_continuously.IsChecked = false;
+                        Program_state_continuously.IsEnabled = false;
                         Button_LaunchCSGO.Visibility = Visibility.Visible;
                     }));
                 }
@@ -295,6 +398,8 @@ namespace CSGO_AutoAccept
                     TextBlock_MonitorSize.Text = "";
                     Program_state.IsChecked = false;
                     Program_state.IsEnabled = false;
+                    Program_state_continuously.IsChecked = false;
+                    Program_state_continuously.IsEnabled = false;
                     Button_LaunchCSGO.Visibility = Visibility.Visible;
                 }));
             }
@@ -340,7 +445,7 @@ namespace CSGO_AutoAccept
                 Bitmap captureBitmap = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
                 // Creating a Rectangle object which will capture our Screen
-                Rectangle captureRectangle = _activeScreen!.Bounds;
+                System.Drawing.Rectangle captureRectangle = _activeScreen!.Bounds;
 
                 // Creating a New Graphics Object
                 Graphics captureGraphics = Graphics.FromImage(captureBitmap);
@@ -354,7 +459,7 @@ namespace CSGO_AutoAccept
             catch (Exception ex)
             {
                 // PrintToLog("{CaptureScreen} FAILED: " + ex.Message);
-                System.Windows.MessageBox.Show(ex.Message, "CS:GO AutoAccepter", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show(ex.Message, "CS:GO AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
                 return null!;
             }
         }
@@ -419,7 +524,7 @@ namespace CSGO_AutoAccept
                     valuePair = OCR(bitmap);
 
                     // Check the returned value
-                    if (!(valuePair.text.ToLower().Contains("cancel search") && valuePair.confidence > .9))
+                    if ((!(valuePair.text.ToLower().Contains("cancel search") && valuePair.confidence > .9)) && !_run_Continuously)
                     {
                         this.Dispatcher.BeginInvoke(new Action(() =>
                         {
