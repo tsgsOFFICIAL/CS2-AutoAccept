@@ -184,7 +184,6 @@ namespace CSGO_AutoAccept
         private void Program_state_continuously_Unchecked(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Program_state_continuously_Unchecked}");
-            Program_state.IsChecked = false;
 
             // Change to a darker color
             Program_state_continuously.Foreground = new SolidColorBrush(Colors.Red);
@@ -378,7 +377,7 @@ namespace CSGO_AutoAccept
                         Button_LaunchCSGO.Visibility = Visibility.Collapsed;
                     }));
 
-                    CalculateSizes();
+                    CalculateSizes(AspectRatio());
                 }
                 else
                 {
@@ -551,9 +550,9 @@ namespace CSGO_AutoAccept
         /// <summary>
         /// Calculate the positions based on display size
         /// </summary>
-        private void CalculateSizes()
+        /// <param name="type">Aspect Ratio</param>
+        private void CalculateSizes(string type)
         {
-            // PrintToLog("{CalculateSizes}");
             // Base settings for 1440p
             int acceptPosX = 1130;
             int acceptPosY = 540;
@@ -563,6 +562,24 @@ namespace CSGO_AutoAccept
             int cancelPosY = 1347;
             int cancelWidth = 386;
             int cancelHeight = 60;
+
+            // PrintToLog("{CalculateSizes}");
+            switch (type)
+            {
+                case "16:9":
+                    break;
+                case "4:3":
+                    // Base settings for 1440p
+                    acceptPosX = 608;
+                    acceptPosY = 404;
+                    acceptWidth = 225;
+                    acceptHeight = 88;
+                    cancelPosX = 1018;
+                    cancelPosY = 1011;
+                    cancelWidth = 293;
+                    cancelHeight = 44;
+                    break;
+            }
 
             // Convert back to pixels for the specific display
             _acceptPosX = (int)(acceptPosX * (_activeScreen!.Bounds.Width / (float)2560));
