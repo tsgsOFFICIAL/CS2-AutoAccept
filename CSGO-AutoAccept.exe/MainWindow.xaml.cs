@@ -98,7 +98,7 @@ namespace CSGO_AutoAccept
             if (UpdateAvailable)
             {
                 LaunchWeb("https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCSGO-AutoAccept.exe%2Ftree%2Fmain%2FCSGO-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86");
-                LaunchWeb("https://github.com/tsgsOFFICIAL/CSGO-AutoAccept.exe#where-can-i-download-this");
+                LaunchWeb("https://github.com/tsgsOFFICIAL/CSGO-AutoAccept.exe#where-can-counter-download-this");
             }
         }
         /// <summary>
@@ -281,7 +281,6 @@ namespace CSGO_AutoAccept
                 }
             }
         }
-
         /// <summary>
         /// Check for any updates and append to the header
         /// </summary>
@@ -480,15 +479,20 @@ namespace CSGO_AutoAccept
             if (obj is null)
                 return;
 
+            int counter = -1;
             CancellationToken ct = (CancellationToken)obj;
             while (!ct.IsCancellationRequested)
             {
+                counter++;
+
                 // PrintToLog("{Scanner}");
                 // Take a screenshot of the accept button
                 Bitmap bitmap = CaptureScreen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
+                bitmap.Save($"C:\\Users\\Marcus\\Desktop\\test\\accept {counter}.png");
 
                 // Adjust the contrast, then sharpen the image
                 bitmap = OptimiseImage(bitmap);
+                bitmap.Save($"C:\\Users\\Marcus\\Desktop\\test\\accept optimised {counter}.png");
 
                 // Read the image using OCR
                 (string text, double confidence) valuePair = OCR(bitmap);
@@ -523,9 +527,11 @@ namespace CSGO_AutoAccept
                     Thread.Sleep(25 * 1000);
 
                     bitmap = CaptureScreen(_cancelWidth, _cancelHeight, _cancelPosX, _cancelPosY); // "Cancel Search" button
+                    bitmap.Save($"C:\\Users\\Marcus\\Desktop\\test\\cancel search {counter}.png");
 
                     // Adjust the contrast, then sharpen the image
                     bitmap = OptimiseImage(bitmap);
+                    bitmap.Save($"C:\\Users\\Marcus\\Desktop\\test\\cancel search optimised {counter}.png");
 
                     // Read the image using OCR
                     valuePair = OCR(bitmap);
@@ -562,11 +568,28 @@ namespace CSGO_AutoAccept
             int cancelPosY = 1347;
             int cancelWidth = 386;
             int cancelHeight = 60;
+            int baseWidth = 2560;
+            int baseHeight = 1440;
 
             // PrintToLog("{CalculateSizes}");
             switch (type)
             {
                 case "16:9":
+                    // Convert back to pixels for the specific display
+                    _acceptPosX = (int)(acceptPosX * (_activeScreen!.Bounds.Width / (float)baseWidth));
+                    _acceptPosY = (int)(acceptPosY * (_activeScreen.Bounds.Height / (float)baseHeight));
+
+                    _acceptWidth = (int)(acceptWidth * (_activeScreen.Bounds.Width / (float)baseWidth));
+                    _acceptHeight = (int)(acceptHeight * (_activeScreen.Bounds.Height / (float)baseHeight));
+
+                    _cancelPosX = (int)(cancelPosX * (_activeScreen.Bounds.Width / (float)baseWidth));
+                    _cancelPosY = (int)(cancelPosY * (_activeScreen.Bounds.Height / (float)baseHeight));
+
+                    _cancelWidth = (int)(cancelWidth * (_activeScreen.Bounds.Width / (float)baseWidth));
+                    _cancelHeight = (int)(cancelHeight * (_activeScreen.Bounds.Height / (float)baseHeight));
+
+                    _clickPosX = _acceptPosX + (_acceptWidth / 2);
+                    _clickPosY = _acceptPosY + (_acceptHeight / 2);
                     break;
                 case "4:3":
                     // Base settings for 1440p
@@ -578,24 +601,26 @@ namespace CSGO_AutoAccept
                     cancelPosY = 1011;
                     cancelWidth = 293;
                     cancelHeight = 44;
+                    baseWidth = 1440;
+                    baseHeight = 1080;
+
+                    // Convert back to pixels for the specific display
+                    _acceptPosX = (int)(acceptPosX * (_activeScreen!.Bounds.Width / (float)baseWidth));
+                    _acceptPosY = (int)(acceptPosY * (_activeScreen.Bounds.Height / (float)baseHeight));
+
+                    _acceptWidth = (int)(acceptWidth * (_activeScreen.Bounds.Width / (float)baseWidth));
+                    _acceptHeight = (int)(acceptHeight * (_activeScreen.Bounds.Height / (float)baseHeight));
+
+                    _cancelPosX = (int)(cancelPosX * (_activeScreen.Bounds.Width / (float)baseWidth));
+                    _cancelPosY = (int)(cancelPosY * (_activeScreen.Bounds.Height / (float)baseHeight));
+
+                    _cancelWidth = (int)(cancelWidth * (_activeScreen.Bounds.Width / (float)baseWidth));
+                    _cancelHeight = (int)(cancelHeight * (_activeScreen.Bounds.Height / (float)baseHeight));
+
+                    _clickPosX = _acceptPosX + (_acceptWidth / 2);
+                    _clickPosY = _acceptPosY + (_acceptHeight / 2);
                     break;
             }
-
-            // Convert back to pixels for the specific display
-            _acceptPosX = (int)(acceptPosX * (_activeScreen!.Bounds.Width / (float)2560));
-            _acceptPosY = (int)(acceptPosY * (_activeScreen.Bounds.Height / (float)1440));
-
-            _acceptWidth = (int)(acceptWidth * (_activeScreen.Bounds.Width / (float)2560));
-            _acceptHeight = (int)(acceptHeight * (_activeScreen.Bounds.Height / (float)1440));
-
-            _cancelPosX = (int)(cancelPosX * (_activeScreen.Bounds.Width / (float)2560));
-            _cancelPosY = (int)(cancelPosY * (_activeScreen.Bounds.Height / (float)1440));
-
-            _cancelWidth = (int)(cancelWidth * (_activeScreen.Bounds.Width / (float)2560));
-            _cancelHeight = (int)(cancelHeight * (_activeScreen.Bounds.Height / (float)1440));
-
-            _clickPosX = _acceptPosX + (_acceptWidth / 2);
-            _clickPosY = _acceptPosY + (_acceptHeight / 2);
 
             // PrintToLog("{CalculateSizes} _acceptPosX: " + _acceptPosX);
             // PrintToLog("{CalculateSizes} _acceptPosY: " + _acceptPosY);
@@ -653,6 +678,7 @@ namespace CSGO_AutoAccept
             }
             catch (Exception)
             {
+                // PrintToLog("{OCR} " + ex.Message);
                 return ("", 100);
             }
         }
