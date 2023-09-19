@@ -154,8 +154,10 @@ namespace CSGO_AutoAccept
         private void Program_state_Unchecked(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Program_state_Unchecked}");
-            // Change to a darker color
             cts!.Cancel();
+            Program_state_continuously.IsChecked = false;
+
+            // Change to a darker color
             Program_state.Foreground = new SolidColorBrush(Colors.Red);
             Program_state.Content = "AutoAccept (OFF)";
         }
