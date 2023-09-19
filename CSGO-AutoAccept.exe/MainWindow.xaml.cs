@@ -479,20 +479,16 @@ namespace CSGO_AutoAccept
             if (obj is null)
                 return;
 
-            int counter = -1;
             CancellationToken ct = (CancellationToken)obj;
             while (!ct.IsCancellationRequested)
             {
-                counter++;
 
                 // PrintToLog("{Scanner}");
                 // Take a screenshot of the accept button
                 Bitmap bitmap = CaptureScreen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
-                bitmap.Save($"C:\\Users\\Marcus\\Desktop\\test\\accept {counter}.png");
 
                 // Adjust the contrast, then sharpen the image
                 bitmap = OptimiseImage(bitmap);
-                bitmap.Save($"C:\\Users\\Marcus\\Desktop\\test\\accept optimised {counter}.png");
 
                 // Read the image using OCR
                 (string text, double confidence) valuePair = OCR(bitmap);
@@ -527,11 +523,9 @@ namespace CSGO_AutoAccept
                     Thread.Sleep(25 * 1000);
 
                     bitmap = CaptureScreen(_cancelWidth, _cancelHeight, _cancelPosX, _cancelPosY); // "Cancel Search" button
-                    bitmap.Save($"C:\\Users\\Marcus\\Desktop\\test\\cancel search {counter}.png");
 
                     // Adjust the contrast, then sharpen the image
                     bitmap = OptimiseImage(bitmap);
-                    bitmap.Save($"C:\\Users\\Marcus\\Desktop\\test\\cancel search optimised {counter}.png");
 
                     // Read the image using OCR
                     valuePair = OCR(bitmap);
