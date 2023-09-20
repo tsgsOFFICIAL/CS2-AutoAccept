@@ -418,22 +418,44 @@ namespace CSGO_AutoAccept
         /// </summary>
         /// <param name="x">Width</param>
         /// <param name="y">Height</param>
-        /// <returns>This method returns eitehr 16:9 or 4:3</returns>
+        /// <returns>This method returns the aspect ratio</returns>
         private string AspectRatio()
         {
             // PrintToLog("{AspectRatio}");
-            double value = (double)_activeScreen!.Bounds.Width / _activeScreen.Bounds.Height;
-            if (value > 1.7)
-            {
-                // PrintToLog("{AspectRatio} 16:9");
-                return "16:9";
+            // double value = (double)_activeScreen!.Bounds.Width / _activeScreen.Bounds.Height;
+            int x = _activeScreen!.Bounds.Width;
+            int y = _activeScreen!.Bounds.Height;
+            
+            // We need to find Greatest Common Divisor, and divide both x and y by it.
+            string aspectRatio = $"{x / GCD(x, y)}:{y / GCD(x, y)}";
+ 
+            if (aspectRatio == "8:5") {
+                // PrintToLog("{AspectRatio} 16:10");
+                return "16:10";
             }
-            else
-            {
-                // PrintToLog("{AspectRatio} 4:3");
-                return "4:3";
-            }
+            
+            // PrintToLog("{AspectRatio} " + aspectRatio);
+            return aspectRatio;
         }
+        /// <summary>
+        /// Find the Greatest Common Divisor and return it 
+        /// </summary>
+        /// <param name="a">a, here it's width</param>
+        /// <param name="b">b, here it's height</param>
+        /// <returns>This method returns the Greatest Common Divisor</returns>
+        private int GCD(int a, int b)
+        {
+            int Remainder;
+
+    		while(b != 0)
+    		{
+    			Remainder = a % b;
+    			a = b;
+    			b = Remainder;
+    		}
+    
+    		return a;
+    	}
         /// <summary>
         /// Take a screen capture assuming the screen is 16:9
         /// </summary>
