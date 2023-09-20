@@ -575,7 +575,7 @@ namespace CSGO_AutoAccept
         /// <param name="type">Aspect Ratio</param>
         private void CalculateSizes(string type)
         {
-            // Base settings for 1440p
+            // Base settings for 2560x1440
             int acceptPosX = 1130;
             int acceptPosY = 540;
             int acceptWidth = 299;
@@ -607,8 +607,37 @@ namespace CSGO_AutoAccept
                     _clickPosX = _acceptPosX + (_acceptWidth / 2);
                     _clickPosY = _acceptPosY + (_acceptHeight / 2);
                     break;
+                case "16:10":
+                    // Base settings for 1920x1200
+                    acceptPosX = 834;
+                    acceptPosY = 447;
+                    acceptWidth = 251;
+                    acceptHeight = 99;
+                    cancelPosX = 1454;
+                    cancelPosY = 1123;
+                    cancelWidth = 321;
+                    cancelHeight = 49;
+                    baseWidth = 1920;
+                    baseHeight = 1200;
+
+                    // Convert back to pixels for the specific display
+                    _acceptPosX = (int)(acceptPosX * (_activeScreen!.Bounds.Width / (float)baseWidth));
+                    _acceptPosY = (int)(acceptPosY * (_activeScreen.Bounds.Height / (float)baseHeight));
+
+                    _acceptWidth = (int)(acceptWidth * (_activeScreen.Bounds.Width / (float)baseWidth));
+                    _acceptHeight = (int)(acceptHeight * (_activeScreen.Bounds.Height / (float)baseHeight));
+
+                    _cancelPosX = (int)(cancelPosX * (_activeScreen.Bounds.Width / (float)baseWidth));
+                    _cancelPosY = (int)(cancelPosY * (_activeScreen.Bounds.Height / (float)baseHeight));
+
+                    _cancelWidth = (int)(cancelWidth * (_activeScreen.Bounds.Width / (float)baseWidth));
+                    _cancelHeight = (int)(cancelHeight * (_activeScreen.Bounds.Height / (float)baseHeight));
+
+                    _clickPosX = _acceptPosX + (_acceptWidth / 2);
+                    _clickPosY = _acceptPosY + (_acceptHeight / 2);
+                    break;
                 case "4:3":
-                    // Base settings for 1440p
+                    // Base settings for 1440x1080
                     acceptPosX = 608;
                     acceptPosY = 404;
                     acceptWidth = 225;

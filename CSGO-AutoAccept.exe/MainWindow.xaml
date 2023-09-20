@@ -112,8 +112,8 @@
         <CheckBox x:Name="Run_at_startup_state" Content="Run at startup (OFF)" ToolTip="Automatically start this app when your pc launches" IsChecked="False" Margin="30,71,632,360" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Run_at_startup_state_Checked" Unchecked="Run_at_startup_state_Unchecked"/>
         <CheckBox x:Name="Program_state_continuously" Content="Auto Accept Every Match (OFF)" ToolTip="Will find the ACCEPT button for all matches, this will consume more cpu power while in game!" IsChecked="False" Margin="30,101,570,330" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Program_state_continuously_Checked" Unchecked="Program_state_continuously_Unchecked"/>
         <!--<CheckBox x:Name="Panorama_state" Content="Panorama (NO)" IsChecked="False" Margin="30,60,646,374" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Panorama_state_Checked" Unchecked="Panorama_state_Unchecked"/>-->
-        <TextBlock x:Name="TextBlock_Monitor" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="13,340,428,89"/>
-        <TextBlock x:Name="TextBlock_MonitorSize" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="13,365,569,64"/>
+        <TextBlock x:Name="TextBlock_Monitor" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="13,340,418,89"/>
+        <TextBlock x:Name="TextBlock_MonitorSize" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="13,365,555,64"/>
 
         <Button x:Name="Button_LaunchCSGO" Margin="540,170,10,170" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" Content="Launch CS:GO" Cursor="Hand" ToolTip="Click here to launch CS:GO" Background="#3F169C80" Click="Button_Click_LaunchCSGO"/>
         <!-- Socials -->
