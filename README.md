@@ -38,7 +38,7 @@ To report any issues or bugs, go to my Github page and create an issue for the p
 
 ## Where can I download this?
 
-You should be able to download it [HERE](https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCS2-AutoAccept.exe%2Ftree%2Fmain%2FCSGO-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86).
+You should be able to download it [HERE](https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCS2-AutoAccept.exe%2Ftree%2Fmain%2FCS2-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86).
 Simply extract it from the zip file, and you should be ready to go.
 I recommend to extract it to %ProgramFiles(x86)%\CS2 AutoAccepter, to do this follow these steps:
 1. Press Windows key + R key at the same time (opens RUN).
