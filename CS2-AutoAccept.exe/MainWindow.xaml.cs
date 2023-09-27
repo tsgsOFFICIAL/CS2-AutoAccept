@@ -17,7 +17,7 @@ using System.Windows.Controls;
 using Microsoft.Win32;
 using System.Windows.Shapes;
 
-namespace CSGO_AutoAccept
+namespace CS2_AutoAccept
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -62,7 +62,7 @@ namespace CSGO_AutoAccept
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message, "CS:GO AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show(ex.Message, "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         #region EventHandlers
@@ -97,7 +97,7 @@ namespace CSGO_AutoAccept
 
             if (UpdateAvailable)
             {
-                LaunchWeb("https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCS2-AutoAccept.exe%2Ftree%2Fmain%2FCSGO-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86");
+                LaunchWeb("https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCS2-AutoAccept.exe%2Ftree%2Fmain%2FCS2-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86");
                 LaunchWeb("https://github.com/tsgsOFFICIAL/CS2-AutoAccept.exe#where-can-counter-download-this");
             }
         }
@@ -112,7 +112,7 @@ namespace CSGO_AutoAccept
             LaunchWeb(@"https://discord.gg/Cddu5aJ");
         }
         /// <summary>
-        /// Launch CS:GO
+        /// Launch CS2
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -212,7 +212,7 @@ namespace CSGO_AutoAccept
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message, "CS:GO AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show(ex.Message, "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             // Change to a brighter color
@@ -297,7 +297,7 @@ namespace CSGO_AutoAccept
             List<int> _serverVersion = new List<int>();
             int[] _clientVersion = new int[4];
             string[] version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion!.Split('.');
-            string serverVersion = await client.GetStringAsync("https://raw.githubusercontent.com/tsgsOFFICIAL/CS2-AutoAccept.exe/main/CSGO-AutoAccept.exe/version.txt");
+            string serverVersion = await client.GetStringAsync("https://raw.githubusercontent.com/tsgsOFFICIAL/CS2-AutoAccept.exe/main/CS2-AutoAccept.exe/version.txt");
 
             for (int i = 0; i < version.Length; i++)
             {
@@ -499,7 +499,7 @@ namespace CSGO_AutoAccept
             catch (Exception ex)
             {
                 // PrintToLog("{CaptureScreen} FAILED: " + ex.Message);
-                System.Windows.MessageBox.Show(ex.Message, "CS:GO AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show(ex.Message, "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
                 return null!;
             }
         }

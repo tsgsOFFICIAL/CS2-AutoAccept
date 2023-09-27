@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CSGO_AutoAccept.Properties {
+namespace CS2_AutoAccept.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

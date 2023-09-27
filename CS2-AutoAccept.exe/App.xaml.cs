@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace CSGO_AutoAccept
+namespace CS2_AutoAccept
 {
     /// <summary>
     /// Interaction logic for App.xaml

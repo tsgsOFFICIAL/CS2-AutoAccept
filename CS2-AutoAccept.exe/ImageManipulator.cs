@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace CSGO_AutoAccept
+namespace CS2_AutoAccept
 {
     internal class ImageManipulator
     {
