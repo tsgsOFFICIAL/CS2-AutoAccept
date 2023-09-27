@@ -355,7 +355,7 @@ namespace CSGO_AutoAccept
             // PrintToLog("{IsGameRunning}");
             try
             {
-                _activeScreen = WindowFinder.FindApplication("csgo");
+                _activeScreen = WindowFinder.FindApplication("csgo")  ?? WindowFinder.FindApplication("cs2");
 
                 if (_activeScreen != null)
                 {
