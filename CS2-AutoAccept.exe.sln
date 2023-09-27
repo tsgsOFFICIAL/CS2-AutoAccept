@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSGO-AutoAccept", "CSGO-AutoAccept.exe\CSGO-AutoAccept.csproj", "{46A456E1-FD1E-46DD-A0CC-1ACEB862F9D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CS2-AutoAccept", "CSGO-AutoAccept.exe\CS2-AutoAccept.csproj", "{46A456E1-FD1E-46DD-A0CC-1ACEB862F9D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

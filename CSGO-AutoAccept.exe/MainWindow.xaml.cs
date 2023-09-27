@@ -58,7 +58,7 @@ namespace CSGO_AutoAccept
             try
             {
                 RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
-                Run_at_startup_state.IsChecked = key.GetValue("CSGO-AutoAccept.exe") != null;
+                Run_at_startup_state.IsChecked = key.GetValue("CS2-AutoAccept.exe") != null;
             }
             catch (Exception ex)
             {
@@ -97,8 +97,8 @@ namespace CSGO_AutoAccept
 
             if (UpdateAvailable)
             {
-                LaunchWeb("https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCSGO-AutoAccept.exe%2Ftree%2Fmain%2FCSGO-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86");
-                LaunchWeb("https://github.com/tsgsOFFICIAL/CSGO-AutoAccept.exe#where-can-counter-download-this");
+                LaunchWeb("https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCS2-AutoAccept.exe%2Ftree%2Fmain%2FCSGO-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86");
+                LaunchWeb("https://github.com/tsgsOFFICIAL/CS2-AutoAccept.exe#where-can-counter-download-this");
             }
         }
         /// <summary>
@@ -118,7 +118,7 @@ namespace CSGO_AutoAccept
         /// <param name="e"></param>
         private void Button_Click_LaunchCS2(object sender, RoutedEventArgs e)
         {
-            // PrintToLog("{Button_Click_LaunchCSGO}");
+            // PrintToLog("{Button_Click_LaunchCS}");
             LaunchWeb("steam://rungameid/730");
             Button_LaunchCS.Content = "Launching CS2";
         }
@@ -198,14 +198,14 @@ namespace CSGO_AutoAccept
         private void Run_at_startup_state_Checked(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Run_at_startup_state_Checked}");
-            string exeLocation = $"{AppContext.BaseDirectory}CSGO-AutoAccept.exe";
+            string exeLocation = $"{AppContext.BaseDirectory}CS2-AutoAccept.exe";
             try
             {
                 RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
 
-                if (key.GetValue("CSGO-AutoAccept.exe") == null)
+                if (key.GetValue("CS2-AutoAccept.exe") == null)
                 {
-                    key.SetValue("CSGO-AutoAccept.exe", exeLocation);
+                    key.SetValue("CS2-AutoAccept.exe", exeLocation);
                 }
 
                 key.Close();
@@ -231,16 +231,16 @@ namespace CSGO_AutoAccept
             {
                 RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
 
-                if (key.GetValue("CSGO-AutoAccept.exe") != null)
+                if (key.GetValue("CS2-AutoAccept.exe") != null)
                 {
-                    key.DeleteValue("CSGO-AutoAccept.exe");
+                    key.DeleteValue("CS2-AutoAccept.exe");
                 }
 
                 key.Close();
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message, "CS:GO AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show(ex.Message, "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             // Change to a darker color
@@ -297,7 +297,7 @@ namespace CSGO_AutoAccept
             List<int> _serverVersion = new List<int>();
             int[] _clientVersion = new int[4];
             string[] version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion!.Split('.');
-            string serverVersion = await client.GetStringAsync("https://raw.githubusercontent.com/tsgsOFFICIAL/CSGO-AutoAccept.exe/main/CSGO-AutoAccept.exe/version.txt");
+            string serverVersion = await client.GetStringAsync("https://raw.githubusercontent.com/tsgsOFFICIAL/CS2-AutoAccept.exe/main/CSGO-AutoAccept.exe/version.txt");
 
             for (int i = 0; i < version.Length; i++)
             {
@@ -762,7 +762,7 @@ namespace CSGO_AutoAccept
         {
             try
             {
-                string logLocation = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CSGO AutoAccepter Log.txt";
+                string logLocation = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CS2 AutoAccepter Log.txt";
                 log = $"{DateTime.Now.ToString("[HH:mm:ss]")} {log}{Environment.NewLine}";
                 await File.AppendAllTextAsync(logLocation, log);
             }
@@ -770,7 +770,7 @@ namespace CSGO_AutoAccept
             {
                 try
                 {
-                    string logLocation = Environment.ExpandEnvironmentVariables("%userprofile%") + "\\onedrive\\Desktop\\CSGO AutoAccepter Log.txt";
+                    string logLocation = Environment.ExpandEnvironmentVariables("%userprofile%") + "\\onedrive\\Desktop\\CS2 AutoAccepter Log.txt";
                     log = $"{DateTime.Now.ToString("[HH:mm:ss]")} {log}{Environment.NewLine}";
                     await File.AppendAllTextAsync(logLocation, log);
                 }
