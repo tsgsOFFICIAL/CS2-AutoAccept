@@ -29,8 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="bin\Release\net6.0-windows\publish\win-x86\CSGO-AutoAccept.deps.json" />
-    <Content Include="bin\Release\net6.0-windows\publish\win-x86\CSGO-AutoAccept.runtimeconfig.json" />
+    <Content Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept.deps.json" />
+    <Content Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept.runtimeconfig.json" />
     <Content Include="logo.ico" />
   </ItemGroup>
 
@@ -83,9 +83,9 @@
     <None Include="bin\Release\net6.0-windows\publish\win-x86\clrjit.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\coreclr.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\createdump.exe" />
-    <None Include="bin\Release\net6.0-windows\publish\win-x86\CSGO-AutoAccept.dll" />
-    <None Include="bin\Release\net6.0-windows\publish\win-x86\CSGO-AutoAccept.exe" />
-    <None Include="bin\Release\net6.0-windows\publish\win-x86\CSGO-AutoAccept.pdb" />
+    <None Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept.dll" />
+    <None Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept.exe" />
+    <None Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept.pdb" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\cs\Microsoft.VisualBasic.Forms.resources.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\cs\PresentationCore.resources.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\cs\PresentationFramework.resources.dll" />
