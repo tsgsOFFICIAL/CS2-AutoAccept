@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CSGO_AutoAccept"
         mc:Ignorable="d"
-        Title="CS:GO AutoAccept by tsgsOFFICIAL" Height="450" Width="800"
+        Title="CS2 AutoAccept by tsgsOFFICIAL" Height="450" Width="800"
         ResizeMode="CanResize"
         WindowStyle="None"
         Background="#353535"
@@ -102,7 +102,7 @@
         <!-- Custom header -->
         <TextBlock Background="#1c1b1b" VerticalAlignment="Top" Height="30" MouseLeftButtonDown="WindowHeader_Mousedown"/>
         <Image Source="/logo.png" MaxHeight="26" Margin="0,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" MouseLeftButtonDown="WindowHeader_Mousedown"/>
-        <TextBlock x:Name="HeaderTextBlock" Text="CS:GO AutoAccept" FontFamily="Roboto" FontSize="15" Foreground="GhostWhite" Margin="30,2,0,420" MouseLeftButtonDown="WindowHeader_Mousedown"/>
+        <TextBlock x:Name="HeaderTextBlock" Text="CS2 AutoAccept" FontFamily="Roboto" FontSize="15" Foreground="GhostWhite" Margin="30,2,0,420" MouseLeftButtonDown="WindowHeader_Mousedown"/>
         <TextBlock Text="by tsgsOFFICIAL" FontFamily="Roboto" FontSize="12" Foreground="GhostWhite" Margin="30,16,675,414" MouseLeftButtonDown="WindowHeader_Mousedown"/>
         <Button Background="Transparent" Content="&#x1F5D5;" FontSize="18" VerticalAlignment="Top" ToolTip="Minimize" Click="Button_Click_Minimize" Foreground="GhostWhite" BorderBrush="Transparent" Height="31" Width="30" HorizontalAlignment="Right" Margin="0,0,30,0" Style="{DynamicResource NavButtons}"/>
         <Button Background="Transparent" Content="&#10006;" ToolTip="Close" Click="Button_Click_Close" Foreground="GhostWhite" BorderBrush="Transparent" Margin="770 0 0 420" Style="{DynamicResource CloseBtn}"/>
@@ -112,14 +112,26 @@
         <CheckBox x:Name="Run_at_startup_state" Content="Run at startup (OFF)" ToolTip="Automatically start this app when your pc launches" IsChecked="False" Margin="30,71,632,360" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Run_at_startup_state_Checked" Unchecked="Run_at_startup_state_Unchecked"/>
         <CheckBox x:Name="Program_state_continuously" Content="Auto Accept Every Match (OFF)" ToolTip="Will find the ACCEPT button for all matches, this will consume more cpu power while in game!" IsChecked="False" Margin="30,101,570,330" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Program_state_continuously_Checked" Unchecked="Program_state_continuously_Unchecked"/>
         <!--<CheckBox x:Name="Panorama_state" Content="Panorama (NO)" IsChecked="False" Margin="30,60,646,374" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Panorama_state_Checked" Unchecked="Panorama_state_Unchecked"/>-->
-        <TextBlock x:Name="TextBlock_Monitor" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="13,340,418,89"/>
+        <TextBlock x:Name="TextBlock_Monitor" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="13,340,320,89"/>
         <TextBlock x:Name="TextBlock_MonitorSize" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="13,365,555,64"/>
 
-        <Button x:Name="Button_LaunchCSGO" Margin="540,170,10,170" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" Content="Launch CS:GO" Cursor="Hand" ToolTip="Click here to launch CS:GO" Background="#3F169C80" Click="Button_Click_LaunchCSGO"/>
+        <Button x:Name="Button_LaunchCS" Margin="540,170,10,170" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" Content="Launch CS2" Cursor="Hand" ToolTip="Click here to launch CS2" Background="#3F169C80" Click="Button_Click_LaunchCS2" BorderThickness="0">
+            <Button.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
         <!-- Socials -->
         <TextBlock Text="Join the Discord!" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" Margin="574,296,44,125"/>
-        <Button Margin="540,330,10,10" Background="#FF7289DA" Cursor="Hand" Click="Button_Click_Discord" ToolTip="Join my Discord server, its a great place for asking questions and hanging out :)">
+        <Button Margin="540,330,10,10" Background="#FF7289DA" Cursor="Hand" Click="Button_Click_Discord" ToolTip="Join my Discord server, its a great place for asking questions and hanging out :)" BorderThickness="0">
             <Image Source="/Discord white.png"/>
+            
+            <Button.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
         </Button>
 
         <Button x:Name="Button_Update" Click="Button_Update_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="200,0,0,0" Height="30" Background="Transparent" BorderThickness="0" FontFamily="Roboto" FontSize="15" Foreground="GhostWhite" FontWeight="SemiBold" Cursor="Hand" Style="{DynamicResource NavButtons}"/>

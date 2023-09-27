@@ -116,11 +116,11 @@ namespace CSGO_AutoAccept
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Button_Click_LaunchCSGO(object sender, RoutedEventArgs e)
+        private void Button_Click_LaunchCS2(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Button_Click_LaunchCSGO}");
             LaunchWeb("steam://rungameid/730");
-            Button_LaunchCSGO.Visibility = Visibility.Collapsed;
+            Button_LaunchCS.Content = "Launching CS2";
         }
         /// <summary>
         /// Drag header
@@ -230,7 +230,7 @@ namespace CSGO_AutoAccept
             try
             {
                 RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
-                
+
                 if (key.GetValue("CSGO-AutoAccept.exe") != null)
                 {
                     key.DeleteValue("CSGO-AutoAccept.exe");
@@ -355,7 +355,15 @@ namespace CSGO_AutoAccept
             // PrintToLog("{IsGameRunning}");
             try
             {
-                _activeScreen = WindowFinder.FindApplication("csgo")  ?? WindowFinder.FindApplication("cs2");
+                string game = "CS:GO";
+
+                _activeScreen = WindowFinder.FindApplication("csgo");
+
+                if (_activeScreen == null)
+                {
+                    game = "CS2";
+                    _activeScreen = WindowFinder.FindApplication("cs2");
+                }
 
                 if (_activeScreen != null)
                 {
@@ -371,9 +379,10 @@ namespace CSGO_AutoAccept
                         TextBlock_Monitor.Foreground = new SolidColorBrush(Colors.GhostWhite);
                         Program_state.IsEnabled = true;
                         Program_state_continuously.IsEnabled = true;
-                        TextBlock_Monitor.Text = $"CS:GO is running on: {formattedString}";
+                        TextBlock_Monitor.Text = $"{game} is running on: {formattedString}";
                         TextBlock_MonitorSize.Text = $"Display size: {_activeScreen.Bounds.Width}x{_activeScreen.Bounds.Height} ({AspectRatio()})";
-                        Button_LaunchCSGO.Visibility = Visibility.Collapsed;
+                        Button_LaunchCS.Visibility = Visibility.Collapsed;
+                        Button_LaunchCS.Content = "Launch CS2";
                     }));
 
                     CalculateSizes(AspectRatio());
@@ -384,13 +393,14 @@ namespace CSGO_AutoAccept
                     this.Dispatcher.BeginInvoke(new Action(() =>
                     {
                         TextBlock_Monitor.Foreground = new SolidColorBrush(Colors.Red);
-                        TextBlock_Monitor.Text = "CS:GO is not running, make sure the game is open!";
+                        TextBlock_Monitor.Text = "CS2 is not running, make sure the game is open!";
                         TextBlock_MonitorSize.Text = "";
                         Program_state.IsChecked = false;
                         Program_state.IsEnabled = false;
                         Program_state_continuously.IsChecked = false;
                         Program_state_continuously.IsEnabled = false;
-                        Button_LaunchCSGO.Visibility = Visibility.Visible;
+                        Button_LaunchCS.Content = "Launch CS2";
+                        Button_LaunchCS.Visibility = Visibility.Visible;
                     }));
                 }
             }
@@ -400,13 +410,14 @@ namespace CSGO_AutoAccept
                 this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     TextBlock_Monitor.Foreground = new SolidColorBrush(Colors.Red);
-                    TextBlock_Monitor.Text = "CS:GO is not running, make sure the game is open!";
+                    TextBlock_Monitor.Text = "CS2 is not running, make sure the game is open!";
                     TextBlock_MonitorSize.Text = "";
                     Program_state.IsChecked = false;
                     Program_state.IsEnabled = false;
                     Program_state_continuously.IsChecked = false;
                     Program_state_continuously.IsEnabled = false;
-                    Button_LaunchCSGO.Visibility = Visibility.Visible;
+                    Button_LaunchCS.Content = "Launch CS2";
+                    Button_LaunchCS.Visibility = Visibility.Visible;
                 }));
             }
 
@@ -425,15 +436,16 @@ namespace CSGO_AutoAccept
             // double value = (double)_activeScreen!.Bounds.Width / _activeScreen.Bounds.Height;
             int x = _activeScreen!.Bounds.Width;
             int y = _activeScreen!.Bounds.Height;
-            
+
             // We need to find Greatest Common Divisor, and divide both x and y by it.
             string aspectRatio = $"{x / GCD(x, y)}:{y / GCD(x, y)}";
- 
-            if (aspectRatio == "8:5") {
+
+            if (aspectRatio == "8:5")
+            {
                 // PrintToLog("{AspectRatio} 16:10");
                 return "16:10";
             }
-            
+
             // PrintToLog("{AspectRatio} " + aspectRatio);
             return aspectRatio;
         }
@@ -447,15 +459,15 @@ namespace CSGO_AutoAccept
         {
             int Remainder;
 
-    		while(b != 0)
-    		{
-    			Remainder = a % b;
-    			a = b;
-    			b = Remainder;
-    		}
-    
-    		return a;
-    	}
+            while (b != 0)
+            {
+                Remainder = a % b;
+                a = b;
+                b = Remainder;
+            }
+
+            return a;
+        }
         /// <summary>
         /// Take a screen capture assuming the screen is 16:9
         /// </summary>
