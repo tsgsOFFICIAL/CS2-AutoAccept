@@ -355,15 +355,7 @@ namespace CS2_AutoAccept
             // PrintToLog("{IsGameRunning}");
             try
             {
-                string game = "CS:GO";
-
-                _activeScreen = WindowFinder.FindApplication("csgo");
-
-                if (_activeScreen == null)
-                {
-                    game = "CS2";
-                    _activeScreen = WindowFinder.FindApplication("cs2");
-                }
+                _activeScreen = WindowFinder.FindApplication("cs2");
 
                 if (_activeScreen != null)
                 {
@@ -379,7 +371,7 @@ namespace CS2_AutoAccept
                         TextBlock_Monitor.Foreground = new SolidColorBrush(Colors.GhostWhite);
                         Program_state.IsEnabled = true;
                         Program_state_continuously.IsEnabled = true;
-                        TextBlock_Monitor.Text = $"{game} is running on: {formattedString}";
+                        TextBlock_Monitor.Text = $"CS2 is running on: {formattedString}";
                         TextBlock_MonitorSize.Text = $"Display size: {_activeScreen.Bounds.Width}x{_activeScreen.Bounds.Height} ({AspectRatio()})";
                         Button_LaunchCS.Visibility = Visibility.Collapsed;
                         Button_LaunchCS.Content = "Launch CS2";
@@ -528,7 +520,7 @@ namespace CS2_AutoAccept
                 (string text, double confidence) valuePair = OCR(bitmap);
 
                 // Check the returned value
-                if (valuePair.text.ToLower().Contains("accept") && valuePair.confidence > .9)
+                if (valuePair.text.ToLower().Contains("accept") && valuePair.confidence > .75)
                 {
                     // PrintToLog("{Scanner} Match found");
                     // Move the cursor and click the accept button
