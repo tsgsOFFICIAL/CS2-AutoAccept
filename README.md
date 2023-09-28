@@ -40,9 +40,9 @@ To report any issues or bugs, go to my Github page and create an issue for the p
 
 You should be able to download it [HERE](https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCS2-AutoAccept.exe%2Ftree%2Fmain%2FCS2-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86).
 Simply extract it from the zip file, and you should be ready to go.
-I recommend to extract it to %ProgramFiles(x86)%\CS2 AutoAccepter, to do this follow these steps:
+I recommend to extract it to "%ProgramFiles(x86)%\CS2 AutoAccepter", to do this follow these steps:
 1. Press Windows key + R key at the same time (opens RUN).
-2. Type %ProgramFiles(x86)% and press ENTER key.
+2. Type "%ProgramFiles(x86)%" and press ENTER key.
 3. Create a new folder called CS2 AutoAccept.
 4. Extract the ZIP file inside this folder.
 5. Create a shortcut to the application by dragging the "CS2-AutoAccept.exe" file somewhere else, like your desktop and holding CTRL and SHIFT while letting it go.
