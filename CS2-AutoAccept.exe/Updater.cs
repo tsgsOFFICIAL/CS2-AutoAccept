@@ -10,11 +10,12 @@ namespace CS2AutoAccept
 {
     internal class Updater
     {
-        string _repositoryOwner = "tsgsOFFICIAL";
-        string _repositoryName = "CS2-AutoAccept.exe";
-        string _folderPath = "CS2-AutoAccept.exe/bin/Release/net6.0-windows/publish/win-x86";
-        long _totalFileSize = 0;
-        long _downloadedFileSize = 0;
+        private readonly string _repositoryOwner = "tsgsOFFICIAL";
+        private readonly string _repositoryName = "CS2-AutoAccept.exe";
+        private readonly string _folderPath = "CS2-AutoAccept.exe/bin/Release/net6.0-windows/publish/win-x86";
+        private long _totalFileSize = 0;
+        private long _downloadedFileSize = 0;
+        public event EventHandler<int>? ProgressUpdated;
 
         /// <summary>
         /// Download the update
@@ -27,6 +28,7 @@ namespace CS2AutoAccept
             {
                 IProgress<int> progress = new Progress<int>(percentComplete =>
                 {
+                    UpdateProgress(percentComplete);
                     Debug.WriteLine($"Progress: {percentComplete}%");
                 });
 
@@ -42,7 +44,7 @@ namespace CS2AutoAccept
         /// <param name="apiUrl"></param>
         /// <param name="downloadDirectory"></param>
         /// <returns></returns>
-        internal async Task CalculateFolderSize(HttpClient client, string apiUrl, string downloadDirectory)
+        private async Task CalculateFolderSize(HttpClient client, string apiUrl, string downloadDirectory)
         {
             HttpResponseMessage response = await client.GetAsync(apiUrl);
 
@@ -74,7 +76,7 @@ namespace CS2AutoAccept
         /// <param name="downloadDirectory"></param>
         /// <param name="progress"></param>
         /// <returns></returns>
-        internal async Task DownloadFolderContents(HttpClient client, string apiUrl, string downloadDirectory, IProgress<int> progress)
+        private async Task DownloadFolderContents(HttpClient client, string apiUrl, string downloadDirectory, IProgress<int> progress)
         {
             HttpResponseMessage response = await client.GetAsync(apiUrl);
 
@@ -130,6 +132,23 @@ namespace CS2AutoAccept
             {
                 Debug.WriteLine($"Failed to fetch folder contents. Status code: {response.StatusCode}");
             }
+        }
+        /// <summary>
+        /// Raises ProgressUpdatedEvent
+        /// </summary>
+        /// <param name="progress">An integer (0-100)</param>
+        public void UpdateProgress(int progress)
+        {
+            // Raise the event to notify the subscribers
+            OnProgressUpdated(progress);
+        }
+        /// <summary>
+        /// Raise the event
+        /// </summary>
+        /// <param name="progress"></param>
+        protected virtual void OnProgressUpdated(int progress)
+        {
+            ProgressUpdated?.Invoke(this, progress);
         }
     }
     /// <summary>

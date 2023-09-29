@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using CS2AutoAccept;
 
 namespace CS2_AutoAccept
 {
@@ -31,6 +32,7 @@ namespace CS2_AutoAccept
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
         #endregion
+        private Updater? updater;
         private Screen? _activeScreen;
         private Thread? _scannerThread;
         private CancellationTokenSource? cts;
@@ -49,6 +51,8 @@ namespace CS2_AutoAccept
         {
             InitializeComponent();
             _ = UpdateHeaderVersion();
+            updater = new Updater();
+            updater.ProgressUpdated += Updater_ProgressUpdated;
             Thread GameRunningThread = new Thread(IsGameRunning);
             GameRunningThread.Start();
             GameRunningThread.IsBackground = true;
@@ -84,6 +88,20 @@ namespace CS2_AutoAccept
             this.Close();
         }
         /// <summary>
+        /// Event handler for download progress
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="progress"></param>
+        private void Updater_ProgressUpdated(object sender, int progress)
+        {
+            // Update the UI with the progress value
+            Dispatcher.Invoke(() =>
+            {
+                // Update your UI elements with the progress value, e.g., a ProgressBar
+                Progress_Download.Value = progress;
+            });
+        }
+        /// <summary>
         /// Open Github to download the newest version
         /// </summary>
         /// <param name="sender"></param>
@@ -95,8 +113,8 @@ namespace CS2_AutoAccept
 
             if (UpdateAvailable)
             {
-                LaunchWeb("https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FtsgsOFFICIAL%2FCS2-AutoAccept.exe%2Ftree%2Fmain%2FCS2-AutoAccept.exe%2Fbin%2FRelease%2Fnet6.0-windows%2Fpublish%2Fwin-x86");
-                LaunchWeb("https://github.com/tsgsOFFICIAL/CS2-AutoAccept.exe#where-can-counter-download-this");
+                
+                updater!.DownloadUpdate("C:\\Users\\mmj\\Desktop\\C# test");
             }
         }
         /// <summary>

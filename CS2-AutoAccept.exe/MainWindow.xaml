@@ -126,7 +126,7 @@
         <TextBlock Text="Join the Discord!" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" Margin="574,296,44,125"/>
         <Button Margin="540,330,10,10" Background="#FF7289DA" Cursor="Hand" Click="Button_Click_Discord" ToolTip="Join my Discord server, its a great place for asking questions and hanging out :)" BorderThickness="0">
             <Image Source="/Discord white.png"/>
-            
+
             <Button.Resources>
                 <Style TargetType="Border">
                     <Setter Property="CornerRadius" Value="5"/>
@@ -135,5 +135,6 @@
         </Button>
 
         <Button x:Name="Button_Update" Click="Button_Update_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="200,0,0,0" Height="30" Background="Transparent" BorderThickness="0" FontFamily="Roboto" FontSize="15" Foreground="GhostWhite" FontWeight="SemiBold" Cursor="Hand" Style="{DynamicResource NavButtons}"/>
+        <ProgressBar x:Name="Progress_Download" HorizontalAlignment="Left" Height="30" Margin="333,80,0,0" VerticalAlignment="Top" Width="457"/>
     </Grid>
 </Window>
