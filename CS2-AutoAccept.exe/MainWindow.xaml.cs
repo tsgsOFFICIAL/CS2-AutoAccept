@@ -4,6 +4,7 @@ using Tesseract;
 using System.Windows;
 using System.Drawing;
 using System.Net.Http;
+using Microsoft.Win32;
 using System.Threading;
 using System.Reflection;
 using System.Diagnostics;
@@ -13,9 +14,6 @@ using System.Windows.Media;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Windows.Controls;
-using Microsoft.Win32;
-using System.Windows.Shapes;
 
 namespace CS2_AutoAccept
 {
@@ -477,7 +475,7 @@ namespace CS2_AutoAccept
                 Bitmap captureBitmap = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
                 // Creating a Rectangle object which will capture our Screen
-                System.Drawing.Rectangle captureRectangle = _activeScreen!.Bounds;
+                Rectangle captureRectangle = _activeScreen!.Bounds;
 
                 // Creating a New Graphics Object
                 Graphics captureGraphics = Graphics.FromImage(captureBitmap);
@@ -712,7 +710,7 @@ namespace CS2_AutoAccept
                 {
                     using (Pix img = Pix.LoadFromMemory(ImageToByte(bitmap)))
                     {
-                        using (Tesseract.Page page = engine.Process(img))
+                        using (Page page = engine.Process(img))
                         {
                             string text = page.GetText();
                             float confidence = page.GetMeanConfidence();
