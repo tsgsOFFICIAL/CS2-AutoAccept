@@ -125,16 +125,16 @@ namespace CS2_AutoAccept
         /// </summary>
         /// <param Name="sender"></param>
         /// <param Name="progress"></param>
-        private void Updater_ProgressUpdated(object sender, ProgressEventArgs e)
+        private void Updater_ProgressUpdated(object sender, int progress)
         {
             // Update the UI with the progress value
             Dispatcher.Invoke(() =>
             {
-                if (e.Progress < 100 && e.Status == "good")
+                if (progress < 100)
                 {
                     // Update your UI elements with the progress value, e.g., a ProgressBar
                     Progress_Download.Visibility = Visibility.Visible;
-                    Progress_Download.Value = e.Progress;
+                    Progress_Download.Value = progress;
                 }
                 else
                 {

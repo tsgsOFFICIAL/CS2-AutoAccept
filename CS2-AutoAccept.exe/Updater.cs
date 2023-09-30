@@ -16,8 +16,7 @@ namespace CS2AutoAccept
         private readonly string _folderPath = "CS2-AutoAccept.exe/bin/Release/net6.0-windows/publish/win-x86";
         private long _totalFileSize = 0;
         private long _downloadedFileSize = 0;
-        private bool _downloadComplete = true;
-        public event EventHandler<ProgressEventArgs>? ProgressUpdated;
+        public event EventHandler<int>? ProgressUpdated;
 
         /// <summary>
         /// Download the update
@@ -25,13 +24,13 @@ namespace CS2AutoAccept
         internal async void DownloadUpdate(string downloadDirectory)
         {
             string apiUrl = $"https://api.github.com/repos/{_repositoryOwner}/{_repositoryName}/contents/{_folderPath}";
-
+            
 
             using (HttpClient client = new HttpClient())
             {
                 IProgress<int> progress = new Progress<int>(percentComplete =>
                 {
-                    UpdateProgress(new ProgressEventArgs(percentComplete, "good"));
+                    UpdateProgress(percentComplete);
                     Debug.WriteLine($"Progress: {percentComplete}%");
                 });
 
@@ -39,14 +38,9 @@ namespace CS2AutoAccept
                 await CalculateFolderSize(client, apiUrl, downloadDirectory);
                 await DownloadFolderContents(client, apiUrl, downloadDirectory, progress);
 
-                if (_downloadComplete)
-                {
-                    Debug.WriteLine("Download completed");
-                    Process.Start(Path.Combine(downloadDirectory, "CS2-AutoAccept.exe"));
-                    Environment.Exit(0);
-                }
-
-                UpdateProgress(new ProgressEventArgs(0, "bad"));
+                Debug.WriteLine("Download completed");
+                Process.Start(Path.Combine(downloadDirectory, "CS2-AutoAccept.exe"));
+                Environment.Exit(0);
             }
         }
         /// <summary>
@@ -78,7 +72,6 @@ namespace CS2AutoAccept
             else
             {
                 Debug.WriteLine($"Failed to fetch folder contents. Status code: {response.StatusCode}");
-                _downloadComplete = false;
             }
         }
         /// <summary>
@@ -143,17 +136,25 @@ namespace CS2AutoAccept
             else
             {
                 Debug.WriteLine($"Failed to fetch folder contents. Status code: {response.StatusCode}");
-                _downloadComplete = false;
+                //await DownloadFolderContents(client, apiUrl, _updatePath, progress);
             }
         }
         /// <summary>
         /// Raises ProgressUpdatedEvent
         /// </summary>
         /// <param Name="progress">An integer (0-100)</param>
-        internal void UpdateProgress(ProgressEventArgs e)
+        public void UpdateProgress(int progress)
         {
             // Raise the event to notify the subscribers
-            ProgressUpdated?.Invoke(this, e);
+            OnProgressUpdated(progress);
+        }
+        /// <summary>
+        /// Raise the event
+        /// </summary>
+        /// <param Name="progress"></param>
+        protected virtual void OnProgressUpdated(int progress)
+        {
+            ProgressUpdated?.Invoke(this, progress);
         }
     }
     /// <summary>
@@ -175,24 +176,5 @@ namespace CS2AutoAccept
 
         [JsonPropertyName("size")]
         public long? Size { get; set; }
-    }
-    /// <summary>
-    /// EventArgs for progress update
-    /// </summary>
-    internal class ProgressEventArgs : EventArgs
-    {
-        /// <summary>
-        /// Progress 0-100%
-        /// </summary>
-        internal int Progress { get; set; }
-        /// <summary>
-        /// Status, either good or bad
-        /// </summary>
-        internal string Status { get; set; }
-        public ProgressEventArgs(int progress, string status)
-        {
-            Progress = progress;
-            Status = status;
-        }
     }
 }
