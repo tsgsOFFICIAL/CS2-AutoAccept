@@ -1,10 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Text.Json.Serialization;
 
 namespace CS2AutoAccept
@@ -24,6 +24,7 @@ namespace CS2AutoAccept
         internal async void DownloadUpdate(string downloadDirectory)
         {
             string apiUrl = $"https://api.github.com/repos/{_repositoryOwner}/{_repositoryName}/contents/{_folderPath}";
+            
 
             using (HttpClient client = new HttpClient())
             {
@@ -36,6 +37,10 @@ namespace CS2AutoAccept
                 client.DefaultRequestHeaders.Add("User-Agent", "request");
                 await CalculateFolderSize(client, apiUrl, downloadDirectory);
                 await DownloadFolderContents(client, apiUrl, downloadDirectory, progress);
+
+                Debug.WriteLine("Download completed");
+                Process.Start(Path.Combine(downloadDirectory, "CS2-AutoAccept.exe"));
+                Environment.Exit(0);
             }
         }
         /// <summary>
@@ -43,7 +48,7 @@ namespace CS2AutoAccept
         /// </summary>
         /// <param Name="client"></param>
         /// <param Name="apiUrl"></param>
-        /// <param Name="downloadDirectory"></param>
+        /// <param Name="_updateDirectory"></param>
         /// <returns></returns>
         private async Task CalculateFolderSize(HttpClient client, string apiUrl, string downloadDirectory)
         {
@@ -74,7 +79,7 @@ namespace CS2AutoAccept
         /// </summary>
         /// <param Name="client"></param>
         /// <param Name="apiUrl"></param>
-        /// <param Name="downloadDirectory"></param>
+        /// <param Name="_updateDirectory"></param>
         /// <param Name="progress"></param>
         /// <returns></returns>
         private async Task DownloadFolderContents(HttpClient client, string apiUrl, string downloadDirectory, IProgress<int> progress)
@@ -122,7 +127,6 @@ namespace CS2AutoAccept
                     }
                     else if (content.Type == "dir")
                     {
-
                         string subfolderPath = content.Path!;
                         string subfolderDownloadDirectory = Path.Combine(downloadDirectory, content.Name!);
                         await DownloadFolderContents(client, apiUrl.Replace(_folderPath, subfolderPath), subfolderDownloadDirectory, progress);
@@ -132,6 +136,7 @@ namespace CS2AutoAccept
             else
             {
                 Debug.WriteLine($"Failed to fetch folder contents. Status code: {response.StatusCode}");
+                //await DownloadFolderContents(client, apiUrl, _updateDirectory, progress);
             }
         }
         /// <summary>
@@ -172,5 +177,4 @@ namespace CS2AutoAccept
         [JsonPropertyName("size")]
         public long? Size { get; set; }
     }
-
 }

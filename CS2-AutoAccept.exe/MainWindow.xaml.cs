@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using CS2AutoAccept;
+using System.Linq;
 
 namespace CS2_AutoAccept
 {
@@ -47,15 +48,19 @@ namespace CS2_AutoAccept
         private int _cancelHeight;
         private int _clickPosX;
         private int _clickPosY;
+        private string _programFilesX86;
+        private string _updateDirectory;
         public MainWindow()
         {
             InitializeComponent();
             _ = UpdateHeaderVersion();
             updater = new Updater();
-            updater.ProgressUpdated += Updater_ProgressUpdated;
+            updater.ProgressUpdated += Updater_ProgressUpdated!;
             Thread GameRunningThread = new Thread(IsGameRunning);
             GameRunningThread.Start();
             GameRunningThread.IsBackground = true;
+            _programFilesX86 = Environment.ExpandEnvironmentVariables("%ProgramFiles(x86)%");
+            _updateDirectory = Path.Combine(_programFilesX86, "CS2 AutoAccept", "UPDATE");
 
             try
             {
@@ -66,8 +71,83 @@ namespace CS2_AutoAccept
             {
                 System.Windows.MessageBox.Show(ex.Message, "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
+            // Kill other instances of same application
+            Process[] pname = Process.GetProcessesByName(AppDomain.CurrentDomain.FriendlyName.Remove(AppDomain.CurrentDomain.FriendlyName.Length - 4));
+
+            if (pname.Length > 1)
+            {
+                pname.Where(p => p.Id != Environment.ProcessId).First().Kill();
+            }
+
+            // If this new directory exists, assume an update was fetched, and control the AppContext.BaseDirectory for the last part in the path
+            if (Directory.Exists(_updateDirectory))
+            {
+                string runPath = AppContext.BaseDirectory;
+
+                // Check if the last character is indeed a backslash, as expected
+                if (runPath.LastIndexOf('\\') == runPath.Length - 1)
+                {
+                    runPath = runPath[..^1]; // Remove the last character
+                }
+
+                string lastFolderInPath = runPath.Split('\\')[^1]; // Get the last folder from the path
+
+                // If this is true, it means that the exe was run from the update folder, AKA an update was fetched, and you need to move the data back
+                if (lastFolderInPath == "UPDATE")
+                {
+                    Process.Start(Path.Combine(_updateDirectory, "CS2-AutoAccept.exe"));
+                }
+                else
+                {
+                    string basePath = Path.Combine(_programFilesX86, "CS2 AutoAccept");
+                    string updatePath = Path.Combine(_programFilesX86, "CS2 AutoAccept", "UPDATE");
+                    string[] updatedFiles = Directory.GetFiles(updatePath);
+
+                    foreach (string file in updatedFiles)
+                    {
+                        string fileName = Path.GetFileName(file);
+                        string destinationPath = Path.Combine(basePath, fileName);
+
+                        try
+                        {
+                            File.Copy(file, destinationPath, true);
+                            Debug.WriteLine($"Copied: {fileName}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Error copying {fileName}: {ex.Message}");
+                        }
+                    }
+
+                    DeleteAllExceptFolder(basePath, "UPDATE");
+                    Directory.Delete(updatePath, true);
+                }
+            }
         }
         #region EventHandlers
+        /// <summary>
+        /// Event handler for download progress
+        /// </summary>
+        /// <param Name="sender"></param>
+        /// <param Name="progress"></param>
+        private void Updater_ProgressUpdated(object sender, int progress)
+        {
+            // Update the UI with the progress value
+            Dispatcher.Invoke(() =>
+            {
+                if (progress < 100)
+                {
+                    // Update your UI elements with the progress value, e.g., a ProgressBar
+                    Progress_Download.Visibility = Visibility.Visible;
+                    Progress_Download.Value = progress;
+                }
+                else
+                {
+                    Progress_Download.Visibility = Visibility.Collapsed;
+                }
+            });
+        }
         /// <summary>
         /// Minimize button
         /// </summary>
@@ -88,20 +168,6 @@ namespace CS2_AutoAccept
             this.Close();
         }
         /// <summary>
-        /// Event handler for download progress
-        /// </summary>
-        /// <param Name="sender"></param>
-        /// <param Name="progress"></param>
-        private void Updater_ProgressUpdated(object sender, int progress)
-        {
-            // Update the UI with the progress value
-            Dispatcher.Invoke(() =>
-            {
-                // Update your UI elements with the progress value, e.g., a ProgressBar
-                Progress_Download.Value = progress;
-            });
-        }
-        /// <summary>
         /// Open Github to download the newest version
         /// </summary>
         /// <param Name="sender"></param>
@@ -113,8 +179,7 @@ namespace CS2_AutoAccept
 
             if (UpdateAvailable)
             {
-                
-                updater!.DownloadUpdate($@"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\CS2 AutoAccepter");
+                updater!.DownloadUpdate(_updateDirectory);
             }
         }
         /// <summary>
@@ -752,7 +817,7 @@ namespace CS2_AutoAccept
         /// </summary>
         /// <param Name="img">Image/Bitmap</param>
         /// <returns>This method returns a Byte[] containing the Image</returns>
-        private byte[] ImageToByte(System.Drawing.Image img)
+        private byte[] ImageToByte(Image img)
         {
             // PrintToLog("{ImageToByte}");
             using (MemoryStream stream = new MemoryStream())
@@ -760,6 +825,35 @@ namespace CS2_AutoAccept
                 img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
                 // PrintToLog("{ImageToByte} SUCCESS");
                 return stream.ToArray();
+            }
+        }
+        /// <summary>
+        /// Delete all files and folders except one
+        /// </summary>
+        /// <param name="directoryPath">Directory To Clear</param>
+        /// <param name="folderToKeep">Folder to keep</param>
+        private void DeleteAllExceptFolder(string directoryPath, string folderToKeep)
+        {
+            foreach (string directory in Directory.GetDirectories(directoryPath))
+            {
+                if (Path.GetFileName(directory) != folderToKeep)
+                {
+                    Directory.Delete(directory, true);
+                }
+            }
+
+            foreach (string file in Directory.GetFiles(directoryPath))
+            {
+                File.Delete(file);
+            }
+
+            // Recursively process subdirectories
+            foreach (string subdirectory in Directory.GetDirectories(directoryPath))
+            {
+                if (Path.GetFileName(subdirectory) != folderToKeep)
+                {
+                    DeleteAllExceptFolder(subdirectory, folderToKeep);
+                }
             }
         }
         /// <summary>
