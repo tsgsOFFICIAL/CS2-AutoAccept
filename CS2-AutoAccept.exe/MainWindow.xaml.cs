@@ -139,6 +139,11 @@ namespace CS2_AutoAccept
                 else
                 {
                     Progress_Download.Visibility = Visibility.Collapsed;
+
+                    if (e.Status == "bad")
+                    {
+                        System.Windows.MessageBox.Show("Update Failed, please try again later, or download it directly from the Github page!", "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             });
         }
