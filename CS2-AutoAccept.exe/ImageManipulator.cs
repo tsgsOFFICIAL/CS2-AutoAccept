@@ -9,7 +9,7 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Sharpen an image
         /// </summary>
-        /// <param name="image"></param>
+        /// <param Name="image"></param>
         /// <returns>This method returns a sharpened image as a Bitmap</returns>
         public static Bitmap Sharpen(Bitmap image)
         {
@@ -77,8 +77,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Adjust the contrast of an image
         /// </summary>
-        /// <param name="Image"></param>
-        /// <param name="Value"></param>
+        /// <param Name="Image"></param>
+        /// <param Name="Value"></param>
         /// <returns>This method returns a Bitmap that has been adjusted in the contrast</returns>
         public static Bitmap AdjustContrast(Bitmap Image, float Value)
         {

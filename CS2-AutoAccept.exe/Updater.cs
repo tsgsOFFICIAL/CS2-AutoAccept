@@ -5,6 +5,7 @@ using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace CS2AutoAccept
 {
@@ -40,9 +41,9 @@ namespace CS2AutoAccept
         /// <summary>
         /// Calculate file sizes, and add them
         /// </summary>
-        /// <param name="client"></param>
-        /// <param name="apiUrl"></param>
-        /// <param name="downloadDirectory"></param>
+        /// <param Name="client"></param>
+        /// <param Name="apiUrl"></param>
+        /// <param Name="downloadDirectory"></param>
         /// <returns></returns>
         private async Task CalculateFolderSize(HttpClient client, string apiUrl, string downloadDirectory)
         {
@@ -71,10 +72,10 @@ namespace CS2AutoAccept
         /// <summary>
         /// Download folder content
         /// </summary>
-        /// <param name="client"></param>
-        /// <param name="apiUrl"></param>
-        /// <param name="downloadDirectory"></param>
-        /// <param name="progress"></param>
+        /// <param Name="client"></param>
+        /// <param Name="apiUrl"></param>
+        /// <param Name="downloadDirectory"></param>
+        /// <param Name="progress"></param>
         /// <returns></returns>
         private async Task DownloadFolderContents(HttpClient client, string apiUrl, string downloadDirectory, IProgress<int> progress)
         {
@@ -95,7 +96,7 @@ namespace CS2AutoAccept
                     if (content.Type == "file")
                     {
 
-                        string fileUrl = content.Download_url!;
+                        string fileUrl = content.DownloadUrl!;
                         string filePath = Path.Combine(downloadDirectory, content.Name!);
 
                         using (HttpResponseMessage fileResponse = await client.GetAsync(fileUrl))
@@ -106,7 +107,7 @@ namespace CS2AutoAccept
                                 File.WriteAllBytes(filePath, bytes);
                                 Debug.WriteLine($"Downloaded {content.Name}");
 
-                                // Increment _downloadedFileSize by the size of the downloaded file
+                                // Increment _downloadedFileSize by the Size of the downloaded file
                                 _downloadedFileSize += bytes.Length;
 
                                 // Calculate progress as a percentage of _downloadedFileSize relative to _totalFileSize
@@ -136,7 +137,7 @@ namespace CS2AutoAccept
         /// <summary>
         /// Raises ProgressUpdatedEvent
         /// </summary>
-        /// <param name="progress">An integer (0-100)</param>
+        /// <param Name="progress">An integer (0-100)</param>
         public void UpdateProgress(int progress)
         {
             // Raise the event to notify the subscribers
@@ -145,7 +146,7 @@ namespace CS2AutoAccept
         /// <summary>
         /// Raise the event
         /// </summary>
-        /// <param name="progress"></param>
+        /// <param Name="progress"></param>
         protected virtual void OnProgressUpdated(int progress)
         {
             ProgressUpdated?.Invoke(this, progress);
@@ -156,10 +157,20 @@ namespace CS2AutoAccept
     /// </summary>
     internal class GitHubContent
     {
-        internal string? Name { get; set; }
-        internal string? Path { get; set; }
-        internal string? Type { get; set; }
-        internal string? Download_url { get; set; }
-        internal long? Size { get; set; }
+        [JsonPropertyName("name")]
+        public string? Name { get; set; }
+
+        [JsonPropertyName("path")]
+        public string? Path { get; set; }
+
+        [JsonPropertyName("type")]
+        public string? Type { get; set; }
+
+        [JsonPropertyName("download_url")]
+        public string? DownloadUrl { get; set; }
+
+        [JsonPropertyName("size")]
+        public long? Size { get; set; }
     }
+
 }

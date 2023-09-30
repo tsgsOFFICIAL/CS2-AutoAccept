@@ -10,10 +10,10 @@ namespace CS2_AutoAccept
     {
         #region DLL Imports
         /// <summary>
-        /// Finds a window by name if open
+        /// Finds a window by Name if open
         /// </summary>
-        /// <param name="lpClassName">Window name</param>
-        /// <param name="lpWindowName">null</param>
+        /// <param Name="lpClassName">Window Name</param>
+        /// <param Name="lpWindowName">null</param>
         /// <returns>This method returns the window handle</returns>
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -23,9 +23,9 @@ namespace CS2_AutoAccept
         /// <remarks>The EnumChildWindows function is more reliable than calling GetWindow in a loop. An application that
         /// calls GetWindow to perform this task risks being caught in an infinite loop or referencing a handle to a window
         /// that has been destroyed.</remarks>
-        /// <param name="hWnd">A handle to a window. The window handle retrieved is relative to this window, based on the
+        /// <param Name="hWnd">A handle to a window. The window handle retrieved is relative to this window, based on the
         /// value of the uCmd parameter.</param>
-        /// <param name="uCmd">The relationship between the specified window and the window whose handle is to be
+        /// <param Name="uCmd">The relationship between the specified window and the window whose handle is to be
         /// retrieved.</param>
         /// <returns>
         /// If the function succeeds, the return value is a window handle. If no window exists with the specified relationship
@@ -37,7 +37,7 @@ namespace CS2_AutoAccept
         private enum GetWindowType : uint
         {
             /// <summary>
-            /// The retrieved handle identifies the window of the same type that is highest in the Z order.
+            /// The retrieved handle identifies the window of the same Type that is highest in the Z order.
             /// <para/>
             /// If the specified window is a topmost window, the handle identifies a topmost window.
             /// If the specified window is a top-level window, the handle identifies a top-level window.
@@ -45,7 +45,7 @@ namespace CS2_AutoAccept
             /// </summary>
             GW_HWNDFIRST = 0,
             /// <summary>
-            /// The retrieved handle identifies the window of the same type that is lowest in the Z order.
+            /// The retrieved handle identifies the window of the same Type that is lowest in the Z order.
             /// <para />
             /// If the specified window is a topmost window, the handle identifies a topmost window.
             /// If the specified window is a top-level window, the handle identifies a top-level window.

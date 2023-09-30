@@ -71,8 +71,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Minimize button
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void Button_Click_Minimize(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Button_Click_Close}");
@@ -81,8 +81,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Close button
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void Button_Click_Close(object sender, RoutedEventArgs e)
         {
             this.Close();
@@ -90,8 +90,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Event handler for download progress
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="progress"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="progress"></param>
         private void Updater_ProgressUpdated(object sender, int progress)
         {
             // Update the UI with the progress value
@@ -104,8 +104,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Open Github to download the newest version
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private async void Button_Update_Click(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Button_Update_Click}");
@@ -120,8 +120,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Open Discord
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void Button_Click_Discord(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Button_Click_Discord}");
@@ -130,8 +130,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Launch CS2
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void Button_Click_LaunchCS2(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Button_Click_LaunchCS}");
@@ -141,8 +141,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Drag header
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void WindowHeader_Mousedown(object sender, MouseButtonEventArgs e)
         {
             DragMove();
@@ -150,8 +150,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// State ON event
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void Program_state_Checked(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Program_state_Checked}");
@@ -165,8 +165,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// State OFF event
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void Program_state_Unchecked(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Program_state_Unchecked}");
@@ -180,8 +180,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// 24/7 State ON event
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void Program_state_continuously_Checked(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Program_state_continuously_Checked}");
@@ -195,8 +195,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// 24/7 State OFF event
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void Program_state_continuously_Unchecked(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Program_state_continuously_Unchecked}");
@@ -209,8 +209,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Run at startup State ON event
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void Run_at_startup_state_Checked(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Run_at_startup_state_Checked}");
@@ -238,8 +238,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Run at startup State OFF event
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void Run_at_startup_state_Unchecked(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Run_at_startup_state_Unchecked}");
@@ -267,7 +267,7 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Launch a web URL on Windows, Linux and OSX
         /// </summary>
-        /// <param name="url">The URL to open in the standard browser</param>
+        /// <param Name="url">The URL to open in the standard browser</param>
         private void LaunchWeb(string url)
         {
             // PrintToLog("{LaunchWeb}");
@@ -388,7 +388,7 @@ namespace CS2_AutoAccept
                         Program_state.IsEnabled = true;
                         Program_state_continuously.IsEnabled = true;
                         TextBlock_Monitor.Text = $"CS2 is running on: {formattedString}";
-                        TextBlock_MonitorSize.Text = $"Display size: {_activeScreen.Bounds.Width}x{_activeScreen.Bounds.Height} ({AspectRatio()})";
+                        TextBlock_MonitorSize.Text = $"Display Size: {_activeScreen.Bounds.Width}x{_activeScreen.Bounds.Height} ({AspectRatio()})";
                         Button_LaunchCS.Visibility = Visibility.Collapsed;
                         Button_LaunchCS.Content = "Launch CS2";
                     }));
@@ -435,8 +435,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Gets the aspect ratio of a given display
         /// </summary>
-        /// <param name="x">Width</param>
-        /// <param name="y">Height</param>
+        /// <param Name="x">Width</param>
+        /// <param Name="y">Height</param>
         /// <returns>This method returns the aspect ratio</returns>
         private string AspectRatio()
         {
@@ -460,8 +460,8 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Find the Greatest Common Divisor and return it 
         /// </summary>
-        /// <param name="a">a, here it's width</param>
-        /// <param name="b">b, here it's height</param>
+        /// <param Name="a">a, here it's width</param>
+        /// <param Name="b">b, here it's height</param>
         /// <returns>This method returns the Greatest Common Divisor</returns>
         private int GCD(int a, int b)
         {
@@ -479,10 +479,10 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Take a screen capture assuming the screen is 16:9
         /// </summary>
-        /// <param name="xwidth">Width in pixels</param>
-        /// <param name="xheight">Height in pixels</param>
-        /// <param name="xstartpos">X Starting position in pixels</param>
-        /// <param name="ystartpos">Y Starting position in pixels</param>
+        /// <param Name="xwidth">Width in pixels</param>
+        /// <param Name="xheight">Height in pixels</param>
+        /// <param Name="xstartpos">X Starting position in pixels</param>
+        /// <param Name="ystartpos">Y Starting position in pixels</param>
         /// <returns>This method returns a bitmap of the area</returns>
         private Bitmap CaptureScreen(int w, int h, int x = 0, int y = 0)
         {
@@ -514,7 +514,7 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Scanner thread method
         /// </summary>
-        /// <param name="obj">CancellationToken</param>
+        /// <param Name="obj">CancellationToken</param>
         private void Scanner(object? obj)
         {
             // PrintToLog("{Scanner Started}");
@@ -590,9 +590,9 @@ namespace CS2_AutoAccept
             }
         }
         /// <summary>
-        /// Calculate the positions based on display size
+        /// Calculate the positions based on display Size
         /// </summary>
-        /// <param name="type">Aspect Ratio</param>
+        /// <param Name="type">Aspect Ratio</param>
         private void CalculateSizes(string type)
         {
             // Base settings for 2560x1440
@@ -702,7 +702,7 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Optimise an image for OCR
         /// </summary>
-        /// <param name="bitmap">The image to optimise</param>
+        /// <param Name="bitmap">The image to optimise</param>
         /// <returns>This method returns a bitmap, optimised for OCR</returns>
         private Bitmap OptimiseImage(Bitmap bitmap)
         {
@@ -717,7 +717,7 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Perform OCR on an Image
         /// </summary>
-        /// <param name="bitmap">The image</param>
+        /// <param Name="bitmap">The image</param>
         /// <returns>This method returns the text, and the confidence</returns>
         private (string, float) OCR(Bitmap bitmap)
         {
@@ -750,7 +750,7 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Converts an image to a Byte[]
         /// </summary>
-        /// <param name="img">Image/Bitmap</param>
+        /// <param Name="img">Image/Bitmap</param>
         /// <returns>This method returns a Byte[] containing the Image</returns>
         private byte[] ImageToByte(System.Drawing.Image img)
         {
@@ -765,7 +765,7 @@ namespace CS2_AutoAccept
         /// <summary>
         /// Prints to the log
         /// </summary>
-        /// <param name="log">Text to log</param>
+        /// <param Name="log">Text to log</param>
         private async Task<bool> PrintToLog(string log)
         {
             try
