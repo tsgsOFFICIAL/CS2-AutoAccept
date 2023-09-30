@@ -594,6 +594,10 @@ namespace CS2_AutoAccept
                 // Read the image using OCR
                 (string text, double confidence) valuePair = OCR(bitmap);
 
+                Debug.WriteLine("OCR RESULTS:");
+                Debug.WriteLine(valuePair.text);
+                Debug.WriteLine(valuePair.confidence);
+
                 // Check the returned value
                 if (valuePair.text.ToLower().Contains("accept") && valuePair.confidence > .75)
                 {
@@ -632,7 +636,7 @@ namespace CS2_AutoAccept
                     valuePair = OCR(bitmap);
 
                     // Check the returned value
-                    if ((!(valuePair.text.ToLower().Contains("cancel search") && valuePair.confidence > .9)) && !_run_Continuously)
+                    if ((!(valuePair.text.ToLower().Contains("cancel search") && valuePair.confidence > .75)) && !_run_Continuously)
                     {
                         this.Dispatcher.BeginInvoke(new Action(() =>
                         {
