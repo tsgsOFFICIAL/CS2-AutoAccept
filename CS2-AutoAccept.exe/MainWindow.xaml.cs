@@ -59,7 +59,7 @@ namespace CS2_AutoAccept
             Thread GameRunningThread = new Thread(IsGameRunning);
             GameRunningThread.Start();
             GameRunningThread.IsBackground = true;
-            _programFilesX86 = Environment.ExpandEnvironmentVariables("%ProgramFiles(x86)%");
+            _programFilesX86 = Environment.ExpandEnvironmentVariables("%APPDATA%");
             _updateDirectory = Path.Combine(_programFilesX86, "CS2 AutoAccept", "UPDATE");
 
             try
