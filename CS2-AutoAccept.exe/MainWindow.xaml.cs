@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using CS2AutoAccept;
-using System.Linq;
 
 namespace CS2_AutoAccept
 {
@@ -48,8 +47,8 @@ namespace CS2_AutoAccept
         private int _cancelHeight;
         private int _clickPosX;
         private int _clickPosY;
-        private string _programFilesX86;
-        private string _updateDirectory;
+        private string _basePath;
+        private string _updatePath;
         public MainWindow()
         {
             InitializeComponent();
@@ -59,8 +58,8 @@ namespace CS2_AutoAccept
             Thread GameRunningThread = new Thread(IsGameRunning);
             GameRunningThread.Start();
             GameRunningThread.IsBackground = true;
-            _programFilesX86 = Environment.ExpandEnvironmentVariables("%APPDATA%");
-            _updateDirectory = Path.Combine(_programFilesX86, "CS2 AutoAccept", "UPDATE");
+            _basePath = Environment.ExpandEnvironmentVariables("%APPDATA%");
+            _updatePath = Path.Combine(_basePath, "CS2 AutoAccept", "UPDATE");
 
             try
             {
@@ -72,16 +71,8 @@ namespace CS2_AutoAccept
                 System.Windows.MessageBox.Show(ex.Message, "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            // Kill other instances of same application
-            Process[] pname = Process.GetProcessesByName(AppDomain.CurrentDomain.FriendlyName.Remove(AppDomain.CurrentDomain.FriendlyName.Length - 4));
-
-            if (pname.Length > 1)
-            {
-                pname.Where(p => p.Id != Environment.ProcessId).First().Kill();
-            }
-
             // If this new directory exists, assume an update was fetched, and control the AppContext.BaseDirectory for the last part in the path
-            if (Directory.Exists(_updateDirectory))
+            if (Directory.Exists(_updatePath))
             {
                 string runPath = AppContext.BaseDirectory;
 
@@ -94,15 +85,14 @@ namespace CS2_AutoAccept
                 string lastFolderInPath = runPath.Split('\\')[^1]; // Get the last folder from the path
 
                 // If this is true, it means that the exe was run from the update folder, AKA an update was fetched, and you need to move the data back
+                string basePath = Path.Combine(_basePath, "CS2 AutoAccept");
+                string updatePath = Path.Combine(basePath, "UPDATE");
+
                 if (lastFolderInPath == "UPDATE")
                 {
-                    Process.Start(Path.Combine(_updateDirectory, "CS2-AutoAccept.exe"));
-                }
-                else
-                {
-                    string basePath = Path.Combine(_programFilesX86, "CS2 AutoAccept");
-                    string updatePath = Path.Combine(_programFilesX86, "CS2 AutoAccept", "UPDATE");
                     string[] updatedFiles = Directory.GetFiles(updatePath);
+
+                    DeleteAllExceptFolder(basePath, "UPDATE");
 
                     foreach (string file in updatedFiles)
                     {
@@ -120,7 +110,11 @@ namespace CS2_AutoAccept
                         }
                     }
 
-                    DeleteAllExceptFolder(basePath, "UPDATE");
+                    Process.Start(Path.Combine(basePath, "CS2-AutoAccept.exe"));
+                    Environment.Exit(0);
+                }
+                else
+                {
                     Directory.Delete(updatePath, true);
                 }
             }
@@ -179,7 +173,7 @@ namespace CS2_AutoAccept
 
             if (UpdateAvailable)
             {
-                updater!.DownloadUpdate(_updateDirectory);
+                updater!.DownloadUpdate(_updatePath);
             }
         }
         /// <summary>

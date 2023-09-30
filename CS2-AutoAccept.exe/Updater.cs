@@ -48,7 +48,7 @@ namespace CS2AutoAccept
         /// </summary>
         /// <param Name="client"></param>
         /// <param Name="apiUrl"></param>
-        /// <param Name="_updateDirectory"></param>
+        /// <param Name="_updatePath"></param>
         /// <returns></returns>
         private async Task CalculateFolderSize(HttpClient client, string apiUrl, string downloadDirectory)
         {
@@ -79,7 +79,7 @@ namespace CS2AutoAccept
         /// </summary>
         /// <param Name="client"></param>
         /// <param Name="apiUrl"></param>
-        /// <param Name="_updateDirectory"></param>
+        /// <param Name="_updatePath"></param>
         /// <param Name="progress"></param>
         /// <returns></returns>
         private async Task DownloadFolderContents(HttpClient client, string apiUrl, string downloadDirectory, IProgress<int> progress)
@@ -136,7 +136,7 @@ namespace CS2AutoAccept
             else
             {
                 Debug.WriteLine($"Failed to fetch folder contents. Status code: {response.StatusCode}");
-                //await DownloadFolderContents(client, apiUrl, _updateDirectory, progress);
+                //await DownloadFolderContents(client, apiUrl, _updatePath, progress);
             }
         }
         /// <summary>
