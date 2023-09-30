@@ -114,7 +114,7 @@ namespace CS2_AutoAccept
             if (UpdateAvailable)
             {
                 
-                updater!.DownloadUpdate("C:\\Users\\mmj\\Desktop\\C# test");
+                updater!.DownloadUpdate($@"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\CS2 AutoAccepter");
             }
         }
         /// <summary>
