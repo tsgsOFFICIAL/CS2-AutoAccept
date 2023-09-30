@@ -84,6 +84,7 @@
     <None Include="bin\Release\net6.0-windows\publish\win-x86\coreclr.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\createdump.exe" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept.dll" />
+    <None Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept.dll.config" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept.exe" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept.pdb" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\cs\Microsoft.VisualBasic.Forms.resources.dll" />
@@ -157,6 +158,7 @@
     <None Include="bin\Release\net6.0-windows\publish\win-x86\fr\UIAutomationTypes.resources.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\fr\WindowsBase.resources.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\fr\WindowsFormsIntegration.resources.dll" />
+    <None Include="bin\Release\net6.0-windows\publish\win-x86\git2-e632535.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\hostfxr.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\hostpolicy.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\it\Microsoft.VisualBasic.Forms.resources.dll" />
@@ -210,6 +212,7 @@
     <None Include="bin\Release\net6.0-windows\publish\win-x86\ko\UIAutomationTypes.resources.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\ko\WindowsBase.resources.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\ko\WindowsFormsIntegration.resources.dll" />
+    <None Include="bin\Release\net6.0-windows\publish\win-x86\LibGit2Sharp.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\Microsoft.CSharp.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\Microsoft.DiaSymReader.Native.x86.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\Microsoft.VisualBasic.Core.dll" />
