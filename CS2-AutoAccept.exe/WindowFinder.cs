@@ -91,7 +91,7 @@ namespace CS2_AutoAccept
             try
             {
                 // Find the first-in-Z-order
-                IntPtr hWnd = FindWindow(name, null);
+                IntPtr hWnd = FindWindow(name, null!);
 
                 // Get the handle to a dialog
                 if (hWnd == IntPtr.Zero)

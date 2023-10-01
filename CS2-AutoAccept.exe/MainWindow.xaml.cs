@@ -71,42 +71,46 @@ namespace CS2_AutoAccept
                 System.Windows.MessageBox.Show(ex.Message, "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            // If this new directory exists, assume an update was fetched, and control the AppContext.BaseDirectory for the last part in the path
             if (Directory.Exists(_updatePath))
             {
                 string runPath = AppContext.BaseDirectory;
 
-                // Check if the last character is indeed a backslash, as expected
                 if (runPath.LastIndexOf('\\') == runPath.Length - 1)
                 {
                     runPath = runPath[..^1]; // Remove the last character
                 }
 
-                string lastFolderInPath = runPath.Split('\\')[^1]; // Get the last folder from the path
+                string lastFolderInPath = runPath.Split('\\')[^1];
 
-                // If this is true, it means that the exe was run from the update folder, AKA an update was fetched, and you need to move the data back
                 string basePath = Path.Combine(_basePath, "CS2 AutoAccept");
                 string updatePath = Path.Combine(basePath, "UPDATE");
 
                 if (lastFolderInPath == "UPDATE")
                 {
-                    string[] updatedFiles = Directory.GetFiles(updatePath);
+                    string[] updatedFilesAndDirs = Directory.GetFileSystemEntries(updatePath, "*", SearchOption.AllDirectories);
 
                     DeleteAllExceptFolder(basePath, "UPDATE");
 
-                    foreach (string file in updatedFiles)
+                    foreach (string fileOrDir in updatedFilesAndDirs)
                     {
-                        string fileName = Path.GetFileName(file);
-                        string destinationPath = Path.Combine(basePath, fileName);
+                        string relativePath = fileOrDir.Substring(updatePath.Length + 1);
+                        string destinationPath = Path.Combine(basePath, relativePath);
 
-                        try
+                        if (Directory.Exists(fileOrDir))
                         {
-                            File.Copy(file, destinationPath, true);
-                            Debug.WriteLine($"Copied: {fileName}");
+                            Directory.CreateDirectory(destinationPath);
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            Debug.WriteLine($"Error copying {fileName}: {ex.Message}");
+                            try
+                            {
+                                File.Copy(fileOrDir, destinationPath, true);
+                                Debug.WriteLine($"Copied: {relativePath}");
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine($"Error copying {relativePath}: {ex.Message}");
+                            }
                         }
                     }
 

@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
+using System.Collections.Generic;
 
 namespace CS2AutoAccept
 {
@@ -36,7 +37,7 @@ namespace CS2AutoAccept
                 });
 
                 client.DefaultRequestHeaders.Add("User-Agent", "request");
-                await CalculateFolderSize(client, apiUrl, downloadDirectory);
+                _totalFileSize = await CalculateFolderSize(client, apiUrl);
                 await DownloadFolderContents(client, apiUrl, downloadDirectory, progress);
 
                 if (_downloadComplete)
@@ -56,31 +57,44 @@ namespace CS2AutoAccept
         /// <param Name="apiUrl"></param>
         /// <param Name="_updatePath"></param>
         /// <returns></returns>
-        private async Task CalculateFolderSize(HttpClient client, string apiUrl, string downloadDirectory)
+        private async Task<long> CalculateFolderSize(HttpClient client, string apiUrl)
         {
-            HttpResponseMessage response = await client.GetAsync(apiUrl);
+            long totalSize = 0;
+            string nextPageUrl = apiUrl;
 
-            if (response.IsSuccessStatusCode)
+            do
             {
-                string json = await response.Content.ReadAsStringAsync();
-                GitHubContent[] contents = JsonSerializer.Deserialize<GitHubContent[]>(json)!;
-                _totalFileSize += (long)contents.Sum(content => content.Size)!;
+                HttpResponseMessage response = await client.GetAsync(nextPageUrl);
 
-                foreach (GitHubContent content in contents)
+                if (response.IsSuccessStatusCode)
                 {
-                    if (content.Type == "dir")
+                    string json = await response.Content.ReadAsStringAsync();
+                    GitHubContent[] contents = JsonSerializer.Deserialize<GitHubContent[]>(json)!;
+
+                    totalSize += contents.Sum(content => content.Size ?? 0);
+
+                    // Check if there's a next page
+                    if (response.Headers.TryGetValues("Link", out IEnumerable<string>? linkHeaders))
                     {
-                        string subfolderPath = content.Path!;
-                        await CalculateFolderSize(client, apiUrl.Replace(_folderPath, subfolderPath), downloadDirectory);
+                        nextPageUrl = GetNextPageUrl(linkHeaders.First()); // Extract the URL for the next page
+                    }
+                    else
+                    {
+                        nextPageUrl = null!; // No next page
                     }
                 }
+                else
+                {
+                    Debug.WriteLine($"Failed to fetch folder contents. Status code: {response.StatusCode}");
+                    _downloadComplete = false;
+                    return totalSize; // Return the calculated size even if there was an error
+                }
             }
-            else
-            {
-                Debug.WriteLine($"Failed to fetch folder contents. Status code: {response.StatusCode}");
-                _downloadComplete = false;
-            }
+            while (!string.IsNullOrEmpty(nextPageUrl)); // Continue until there are no more pages
+
+            return totalSize;
         }
+
         /// <summary>
         /// Download folder content
         /// </summary>
@@ -91,59 +105,159 @@ namespace CS2AutoAccept
         /// <returns></returns>
         private async Task DownloadFolderContents(HttpClient client, string apiUrl, string downloadDirectory, IProgress<int> progress)
         {
-            HttpResponseMessage response = await client.GetAsync(apiUrl);
+            string nextPageUrl = apiUrl; // Start with the initial URL
 
-            if (response.IsSuccessStatusCode)
+            do
             {
-                string json = await response.Content.ReadAsStringAsync();
-                GitHubContent[] contents = JsonSerializer.Deserialize<GitHubContent[]>(json)!;
+                HttpResponseMessage response = await client.GetAsync(nextPageUrl);
 
-                if (!Directory.Exists(downloadDirectory))
+                if (response.IsSuccessStatusCode)
                 {
-                    Directory.CreateDirectory(downloadDirectory);
-                }
+                    string json = await response.Content.ReadAsStringAsync();
+                    GitHubContent[] contents = JsonSerializer.Deserialize<GitHubContent[]>(json)!;
 
-                foreach (GitHubContent content in contents)
-                {
-                    if (content.Type == "file")
+                    if (!Directory.Exists(downloadDirectory))
                     {
+                        Directory.CreateDirectory(downloadDirectory);
+                    }
 
-                        string fileUrl = content.DownloadUrl!;
-                        string filePath = Path.Combine(downloadDirectory, content.Name!);
+                    List<Task> downloadTasks = new List<Task>();
+                    List<Task> subfolderTasks = new List<Task>();
 
-                        using (HttpResponseMessage fileResponse = await client.GetAsync(fileUrl))
+                    foreach (GitHubContent content in contents)
+                    {
+                        if (content.Type == "file")
                         {
-                            if (fileResponse.IsSuccessStatusCode)
-                            {
-                                byte[] bytes = await fileResponse.Content.ReadAsByteArrayAsync();
-                                File.WriteAllBytes(filePath, bytes);
-                                Debug.WriteLine($"Downloaded {content.Name}");
+                            string fileUrl = content.DownloadUrl!;
+                            string filePath = Path.Combine(downloadDirectory, content.Name!);
 
-                                // Increment _downloadedFileSize by the Size of the downloaded file
-                                _downloadedFileSize += bytes.Length;
-
-                                // Calculate progress as a percentage of _downloadedFileSize relative to _totalFileSize
-                                int percentComplete = (int)(((double)_downloadedFileSize / _totalFileSize) * 100);
-                                progress.Report(percentComplete);
-                            }
-                            else
-                            {
-                                Debug.WriteLine($"Failed to download {content.Name}");
-                            }
+                            downloadTasks.Add(DownloadFileAsync(client, fileUrl, filePath, progress));
+                        }
+                        else if (content.Type == "dir")
+                        {
+                            string subfolderPath = content.Path!;
+                            string subfolderDownloadDirectory = Path.Combine(downloadDirectory, content.Name!);
+                            subfolderTasks.Add(DownloadFolderContents(client, apiUrl.Replace(_folderPath, subfolderPath), subfolderDownloadDirectory, progress));
                         }
                     }
-                    else if (content.Type == "dir")
+
+                    await Task.WhenAll(downloadTasks);
+
+                    // Check if there's a next page
+                    if (response.Headers.TryGetValues("Link", out IEnumerable<string>? linkHeaders))
                     {
-                        string subfolderPath = content.Path!;
-                        string subfolderDownloadDirectory = Path.Combine(downloadDirectory, content.Name!);
-                        await DownloadFolderContents(client, apiUrl.Replace(_folderPath, subfolderPath), subfolderDownloadDirectory, progress);
+                        nextPageUrl = GetNextPageUrl(linkHeaders.First()); // Extract the URL for the next page
                     }
+                    else
+                    {
+                        nextPageUrl = null!; // No next page
+                    }
+
+                    await Task.WhenAll(subfolderTasks); // Wait for subfolder downloads to complete
+                }
+                else
+                {
+                    Debug.WriteLine($"Failed to fetch folder contents. Status code: {response.StatusCode}");
+                    _downloadComplete = false;
                 }
             }
-            else
+            while (!string.IsNullOrEmpty(nextPageUrl)); // Continue until there are no more pages
+
+
+            //foreach (GitHubContent content in contents)
+            //{
+            //    if (content.Type == "file")
+            //    {
+
+            //        string fileUrl = content.DownloadUrl!;
+            //        string filePath = Path.Combine(downloadDirectory, content.Name!);
+
+            //        using (HttpResponseMessage fileResponse = await client.GetAsync(fileUrl))
+            //        {
+            //            if (fileResponse.IsSuccessStatusCode)
+            //            {
+            //                byte[] bytes = await fileResponse.Content.ReadAsByteArrayAsync();
+            //                File.WriteAllBytes(filePath, bytes);
+            //                Debug.WriteLine($"Downloaded {content.Name}");
+
+            //                // Increment _downloadedFileSize by the Size of the downloaded file
+            //                _downloadedFileSize += bytes.Length;
+
+            //                // Calculate progress as a percentage of _downloadedFileSize relative to _totalFileSize
+            //                int percentComplete = (int)(((double)_downloadedFileSize / _totalFileSize) * 100);
+            //                progress.Report(percentComplete);
+            //            }
+            //            else
+            //            {
+            //                Debug.WriteLine($"Failed to download {content.Name}");
+            //            }
+            //        }
+            //    }
+            //    else if (content.Type == "dir")
+            //    {
+            //        string subfolderPath = content.Path!;
+            //        string subfolderDownloadDirectory = Path.Combine(downloadDirectory, content.Name!);
+            //        await DownloadFolderContents(client, apiUrl.Replace(_folderPath, subfolderPath), subfolderDownloadDirectory, progress);
+            //    }
+            //}
+            //}
+            //    else
+            //    {
+            //        Debug.WriteLine($"Failed to fetch folder contents. Status code: {response.StatusCode}");
+            //        _downloadComplete = false;
+            //    }
+        }
+        /// <summary>
+        /// Get next paging url
+        /// </summary>
+        /// <param name="linkHeader"></param>
+        /// <returns></returns>
+        private string GetNextPageUrl(string linkHeader)
+        {
+            // Parse the Link header to extract the URL for the next page
+            string[] parts = linkHeader.Split(',');
+            foreach (string part in parts)
             {
-                Debug.WriteLine($"Failed to fetch folder contents. Status code: {response.StatusCode}");
-                _downloadComplete = false;
+                string[] subparts = part.Split(';');
+                if (subparts.Length == 2 && subparts[1].Trim() == "rel=\"next\"")
+                {
+                    string url = subparts[0].Trim('<', '>');
+                    return url;
+                }
+            }
+
+            return null!; // No next page
+        }
+        /// <summary>
+        /// Download a file async
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="fileUrl"></param>
+        /// <param name="filePath"></param>
+        /// <param name="progress"></param>
+        /// <returns></returns>
+        private async Task DownloadFileAsync(HttpClient client, string fileUrl, string filePath, IProgress<int> progress)
+        {
+            using (HttpResponseMessage fileResponse = await client.GetAsync(fileUrl))
+            {
+                if (fileResponse.IsSuccessStatusCode)
+                {
+                    byte[] bytes = await fileResponse.Content.ReadAsByteArrayAsync();
+                    File.WriteAllBytes(filePath, bytes);
+                    Debug.WriteLine($"Downloaded {Path.GetFileName(filePath)}");
+
+                    // Increment _downloadedFileSize by the Size of the downloaded file
+                    _downloadedFileSize += bytes.Length;
+
+                    // Calculate progress as a percentage of _downloadedFileSize relative to _totalFileSize
+                    int percentComplete = (int)(((double)_downloadedFileSize / _totalFileSize) * 100);
+                    progress.Report(percentComplete);
+                }
+                else
+                {
+                    Debug.WriteLine($"Failed to download {Path.GetFileName(filePath)}");
+                    _downloadComplete = false;
+                }
             }
         }
         /// <summary>
