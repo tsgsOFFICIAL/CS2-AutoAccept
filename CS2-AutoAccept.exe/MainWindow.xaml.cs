@@ -47,6 +47,7 @@ namespace CS2_AutoAccept
         private int _cancelHeight;
         private int _clickPosX;
         private int _clickPosY;
+        private int _gameRunExtraDelay = 0; // Seconds
         private string _basePath;
         private string _updatePath;
         public MainWindow()
@@ -138,11 +139,14 @@ namespace CS2_AutoAccept
                 {
                     // Update your UI elements with the progress value, e.g., a ProgressBar
                     Progress_Download.Visibility = Visibility.Visible;
+                    TextBlock_Progress.Visibility = Visibility.Visible;
                     Progress_Download.Value = e.Progress;
+                    TextBlock_Progress.Text = $"{e.Progress}%";
                 }
                 else
                 {
                     Progress_Download.Visibility = Visibility.Collapsed;
+                    TextBlock_Progress.Visibility = Visibility.Collapsed;
 
                     if (e.Status == "bad")
                     {
@@ -182,6 +186,10 @@ namespace CS2_AutoAccept
 
             if (UpdateAvailable)
             {
+                Program_state.IsChecked = false;
+                Program_state.Visibility = Visibility.Collapsed;
+                Program_state_continuously.Visibility = Visibility.Collapsed;
+                Run_at_startup_state.Visibility = Visibility.Collapsed;
                 updater!.DownloadUpdate(_updatePath);
             }
         }
@@ -205,6 +213,7 @@ namespace CS2_AutoAccept
             // PrintToLog("{Button_Click_LaunchCS}");
             LaunchWeb("steam://rungameid/730");
             Button_LaunchCS.Content = "Launching CS2";
+            _gameRunExtraDelay = 15;
         }
         /// <summary>
         /// Drag header
@@ -444,7 +453,7 @@ namespace CS2_AutoAccept
                 if (_activeScreen != null)
                 {
                     // PrintToLog("{IsGameRunning} Game is running");
-                    this.Dispatcher.BeginInvoke(new Action(() =>
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
                         string input = _activeScreen.DeviceName;
                         int lastBackslashIndex = input.LastIndexOf('\\');
@@ -466,7 +475,7 @@ namespace CS2_AutoAccept
                 else
                 {
                     // PrintToLog("{IsGameRunning} Game is not running");
-                    this.Dispatcher.BeginInvoke(new Action(() =>
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
                         TextBlock_Monitor.Foreground = new SolidColorBrush(Colors.Red);
                         TextBlock_Monitor.Text = "CS2 is not running, make sure the game is open!";
@@ -483,7 +492,7 @@ namespace CS2_AutoAccept
             catch (Exception)
             {
                 // PrintToLog("{IsGameRunning} EXCEPTION: " + ex.Message);
-                this.Dispatcher.BeginInvoke(new Action(() =>
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     TextBlock_Monitor.Foreground = new SolidColorBrush(Colors.Red);
                     TextBlock_Monitor.Text = "CS2 is not running, make sure the game is open!";
@@ -498,6 +507,8 @@ namespace CS2_AutoAccept
             }
 
             Thread.Sleep(5 * 1000);
+            Thread.Sleep(_gameRunExtraDelay * 1000);
+            _gameRunExtraDelay = 0; // Reset the delay, in case it was changed somewhere else
             IsGameRunning();
         }
         /// <summary>
@@ -647,7 +658,7 @@ namespace CS2_AutoAccept
                     // Check the returned value
                     if ((!(valuePair.text.ToLower().Contains("cancel search") && valuePair.confidence > .75)) && !_run_Continuously)
                     {
-                        this.Dispatcher.BeginInvoke(new Action(() =>
+                        Dispatcher.BeginInvoke(new Action(() =>
                         {
                             Program_state.IsChecked = false;
                         }));

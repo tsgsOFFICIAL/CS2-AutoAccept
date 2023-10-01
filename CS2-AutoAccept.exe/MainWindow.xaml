@@ -107,7 +107,7 @@
         <Button Background="Transparent" Content="&#x1F5D5;" FontSize="18" VerticalAlignment="Top" ToolTip="Minimize" Click="Button_Click_Minimize" Foreground="GhostWhite" BorderBrush="Transparent" Height="31" Width="30" HorizontalAlignment="Right" Margin="0,0,30,0" Style="{DynamicResource NavButtons}"/>
         <Button Background="Transparent" Content="&#10006;" ToolTip="Close" Click="Button_Click_Close" Foreground="GhostWhite" BorderBrush="Transparent" Margin="770 0 0 420" Style="{DynamicResource CloseBtn}"/>
         <Button Background="Transparent" x:Name="Button_Update" Click="Button_Update_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="200,0,0,0" Height="30" BorderThickness="0" FontFamily="Roboto" FontSize="15" Foreground="GhostWhite" FontWeight="SemiBold" Cursor="Hand" Style="{DynamicResource NavButtons}"/>
-        
+
         <!-- Controls -->
         <CheckBox x:Name="Program_state" Content="AutoAccept (OFF)" ToolTip="Will find the ACCEPT button, only for the current match" IsChecked="False" Margin="30,41,646,390" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Program_state_Checked" Unchecked="Program_state_Unchecked"/>
         <CheckBox x:Name="Run_at_startup_state" Content="Run at startup (OFF)" ToolTip="Automatically start this app when your pc launches" IsChecked="False" Margin="30,71,632,360" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Run_at_startup_state_Checked" Unchecked="Run_at_startup_state_Unchecked"/>
@@ -116,8 +116,9 @@
         <TextBlock x:Name="TextBlock_Monitor" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="13,340,320,89"/>
         <TextBlock x:Name="TextBlock_MonitorSize" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="13,365,555,64"/>
 
-        <ProgressBar x:Name="Progress_Download" HorizontalAlignment="Left" Height="30" Margin="333,80,0,0" VerticalAlignment="Top" Width="457" Visibility="Collapsed"/>
-        
+        <TextBlock x:Name="TextBlock_Progress" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="30,185,313,245" TextAlignment="Center" Visibility="Collapsed"/>
+        <ProgressBar x:Name="Progress_Download" HorizontalAlignment="Left" Height="30" Margin="30,0,0,0" Width="457" Visibility="Collapsed"/>
+
         <Button x:Name="Button_LaunchCS" Margin="540,170,10,170" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" Content="Launch CS2" Cursor="Hand" ToolTip="Click here to launch CS2" Background="#3F169C80" Click="Button_Click_LaunchCS2" BorderThickness="0">
             <Button.Resources>
                 <Style TargetType="Border">
@@ -125,7 +126,7 @@
                 </Style>
             </Button.Resources>
         </Button>
-        
+
         <!-- Socials -->
         <TextBlock Text="Join the Discord!" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" Margin="574,296,44,125"/>
         <Button Margin="540,330,10,10" Background="#FF7289DA" Cursor="Hand" Click="Button_Click_Discord" ToolTip="Join my Discord server, its a great place for asking questions and hanging out :)" BorderThickness="0">

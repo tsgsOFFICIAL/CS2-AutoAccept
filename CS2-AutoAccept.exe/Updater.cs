@@ -30,10 +30,10 @@ namespace CS2AutoAccept
 
             using (HttpClient client = new HttpClient())
             {
-                IProgress<int> progress = new Progress<int>(percentComplete =>
+                IProgress<int> progress = new Progress<int>(percentageComplete =>
                 {
-                    UpdateProgress(new ProgressEventArgs(percentComplete, "good"));
-                    Debug.WriteLine($"Progress: {percentComplete}%");
+                    UpdateProgress(new ProgressEventArgs(percentageComplete, "good"));
+                    Debug.WriteLine($"Progress: {percentageComplete}%");
                 });
 
                 client.DefaultRequestHeaders.Add("User-Agent", "request");
