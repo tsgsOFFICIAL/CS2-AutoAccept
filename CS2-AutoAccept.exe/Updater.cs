@@ -94,7 +94,6 @@ namespace CS2AutoAccept
 
             return totalSize;
         }
-
         /// <summary>
         /// Download folder content
         /// </summary>
@@ -159,53 +158,10 @@ namespace CS2AutoAccept
                 {
                     Debug.WriteLine($"Failed to fetch folder contents. Status code: {response.StatusCode}");
                     _downloadComplete = false;
+                    return;
                 }
             }
             while (!string.IsNullOrEmpty(nextPageUrl)); // Continue until there are no more pages
-
-
-            //foreach (GitHubContent content in contents)
-            //{
-            //    if (content.Type == "file")
-            //    {
-
-            //        string fileUrl = content.DownloadUrl!;
-            //        string filePath = Path.Combine(downloadDirectory, content.Name!);
-
-            //        using (HttpResponseMessage fileResponse = await client.GetAsync(fileUrl))
-            //        {
-            //            if (fileResponse.IsSuccessStatusCode)
-            //            {
-            //                byte[] bytes = await fileResponse.Content.ReadAsByteArrayAsync();
-            //                File.WriteAllBytes(filePath, bytes);
-            //                Debug.WriteLine($"Downloaded {content.Name}");
-
-            //                // Increment _downloadedFileSize by the Size of the downloaded file
-            //                _downloadedFileSize += bytes.Length;
-
-            //                // Calculate progress as a percentage of _downloadedFileSize relative to _totalFileSize
-            //                int percentComplete = (int)(((double)_downloadedFileSize / _totalFileSize) * 100);
-            //                progress.Report(percentComplete);
-            //            }
-            //            else
-            //            {
-            //                Debug.WriteLine($"Failed to download {content.Name}");
-            //            }
-            //        }
-            //    }
-            //    else if (content.Type == "dir")
-            //    {
-            //        string subfolderPath = content.Path!;
-            //        string subfolderDownloadDirectory = Path.Combine(downloadDirectory, content.Name!);
-            //        await DownloadFolderContents(client, apiUrl.Replace(_folderPath, subfolderPath), subfolderDownloadDirectory, progress);
-            //    }
-            //}
-            //}
-            //    else
-            //    {
-            //        Debug.WriteLine($"Failed to fetch folder contents. Status code: {response.StatusCode}");
-            //        _downloadComplete = false;
-            //    }
         }
         /// <summary>
         /// Get next paging url
