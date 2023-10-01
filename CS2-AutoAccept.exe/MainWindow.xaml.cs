@@ -37,6 +37,7 @@ namespace CS2_AutoAccept
         private Thread? _scannerThread;
         private CancellationTokenSource? cts;
         private bool _run_Continuously = false;
+        private bool _updateAvailable = false;
         private int _acceptPosX;
         private int _acceptPosY;
         private int _acceptWidth;
@@ -182,9 +183,7 @@ namespace CS2_AutoAccept
         private async void Button_Update_Click(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Button_Update_Click}");
-            bool UpdateAvailable = await UpdateHeaderVersion();
-
-            if (UpdateAvailable)
+            if (_updateAvailable)
             {
                 Program_state.IsChecked = false;
                 Program_state.Visibility = Visibility.Collapsed;
@@ -192,6 +191,11 @@ namespace CS2_AutoAccept
                 Run_at_startup_state.Visibility = Visibility.Collapsed;
                 updater!.DownloadUpdate(_updatePath);
             }
+            else
+            {
+                _updateAvailable = await UpdateHeaderVersion();
+            }
+
         }
         /// <summary>
         /// Open Discord
