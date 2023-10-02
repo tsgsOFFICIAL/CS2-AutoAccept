@@ -131,8 +131,10 @@ namespace CS2_AutoAccept
         /// </summary>
         /// <param Name="sender"></param>
         /// <param Name="progress"></param>
-        private void Updater_ProgressUpdated(object sender, ProgressEventArgs e)
+        private async void Updater_ProgressUpdated(object sender, ProgressEventArgs e)
         {
+            await Task.Delay(500);
+
             // Update the UI with the progress value
             Dispatcher.Invoke(() =>
             {
