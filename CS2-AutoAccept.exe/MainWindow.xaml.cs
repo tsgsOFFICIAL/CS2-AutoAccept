@@ -133,8 +133,6 @@ namespace CS2_AutoAccept
         /// <param Name="progress"></param>
         private async void Updater_ProgressUpdated(object sender, ProgressEventArgs e)
         {
-            await Task.Delay(500);
-
             // Update the UI with the progress value
             Dispatcher.Invoke(() =>
             {
@@ -187,6 +185,8 @@ namespace CS2_AutoAccept
             // PrintToLog("{Button_Update_Click}");
             if (_updateAvailable)
             {
+                Button_Update.IsEnabled = false;
+                Button_Update.Content = "Updating...";
                 Program_state.IsChecked = false;
                 Program_state.Visibility = Visibility.Collapsed;
                 Program_state_continuously.Visibility = Visibility.Collapsed;
@@ -418,6 +418,7 @@ namespace CS2_AutoAccept
                     Button_Update.Content = "Update Now";
                     Button_Update.ToolTip = $"Version {_serverVersion[0]}.{_serverVersion[1]}.{_serverVersion[2]}.{_serverVersion[3]} is now available!\nYou're on version {_clientVersion[0]}.{_clientVersion[1]}.{_clientVersion[2]}.{_clientVersion[3]}\nClick to update now";
                     Button_Update.Foreground = new SolidColorBrush(Colors.Orange);
+                    _updateAvailable = true;
                     return true;
                 }
 
