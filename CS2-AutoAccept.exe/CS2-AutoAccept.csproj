@@ -11,7 +11,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Description>A program to automatically find and press "ACCEPT" for you, when entering a competitive match in CS2.</Description>
     <Copyright>©️ tsgsOFFICIAL - 2023</Copyright>
-    <FileVersion>3.2.2.1</FileVersion>
+    <FileVersion>3.2.3.0</FileVersion>
     <AssemblyName>CS2-AutoAccept</AssemblyName>
   </PropertyGroup>
 
