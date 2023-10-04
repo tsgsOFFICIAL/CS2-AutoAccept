@@ -20,7 +20,6 @@ namespace CS2_AutoAccept
         private readonly string _repositoryOwner;
         private readonly string _repositoryName;
         private readonly string _folderPath;
-        private bool _downloadState = false;
         private long _totalFileSize = 0;
         private long _downloadedFileSize = 0;
         private object _lockTotalSize = new object();
@@ -38,7 +37,14 @@ namespace CS2_AutoAccept
         /// <param name="folderPath">Folder path in repository</param>
         public GitHubDirectoryDownloader(string repositoryOwner, string repositoryName, string folderPath)
         {
-            _httpClient = new HttpClient();
+            HttpClientHandler httpClientHandler = new HttpClientHandler();
+            httpClientHandler.AllowAutoRedirect = true;
+            httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) =>
+            {
+                return true;
+            };
+
+            _httpClient = new HttpClient(httpClientHandler);
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "GitHubDirectoryDownloader");
             _repositoryOwner = repositoryOwner;
             _repositoryName = repositoryName;
@@ -58,8 +64,6 @@ namespace CS2_AutoAccept
             Debug.WriteLine("waiting for tasks to complete");
             await Task.WhenAll(_downloadTasks);
             await Task.WhenAll(_subfolderTasks);
-
-            OnDownloadChanged(_downloadState);
         }
         /// <summary>
         /// Downloads a GitHub directory asynchronously
@@ -77,8 +81,9 @@ namespace CS2_AutoAccept
             // Rate limit was reached.
             if (responseMessage.Contains("API rate limit exceeded"))
             {
-                _downloadState = false;
+                OnProgressChanged(new ProgressEventArgs(0, "API rate limit exceeded"));
                 Dispose();
+                return;
             }
 
 
@@ -124,7 +129,7 @@ namespace CS2_AutoAccept
             }
             else
             {
-                _downloadState = false;
+                OnProgressChanged(new ProgressEventArgs(0, "Something went wrong"));
                 Dispose();
             }
         }
@@ -158,7 +163,7 @@ namespace CS2_AutoAccept
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                _downloadState = false;
+                OnProgressChanged(new ProgressEventArgs(0, ex.Message));
                 Dispose();
             }
         }
@@ -169,18 +174,6 @@ namespace CS2_AutoAccept
         protected virtual void OnProgressChanged(ProgressEventArgs e)
         {
             ProgressUpdated?.Invoke(this, e);
-        }
-        /// <summary>
-        /// Raises the DownloadCompleted event.
-        /// </summary>
-        /// <param name="state"></param>
-        protected virtual void OnDownloadChanged(bool state)
-        {
-            DownloadCompleted?.Invoke(this, state);
-            if (!state)
-            {
-                OnProgressChanged(new ProgressEventArgs(0, "fail"));
-            }
         }
         /// <summary>
         /// Disposes of the GitHubDirectoryDownloader instance.

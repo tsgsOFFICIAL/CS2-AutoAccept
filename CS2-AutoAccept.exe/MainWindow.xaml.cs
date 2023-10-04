@@ -136,7 +136,7 @@ namespace CS2_AutoAccept
             // Update the UI with the progress value
             Dispatcher.Invoke(() =>
             {
-                if (e.Status == "fail")
+                if (e.Status != "" || e.Status != null)
                 {
                     Progress_Download.Visibility = Visibility.Collapsed;
                     TextBlock_Progress.Visibility = Visibility.Collapsed;
@@ -147,7 +147,7 @@ namespace CS2_AutoAccept
                     Program_state_continuously.Visibility = Visibility.Visible;
                     Run_at_startup_state.Visibility = Visibility.Visible;
 
-                    System.Windows.MessageBox.Show("Update Failed, please try again later, or download it directly from the Github page!", "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Windows.MessageBox.Show($"Update Failed, please try again later, or download it directly from the Github page!\n\nError Message: {e.Status}", "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 else if (e.Progress < 100)
                 {
