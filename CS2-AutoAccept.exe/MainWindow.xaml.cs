@@ -136,7 +136,7 @@ namespace CS2_AutoAccept
             // Update the UI with the progress value
             Dispatcher.Invoke(() =>
             {
-                if (e.Status != "" || e.Status != null)
+                if (e.Status != "" && e.Status != null)
                 {
                     Progress_Download.Visibility = Visibility.Collapsed;
                     TextBlock_Progress.Visibility = Visibility.Collapsed;
