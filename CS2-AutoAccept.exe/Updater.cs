@@ -1,10 +1,11 @@
 ﻿using System;
 using CS2_AutoAccept;
 using System.Diagnostics;
+using System.Net.Http;
 
 namespace CS2AutoAccept
 {
-    internal class Updater
+    internal class Updater : IDisposable
     {
         private readonly string _repositoryOwner = "tsgsOFFICIAL";
         private readonly string _repositoryName = "CS2-AutoAccept.exe";
@@ -22,6 +23,7 @@ namespace CS2AutoAccept
                 downloader.ProgressUpdated += OnProgressChanged!;
 
                 await downloader.DownloadDirectoryAsync(downloadDirectory);
+                DownloadProgress?.Invoke(this, new ProgressEventArgs(100)); // DOES THIS RUN BEFORE OR AFTER
             }
         }
         /// <summary>
@@ -31,6 +33,14 @@ namespace CS2AutoAccept
         protected virtual void OnProgressChanged(object sender, ProgressEventArgs e)
         {
             DownloadProgress?.Invoke(this, e);
+        }
+
+        /// <summary>
+        /// Disposes of the Updater instance.
+        /// </summary>
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
 }

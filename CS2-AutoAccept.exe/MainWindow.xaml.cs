@@ -116,12 +116,29 @@ namespace CS2_AutoAccept
                         }
                     }
 
+                    // Start the updated program, in the new default path
                     Process.Start(Path.Combine(basePath, "CS2-AutoAccept.exe"));
                     Environment.Exit(0);
                 }
                 else
                 {
-                    Directory.Delete(updatePath, true);
+                    // Try to delete the update folder, if not run from that path
+                    try
+                    {
+                        Directory.Delete(updatePath, true);
+                    }
+                    catch (Exception)
+                    {
+                        try
+                        {
+                            Thread.Sleep(10 * 1000);
+                            Directory.Delete(updatePath, true);
+                        }
+                        catch (Exception)
+                        {
+
+                        }
+                    }
                 }
             }
         }
