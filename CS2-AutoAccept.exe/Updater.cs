@@ -20,7 +20,6 @@ namespace CS2AutoAccept
             using (GitHubDirectoryDownloader downloader = new GitHubDirectoryDownloader(_repositoryOwner, _repositoryName, _folderPath))
             {
                 downloader.ProgressUpdated += OnProgressChanged!;
-                downloader.DownloadCompleted += DownloadCompleted!;
 
                 await downloader.DownloadDirectoryAsync(downloadDirectory);
             }
@@ -32,15 +31,6 @@ namespace CS2AutoAccept
         protected virtual void OnProgressChanged(object sender, ProgressEventArgs e)
         {
             DownloadProgress?.Invoke(this, e);
-        }
-        /// <summary>
-        /// Raises the DownloadComplete Event
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="state"></param>
-        private void DownloadCompleted(object sender, bool state)
-        {
-
         }
     }
 }
