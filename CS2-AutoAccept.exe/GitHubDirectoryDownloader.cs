@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Security;
+using System.Security.Authentication;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -37,8 +39,14 @@ namespace CS2_AutoAccept
         /// <param name="folderPath">Folder path in repository</param>
         public GitHubDirectoryDownloader(string repositoryOwner, string repositoryName, string folderPath)
         {
+            #region HttpClient Settings
+            //specify to use TLS 1.2 as default connection
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
             HttpClientHandler httpClientHandler = new HttpClientHandler();
             httpClientHandler.AllowAutoRedirect = true;
+            // Set the SSL/TLS version (for example, TLS 1.2)
+            httpClientHandler.SslProtocols = SslProtocols.Tls12;
             httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) =>
             {
                 return true;
@@ -46,6 +54,8 @@ namespace CS2_AutoAccept
 
             _httpClient = new HttpClient(httpClientHandler);
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "GitHubDirectoryDownloader");
+            #endregion
+
             _repositoryOwner = repositoryOwner;
             _repositoryName = repositoryName;
             _folderPath = folderPath;
