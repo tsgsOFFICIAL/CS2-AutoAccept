@@ -56,7 +56,7 @@ namespace CS2_AutoAccept
             InitializeComponent();
             _ = UpdateHeaderVersion();
             updater = new Updater();
-            updater.ProgressUpdated += Updater_ProgressUpdated!;
+            updater.DownloadProgress += Updater_ProgressUpdated!;
             Thread GameRunningThread = new Thread(IsGameRunning);
             GameRunningThread.Start();
             GameRunningThread.IsBackground = true;
@@ -136,23 +136,20 @@ namespace CS2_AutoAccept
             // Update the UI with the progress value
             Dispatcher.Invoke(() =>
             {
-                if (e.Progress < 100 && e.Status == "good")
+                if (e.Status == "fail")
+                {
+                    Progress_Download.Visibility = Visibility.Collapsed;
+                    TextBlock_Progress.Visibility = Visibility.Collapsed;
+
+                    System.Windows.MessageBox.Show("Update Failed, please try again later, or download it directly from the Github page!", "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                else if (e.Progress < 100)
                 {
                     // Update your UI elements with the progress value, e.g., a ProgressBar
                     Progress_Download.Visibility = Visibility.Visible;
                     TextBlock_Progress.Visibility = Visibility.Visible;
                     Progress_Download.Value = e.Progress;
                     TextBlock_Progress.Text = $"{e.Progress}%";
-                }
-                else
-                {
-                    Progress_Download.Visibility = Visibility.Collapsed;
-                    TextBlock_Progress.Visibility = Visibility.Collapsed;
-
-                    if (e.Status == "bad")
-                    {
-                        System.Windows.MessageBox.Show("Update Failed, please try again later, or download it directly from the Github page!", "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
                 }
             });
         }
