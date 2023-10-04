@@ -47,10 +47,10 @@ namespace CS2_AutoAccept
             httpClientHandler.AllowAutoRedirect = true;
             // Set the SSL/TLS version (for example, TLS 1.2)
             httpClientHandler.SslProtocols = SslProtocols.Tls12;
-            httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) =>
-            {
-                return true;
-            };
+            //httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) =>
+            //{
+            //    return true;
+            //};
 
             _httpClient = new HttpClient(httpClientHandler);
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "GitHubDirectoryDownloader");
@@ -207,7 +207,7 @@ namespace CS2_AutoAccept
         /// Status, either good or bad
         /// </summary>
         public string Status { get; set; }
-        public ProgressEventArgs(int progress, string status = "default")
+        public ProgressEventArgs(int progress, string status = "")
         {
             Progress = progress;
             Status = status;
