@@ -73,6 +73,7 @@ namespace CS2_AutoAccept
                 System.Windows.MessageBox.Show(ex.Message, "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
+            #region Update
             if (Directory.Exists(_updatePath))
             {
                 string runPath = AppContext.BaseDirectory;
@@ -87,32 +88,28 @@ namespace CS2_AutoAccept
                 string basePath = Path.Combine(_basePath, "CS2 AutoAccept");
                 string updatePath = Path.Combine(basePath, "UPDATE");
 
+                // If true, the exe was run from inside the UPDATE folder
                 if (lastFolderInPath == "UPDATE")
                 {
                     string[] updatedFilesAndDirs = Directory.GetFileSystemEntries(updatePath, "*", SearchOption.AllDirectories);
 
+                    // Delete all the old files and folders
                     DeleteAllExceptFolder(basePath, "UPDATE");
 
+                    // Move all the new files and folders, to the basePath
                     foreach (string fileOrDir in updatedFilesAndDirs)
                     {
                         string relativePath = fileOrDir.Substring(updatePath.Length + 1);
                         string destinationPath = Path.Combine(basePath, relativePath);
 
-                        if (Directory.Exists(fileOrDir))
+                        try
                         {
-                            Directory.CreateDirectory(destinationPath);
+                            File.Copy(fileOrDir, destinationPath, true);
+                            Debug.WriteLine($"Copied: {relativePath}");
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            try
-                            {
-                                File.Copy(fileOrDir, destinationPath, true);
-                                Debug.WriteLine($"Copied: {relativePath}");
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine($"Error copying {relativePath}: {ex.Message}");
-                            }
+                            Debug.WriteLine($"Error copying {relativePath}: {ex.Message}");
                         }
                     }
 
@@ -134,13 +131,14 @@ namespace CS2_AutoAccept
                             Thread.Sleep(10 * 1000);
                             Directory.Delete(updatePath, true);
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
-
+                            Debug.WriteLine($"Failed to delete the update directory: {ex.Message}");
                         }
                     }
                 }
             }
+            #endregion
         }
         #region EventHandlers
         /// <summary>

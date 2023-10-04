@@ -1,7 +1,7 @@
 ﻿using System;
+using System.IO;
 using CS2_AutoAccept;
 using System.Diagnostics;
-using System.Net.Http;
 
 namespace CS2AutoAccept
 {
@@ -23,7 +23,8 @@ namespace CS2AutoAccept
                 downloader.ProgressUpdated += OnProgressChanged!;
 
                 await downloader.DownloadDirectoryAsync(downloadDirectory);
-                DownloadProgress?.Invoke(this, new ProgressEventArgs(100)); // DOES THIS RUN BEFORE OR AFTER
+                Process.Start(Path.Combine(downloadDirectory, "CS2-AutoAccept.exe"));
+                Environment.Exit(0);
             }
         }
         /// <summary>
