@@ -141,6 +141,12 @@ namespace CS2_AutoAccept
                     Progress_Download.Visibility = Visibility.Collapsed;
                     TextBlock_Progress.Visibility = Visibility.Collapsed;
 
+                    _ = UpdateHeaderVersion();
+                    Button_Update.IsEnabled = true;
+                    Program_state.Visibility = Visibility.Visible;
+                    Program_state_continuously.Visibility = Visibility.Visible;
+                    Run_at_startup_state.Visibility = Visibility.Visible;
+
                     System.Windows.MessageBox.Show("Update Failed, please try again later, or download it directly from the Github page!", "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 else if (e.Progress < 100)

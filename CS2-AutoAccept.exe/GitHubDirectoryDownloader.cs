@@ -1,10 +1,10 @@
-﻿using CS2AutoAccept;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Security;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -20,6 +20,7 @@ namespace CS2_AutoAccept
         private readonly string _repositoryOwner;
         private readonly string _repositoryName;
         private readonly string _folderPath;
+        private bool _downloadState = false;
         private long _totalFileSize = 0;
         private long _downloadedFileSize = 0;
         private object _lockTotalSize = new object();
@@ -46,17 +47,19 @@ namespace CS2_AutoAccept
             _subfolderTasks = new List<Task>();
         }
         /// <summary>
-        /// Downloads a GitHub directory asynchronously
+        /// Starts a Task that downloads a GitHub directory asynchronously
         /// </summary>
         /// <param name="downloadPath">Where to download the directory to</param>
         /// <returns>This method returns a Task, meaning it's awaitable</returns>
         public async Task DownloadDirectoryAsync(string downloadPath)
         {
             await StartDownloadAsync(downloadPath);
+
             Debug.WriteLine("waiting for tasks to complete");
             await Task.WhenAll(_downloadTasks);
             await Task.WhenAll(_subfolderTasks);
-            OnDownloadChanged(true);
+
+            OnDownloadChanged(_downloadState);
         }
         /// <summary>
         /// Downloads a GitHub directory asynchronously
@@ -66,9 +69,18 @@ namespace CS2_AutoAccept
         private async Task StartDownloadAsync(string downloadPath, string apiUrl = null!)
         {
             // Construct the API url
-            apiUrl = apiUrl ?? $"https://api.github.com/repos/{_repositoryOwner}/{_repositoryName}/contents/{_folderPath}";
+            apiUrl ??= $"https://api.github.com/repos/{_repositoryOwner}/{_repositoryName}/contents/{_folderPath}";
 
             HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
+            string responseMessage = await response.Content.ReadAsStringAsync();
+
+            // Rate limit was reached.
+            if (responseMessage.Contains("API rate limit exceeded"))
+            {
+                _downloadState = false;
+                Dispose();
+            }
+
 
             if (response.IsSuccessStatusCode)
             {
@@ -112,7 +124,7 @@ namespace CS2_AutoAccept
             }
             else
             {
-                OnDownloadChanged(false);
+                _downloadState = false;
                 Dispose();
             }
         }
@@ -143,9 +155,10 @@ namespace CS2_AutoAccept
                     Debug.WriteLine($"Failed to download a file: {response.Content}");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                OnDownloadChanged(false);
+                Debug.WriteLine(ex.Message);
+                _downloadState = false;
                 Dispose();
             }
         }
@@ -165,7 +178,9 @@ namespace CS2_AutoAccept
         {
             DownloadCompleted?.Invoke(this, state);
             if (!state)
+            {
                 OnProgressChanged(new ProgressEventArgs(0, "fail"));
+            }
         }
         /// <summary>
         /// Disposes of the GitHubDirectoryDownloader instance.
