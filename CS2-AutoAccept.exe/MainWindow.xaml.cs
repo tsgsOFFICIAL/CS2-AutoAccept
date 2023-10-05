@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using CS2AutoAccept;
+using System.Net.Http.Headers;
 
 namespace CS2_AutoAccept
 {
@@ -403,64 +404,69 @@ namespace CS2_AutoAccept
         /// </summary>
         private async Task<bool> UpdateHeaderVersion()
         {
-            // PrintToLog("{UpdateHeaderVersion}");
-            // Create a new instance of WebClient, and search for the current version
-            HttpClient client = new HttpClient();
-            client.CancelPendingRequests();
-
-            // disable caching
-            client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
-
             List<int> _serverVersion = new List<int>();
             int[] _clientVersion = new int[4];
             string[] version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion!.Split('.');
-            string serverVersion = await client.GetStringAsync("https://raw.githubusercontent.com/tsgsOFFICIAL/CS2-AutoAccept.exe/main/CS2-AutoAccept.exe/version.txt");
-
-            for (int i = 0; i < version.Length; i++)
-            {
-                _clientVersion[i] = int.Parse(version[i]);
-            }
+            string serverVersion;
 
             try
             {
-                // Convert the array to a list
-                foreach (string onlineVersion in serverVersion.Split('.'))
+                using (HttpClient client = new HttpClient())
                 {
-                    _serverVersion.Add(Convert.ToInt32(onlineVersion));
-                }
+                    client.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
+                    {
+                        NoCache = true
+                    };
 
-                // Check if the update is newer
-                if ((_clientVersion[0] < _serverVersion[0]) || (_clientVersion[1] < _serverVersion[1] && _clientVersion[0] <= _serverVersion[0]) || (_clientVersion[2] < _serverVersion[2] && _clientVersion[1] <= _serverVersion[1] && _clientVersion[0] <= _serverVersion[0]) || (_clientVersion[3] < _serverVersion[3] && _clientVersion[2] <= _serverVersion[2] && _clientVersion[1] <= _serverVersion[1] && _clientVersion[0] <= _serverVersion[0]))
-                {
-                    // PrintToLog("{UpdateHeaderVersion} Update available");
-                    Button_Update.Content = "Update Now";
-                    Button_Update.ToolTip = $"Version {_serverVersion[0]}.{_serverVersion[1]}.{_serverVersion[2]}.{_serverVersion[3]} is now available!\nYou're on version {_clientVersion[0]}.{_clientVersion[1]}.{_clientVersion[2]}.{_clientVersion[3]}\nClick to update now";
-                    Button_Update.Foreground = new SolidColorBrush(Colors.Orange);
-                    _updateAvailable = true;
-                    return true;
-                }
+                    // disable caching
+                    client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
 
-                // Check if the user is on a newer build than the server
-                if ((_clientVersion[0] > _serverVersion[0]) || (_clientVersion[1] > _serverVersion[1] && _clientVersion[0] >= _serverVersion[0]) || (_clientVersion[2] > _serverVersion[2] && _clientVersion[1] >= _serverVersion[1] && _clientVersion[0] >= _serverVersion[0]) || (_clientVersion[3] > _serverVersion[3] && _clientVersion[2] >= _serverVersion[2] && _clientVersion[1] >= _serverVersion[1] && _clientVersion[0] >= _serverVersion[0]))
-                {
-                    // PrintToLog("{UpdateHeaderVersion} You're on a dev build");
-                    Button_Update.Content = "You're on a dev build";
-                    Button_Update.ToolTip = $"Woooo! Look at you, you're on a dev build, version: {_clientVersion[0]}.{_clientVersion[1]}.{_clientVersion[2]}.{_clientVersion[3]}\nBe careful, Dev builds don't tend to be as stable.. ;)";
-                    Button_Update.Foreground = new SolidColorBrush(Colors.GreenYellow);
+                    for (int i = 0; i < version.Length; i++)
+                    {
+                        _clientVersion[i] = int.Parse(version[i]);
+                    }
+
+                    serverVersion = await client.GetStringAsync("https://raw.githubusercontent.com/tsgsOFFICIAL/CS2-AutoAccept.exe/main/CS2-AutoAccept.exe/version.txt");
+
+                    // Convert the array to a list
+                    foreach (string onlineVersion in serverVersion.Split('.'))
+                    {
+                        _serverVersion.Add(Convert.ToInt32(onlineVersion));
+                    }
+
+                    // Check if the update is newer
+                    if ((_clientVersion[0] < _serverVersion[0]) || (_clientVersion[1] < _serverVersion[1] && _clientVersion[0] <= _serverVersion[0]) || (_clientVersion[2] < _serverVersion[2] && _clientVersion[1] <= _serverVersion[1] && _clientVersion[0] <= _serverVersion[0]) || (_clientVersion[3] < _serverVersion[3] && _clientVersion[2] <= _serverVersion[2] && _clientVersion[1] <= _serverVersion[1] && _clientVersion[0] <= _serverVersion[0]))
+                    {
+                        // PrintToLog("{UpdateHeaderVersion} Update available");
+                        Button_Update.Content = "Update Now";
+                        Button_Update.ToolTip = $"Version {_serverVersion[0]}.{_serverVersion[1]}.{_serverVersion[2]}.{_serverVersion[3]} is now available!\nYou're on version {_clientVersion[0]}.{_clientVersion[1]}.{_clientVersion[2]}.{_clientVersion[3]}\nClick to update now";
+                        Button_Update.Foreground = new SolidColorBrush(Colors.Orange);
+                        _updateAvailable = true;
+                        return true;
+                    }
+
+                    // Check if the user is on a newer build than the server
+                    if ((_clientVersion[0] > _serverVersion[0]) || (_clientVersion[1] > _serverVersion[1] && _clientVersion[0] >= _serverVersion[0]) || (_clientVersion[2] > _serverVersion[2] && _clientVersion[1] >= _serverVersion[1] && _clientVersion[0] >= _serverVersion[0]) || (_clientVersion[3] > _serverVersion[3] && _clientVersion[2] >= _serverVersion[2] && _clientVersion[1] >= _serverVersion[1] && _clientVersion[0] >= _serverVersion[0]))
+                    {
+                        // PrintToLog("{UpdateHeaderVersion} You're on a dev build");
+                        Button_Update.Content = "You're on a dev build";
+                        Button_Update.ToolTip = $"Woooo! Look at you, you're on a dev build, version: {_clientVersion[0]}.{_clientVersion[1]}.{_clientVersion[2]}.{_clientVersion[3]}\nBe careful, Dev builds don't tend to be as stable.. ;)";
+                        Button_Update.Foreground = new SolidColorBrush(Colors.GreenYellow);
+                        return false;
+                    }
+                    // PrintToLog("{UpdateHeaderVersion} You are up-to-date!");
+                    Button_Update.Content = "You are up-to-date!";
+                    Button_Update.ToolTip = $"You are on the newest version ({_clientVersion[0]}.{_clientVersion[1]}.{_clientVersion[2]}.{_clientVersion[3]})\nYou can click at anytime to check again";
+                    Button_Update.Foreground = new SolidColorBrush(Colors.LawnGreen);
                     return false;
+                    // Catch if the client.DownloadString failed, maybe the link changed, the server is down or the client is offline
                 }
-                // PrintToLog("{UpdateHeaderVersion} You are up-to-date!");
-                Button_Update.Content = "You are up-to-date!";
-                Button_Update.ToolTip = $"You are on the newest version ({_clientVersion[0]}.{_clientVersion[1]}.{_clientVersion[2]}.{_clientVersion[3]})\nYou can click at anytime to check again";
-                Button_Update.Foreground = new SolidColorBrush(Colors.LawnGreen);
-                return false;
-                // Catch if the client.DownloadString failed, maybe the link changed, the server is down or the client is offline
             }
             catch (Exception)
             {
                 // PrintToLog("{UpdateHeaderVersion} EXCEPTION: " + ex.Message);
                 Button_Update.Foreground = new SolidColorBrush(Colors.Red);
-                Button_Update.Content = "Could not establish a connection";
+                Button_Update.Content = "You're offline!";
                 Button_Update.ToolTip = $"You are on version ({_clientVersion[0]}.{_clientVersion[1]}.{_clientVersion[2]}.{_clientVersion[3]})";
                 return false;
             }
