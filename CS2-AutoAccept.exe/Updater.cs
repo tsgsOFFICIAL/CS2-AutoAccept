@@ -23,8 +23,15 @@ namespace CS2AutoAccept
                 downloader.ProgressUpdated += OnProgressChanged!;
 
                 await downloader.DownloadDirectoryAsync(downloadDirectory);
-                Process.Start(Path.Combine(downloadDirectory, "CS2-AutoAccept.exe"));
-                Environment.Exit(0);
+                try
+                {
+                    Process.Start(Path.Combine(downloadDirectory, "CS2-AutoAccept.exe"));
+                    Environment.Exit(0);
+                }
+                catch (Exception)
+                {
+                
+                }
             }
         }
         /// <summary>

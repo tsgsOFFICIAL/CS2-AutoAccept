@@ -29,7 +29,6 @@ namespace CS2_AutoAccept
         private List<Task> _downloadTasks;
         private List<Task> _subfolderTasks;
         public event EventHandler<ProgressEventArgs>? ProgressUpdated;
-        public event EventHandler<bool>? DownloadCompleted;
 
         /// <summary>
         /// Initializes a new instance of the GitHubDirectoryDownloader class.
@@ -95,7 +94,6 @@ namespace CS2_AutoAccept
                 Dispose();
                 return;
             }
-
 
             if (response.IsSuccessStatusCode)
             {

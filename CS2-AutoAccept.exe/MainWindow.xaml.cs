@@ -39,6 +39,7 @@ namespace CS2_AutoAccept
         private CancellationTokenSource? cts;
         private bool _run_Continuously = false;
         private bool _updateAvailable = false;
+        private bool _updateFailed = false;
         private int _acceptPosX;
         private int _acceptPosY;
         private int _acceptWidth;
@@ -97,6 +98,8 @@ namespace CS2_AutoAccept
                     // Delete all the old files and folders
                     DeleteAllExceptFolder(basePath, "UPDATE");
 
+                    Thread.Sleep(3000);
+
                     // Move all the new files and folders, to the basePath
                     foreach (string fileOrDir in updatedFilesAndDirs)
                     {
@@ -113,6 +116,8 @@ namespace CS2_AutoAccept
                             Debug.WriteLine($"Error copying {relativePath}: {ex.Message}");
                         }
                     }
+
+                    Thread.Sleep(3000);
 
                     // Start the updated program, in the new default path
                     Process.Start(Path.Combine(basePath, "CS2-AutoAccept.exe"));
@@ -149,31 +154,35 @@ namespace CS2_AutoAccept
         /// <param Name="progress"></param>
         private void Updater_ProgressUpdated(object sender, ProgressEventArgs e)
         {
-            // Update the UI with the progress value
-            Dispatcher.Invoke(() =>
+            if (!_updateFailed)
             {
-                if (e.Status != "" && e.Status != null)
+                // Update the UI with the progress value
+                Dispatcher.Invoke(() =>
                 {
-                    Progress_Download.Visibility = Visibility.Collapsed;
-                    TextBlock_Progress.Visibility = Visibility.Collapsed;
+                    if (e.Status != "" && e.Status != null)
+                    {
+                        Progress_Download.Visibility = Visibility.Collapsed;
+                        TextBlock_Progress.Visibility = Visibility.Collapsed;
 
-                    _ = UpdateHeaderVersion();
-                    Button_Update.IsEnabled = true;
-                    Program_state.Visibility = Visibility.Visible;
-                    Program_state_continuously.Visibility = Visibility.Visible;
-                    Run_at_startup_state.Visibility = Visibility.Visible;
+                        _ = UpdateHeaderVersion();
+                        Button_Update.IsEnabled = true;
+                        Program_state.Visibility = Visibility.Visible;
+                        Program_state_continuously.Visibility = Visibility.Visible;
+                        Run_at_startup_state.Visibility = Visibility.Visible;
 
-                    System.Windows.MessageBox.Show($"Update Failed, please try again later, or download it directly from the Github page!\n\nError Message: {e.Status}", "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                else if (e.Progress < 100)
-                {
-                    // Update your UI elements with the progress value, e.g., a ProgressBar
-                    Progress_Download.Visibility = Visibility.Visible;
-                    TextBlock_Progress.Visibility = Visibility.Visible;
-                    Progress_Download.Value = e.Progress;
-                    TextBlock_Progress.Text = $"{e.Progress}%";
-                }
-            });
+                        System.Windows.MessageBox.Show($"Update Failed, please try again later, or download it directly from the Github page!\n\nError Message: {e.Status}", "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
+                        _updateFailed = true;
+                    }
+                    else if (e.Progress < 100)
+                    {
+                        // Update your UI elements with the progress value, e.g., a ProgressBar
+                        Progress_Download.Visibility = Visibility.Visible;
+                        TextBlock_Progress.Visibility = Visibility.Visible;
+                        Progress_Download.Value = e.Progress;
+                        TextBlock_Progress.Text = $"{e.Progress}%";
+                    }
+                });
+            }
         }
         /// <summary>
         /// Minimize button
@@ -204,6 +213,7 @@ namespace CS2_AutoAccept
             // PrintToLog("{Button_Update_Click}");
             if (_updateAvailable)
             {
+                _updateFailed = false;
                 Button_Update.IsEnabled = false;
                 Button_Update.Content = "Updating...";
                 Program_state.IsChecked = false;
