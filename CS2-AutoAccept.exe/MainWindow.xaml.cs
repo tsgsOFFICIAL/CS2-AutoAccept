@@ -75,6 +75,72 @@ namespace CS2_AutoAccept
                 System.Windows.MessageBox.Show(ex.Message, "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
+            #region Update
+            if (Directory.Exists(_updatePath))
+            {
+                string runPath = AppContext.BaseDirectory;
+
+                if (runPath.LastIndexOf('\\') == runPath.Length - 1)
+                {
+                    runPath = runPath[..^1]; // Remove the last character
+                }
+
+                string lastFolderInPath = runPath.Split('\\')[^1];
+
+                string basePath = Path.Combine(_basePath, "CS2 AutoAccept");
+                string updatePath = Path.Combine(basePath, "UPDATE");
+
+                // If true, the exe was run from inside the UPDATE folder
+                if (lastFolderInPath == "UPDATE")
+                {
+                    string[] updatedFilesAndDirs = Directory.GetFileSystemEntries(updatePath, "*", SearchOption.AllDirectories);
+
+                    // Delete all the old files and folders
+                    DeleteAllExceptFolder(basePath, "UPDATE");
+
+                    // Move all the new files and folders, to the basePath
+                    foreach (string fileOrDir in updatedFilesAndDirs)
+                    {
+                        string relativePath = fileOrDir.Substring(updatePath.Length + 1);
+                        string destinationPath = Path.Combine(basePath, relativePath);
+
+                        try
+                        {
+                            File.Copy(fileOrDir, destinationPath, true);
+                            Debug.WriteLine($"Copied: {relativePath}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Error copying {relativePath}: {ex.Message}");
+                        }
+                    }
+
+                    // Start the updated program, in the new default path
+                    Process.Start(Path.Combine(basePath, "CS2-AutoAccept.exe"));
+                    Environment.Exit(0);
+                }
+                else
+                {
+                    // Try to delete the update folder, if not run from that path
+                    try
+                    {
+                        Directory.Delete(updatePath, true);
+                    }
+                    catch (Exception)
+                    {
+                        try
+                        {
+                            Thread.Sleep(10 * 1000);
+                            Directory.Delete(updatePath, true);
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Failed to delete the update directory: {ex.Message}");
+                        }
+                    }
+                }
+            }
+            #endregion
 
         }
         #region EventHandlers
