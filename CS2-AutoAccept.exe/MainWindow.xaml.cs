@@ -93,25 +93,42 @@ namespace CS2_AutoAccept
                 // If true, the exe was run from inside the UPDATE folder
                 if (lastFolderInPath == "UPDATE")
                 {
-                    string[] updatedFilesAndDirs = Directory.GetFileSystemEntries(updatePath, "*", SearchOption.AllDirectories);
+                    string[] updatedFiles = Directory.GetFiles(updatePath, "*", SearchOption.TopDirectoryOnly);
+                    string[] updatedDirectories = Directory.GetDirectories(updatePath, "*", SearchOption.TopDirectoryOnly);
 
                     // Delete all the old files and folders
                     DeleteAllExceptFolder(basePath, "UPDATE");
 
                     // Move all the new files and folders, to the basePath
-                    foreach (string fileOrDir in updatedFilesAndDirs)
+                    foreach (string filePath in updatedFiles)
                     {
-                        string relativePath = fileOrDir.Substring(updatePath.Length + 1);
-                        string destinationPath = Path.Combine(basePath, relativePath);
+                        string fileName = filePath.Substring(updatePath.Length + 1);
+                        string destinationPath = Path.Combine(basePath, fileName);
 
                         try
                         {
-                            File.Copy(fileOrDir, destinationPath, true);
-                            Debug.WriteLine($"Copied: {relativePath}");
+                            File.Copy(filePath, destinationPath, true);
+                            Debug.WriteLine($"Copied: {fileName}");
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine($"Error copying {relativePath}: {ex.Message}");
+                            Debug.WriteLine($"Error copying {fileName}: {ex.Message}");
+                        }
+                    }
+
+                    foreach (string directoryPath in updatedDirectories)
+                    {
+                        string directoryName = directoryPath.Substring(updatePath.Length + 1);
+                        string destinationPath = Path.Combine(basePath, directoryName);
+
+                        try
+                        {
+                            Directory.Move(directoryPath, destinationPath);
+                            Debug.WriteLine($"Moved: {directoryName}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Error copying {directoryName}: {ex.Message}");
                         }
                     }
 
@@ -135,7 +152,7 @@ namespace CS2_AutoAccept
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine($"Failed to delete the update directory: {ex.Message}");
+                            Debug.WriteLine($"Failed to delete the update directoryPath: {ex.Message}");
                         }
                     }
                 }
