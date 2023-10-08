@@ -655,7 +655,7 @@ namespace CS2_AutoAccept
                     // PrintToLog("{Scanner} Match found");
                     // Move the cursor and click the accept button
 
-                    for (int i = 0; i < 10; i++)
+                    for (int i = 0; i < 3; i++)
                     {
                         if (i % 2 == 0)
                         {
