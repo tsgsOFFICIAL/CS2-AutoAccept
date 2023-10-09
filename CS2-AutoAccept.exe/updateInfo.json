@@ -1,0 +1,32 @@
+{
+  "version": "3.4.0.0",
+  "type": "minor",
+  "changelog": "Added a changelog feature, to see what the update is about, and if it's important",
+  "historic_versions": [
+    {
+      "version": "3.3.2.0",
+      "type": "minor",
+      "changelog": "HOTFIX for update method"
+    },
+    {
+      "version": "3.0.0.0",
+      "type": "major",
+      "changelog": "Officially supports CS2, and automatic updates!"
+    },
+    {
+      "version": "2.1.9.0",
+      "type": "major",
+      "changelog": "Added CS2 Beta support"
+    },
+    {
+      "version": "2.0.0.0",
+      "type": "major",
+      "changelog": "Improved a lot, bug fixes"
+    },
+    {
+      "version": "1.0.0.0",
+      "type": "major",
+      "changelog": "First major release for CS:GO"
+    }
+  ]
+}
