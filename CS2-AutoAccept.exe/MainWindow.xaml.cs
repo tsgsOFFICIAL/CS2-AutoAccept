@@ -145,17 +145,9 @@ namespace CS2_AutoAccept
                     {
                         Directory.Delete(updatePath, true);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        try
-                        {
-                            Thread.Sleep(10 * 1000);
-                            Directory.Delete(updatePath, true);
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine($"Failed to delete the update directoryPath: {ex.Message}");
-                        }
+                        Debug.WriteLine($"Failed to delete the update directoryPath: {ex.Message}");
                     }
                 }
             }
