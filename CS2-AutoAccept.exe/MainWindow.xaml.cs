@@ -462,7 +462,7 @@ namespace CS2_AutoAccept
                 {
                     // PrintToLog("{UpdateHeaderVersion} Update available");
                     Button_Update.Content = "Update Now";
-                    Button_Update.ToolTip = $"Version {serverVersion[0]}.{serverVersion[1]}.{serverVersion[2]}.{serverVersion[3]} is now available!\nYou're on version {clientVersion[0]}.{clientVersion[1]}.{clientVersion[2]}.{clientVersion[3]}\nClick to update now\n\nChangelog: {serverUpdateInfo.Changelog}\nType: {serverUpdateInfo.Type}";
+                    Button_Update.ToolTip = $"Version {serverVersion[0]}.{serverVersion[1]}.{serverVersion[2]}.{serverVersion[3]} is now available!\nYou're on version {clientVersion[0]}.{clientVersion[1]}.{clientVersion[2]}.{clientVersion[3]}\nClick to update now";
                     Button_Update.Foreground = new SolidColorBrush(Colors.Orange);
                     _updateAvailable = true;
                 }
@@ -476,6 +476,8 @@ namespace CS2_AutoAccept
                     Button_Update.Foreground = new SolidColorBrush(Colors.GreenYellow);
                     _updateAvailable = false;
                 }
+
+                Button_Update.ToolTip += $"\n\nChangelog: {serverUpdateInfo.Changelog}\nType: {serverUpdateInfo.Type}";
                 // Catch if the client.DownloadString failed, maybe the link changed, the server is down or the client is offline
             }
             catch (Exception ex)
