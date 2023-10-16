@@ -655,6 +655,9 @@ namespace CS2_AutoAccept
                 // Adjust the contrast, then sharpen the image
                 bitmap = OptimiseImage(bitmap);
 
+                // Take a color sample, to match with letters
+                System.Drawing.Color colorSample = bitmap.GetPixel(bitmap.Width / 2, bitmap.Height / 2);
+
                 // Read the image using OCR
                 (string text, double confidence) valuePair = OCR(bitmap);
 
@@ -663,44 +666,37 @@ namespace CS2_AutoAccept
                 Debug.WriteLine(valuePair.confidence);
 
                 // Check the returned value
-                if (valuePair.text.ToLower().Contains("accept") || valuePair.text.ToLower().Contains("acgept")/*&& valuePair.confidence > .75*/)
+                if ((valuePair.text.ToLower().Contains("accept") && valuePair.confidence > .75) || colorSample.G > 150)
                 {
                     // PrintToLog("{Scanner} Match found");
                     // Move the cursor and click the accept button
 
-                    for (int i = 0; i < 3; i++)
-                    {
-                        if (i % 2 == 0)
-                        {
-                            System.Windows.Forms.Cursor.Position = new System.Drawing.Point(_clickPosX + 5 * i, _clickPosY + 5 * i);
-                        }
-                        else
-                        {
-                            System.Windows.Forms.Cursor.Position = new System.Drawing.Point(_clickPosX - 5 * i, _clickPosY - 5 * i);
-                        }
+                    System.Windows.Forms.Cursor.Position = new System.Drawing.Point(_clickPosX, _clickPosY);
 
-                        uint X = (uint)System.Windows.Forms.Cursor.Position.X;
-                        uint Y = (uint)System.Windows.Forms.Cursor.Position.Y;
+                    uint X = (uint)System.Windows.Forms.Cursor.Position.X;
+                    uint Y = (uint)System.Windows.Forms.Cursor.Position.Y;
 
-                        mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
-                        Thread.Sleep(50);
-                    }
+                    mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
 
                     // PrintToLog("{Scanner} Match accpeted");
 
-                    // Wait 25 seconds, to see if everyone accepted the match
-                    Thread.Sleep(25 * 1000);
+                    // Wait 30 seconds, to see if everyone accepted the match
+                    Thread.Sleep(30 * 1000);
 
                     bitmap = CaptureScreen(_cancelWidth, _cancelHeight, _cancelPosX, _cancelPosY); // "Cancel Search" button
 
+
                     // Adjust the contrast, then sharpen the image
                     bitmap = OptimiseImage(bitmap);
+
+                    // Take a color sample, to match with letters
+                    colorSample = bitmap.GetPixel(bitmap.Width / 2, bitmap.Height / 2);
 
                     // Read the image using OCR
                     valuePair = OCR(bitmap);
 
                     // Check the returned value
-                    if ((!(valuePair.text.ToLower().Contains("cancel search") && valuePair.confidence > .75)) && !_run_Continuously)
+                    if ((!(valuePair.text.ToLower().Contains("cancel search") && valuePair.confidence > .75) || colorSample.R < 150) && !_run_Continuously)
                     {
                         Dispatcher.BeginInvoke(new Action(() =>
                         {
@@ -813,6 +809,13 @@ namespace CS2_AutoAccept
                     _clickPosY = _acceptPosY + (_acceptHeight / 2);
                     break;
             }
+
+            _acceptPosX += _activeScreen!.Bounds.Left;
+            _acceptPosY += _activeScreen!.Bounds.Top;
+            _cancelPosX += _activeScreen!.Bounds.Left;
+            _cancelPosY += _activeScreen!.Bounds.Top;
+            _clickPosX += _activeScreen!.Bounds.Left;
+            _clickPosY += _activeScreen!.Bounds.Top;
 
             // PrintToLog("{CalculateSizes} _acceptPosX: " + _acceptPosX);
             // PrintToLog("{CalculateSizes} _acceptPosY: " + _acceptPosY);
