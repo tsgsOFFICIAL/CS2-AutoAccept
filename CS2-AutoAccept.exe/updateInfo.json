@@ -4,12 +4,11 @@
   "changelog": "Updated conditions to work with any language, basing the conditions on colors instead of only text",
   "historic_versions": [
     {
-      {
-
-        "version": "4.0.0.0",
-        "type": "major",
-        "changelog": "Updated conditions to work with any language, basing the conditions on colors instead of only text"
-      },
+      "version": "4.0.0.0",
+      "type": "major",
+      "changelog": "Updated conditions to work with any language, basing the conditions on colors instead of only text"
+    },
+    {
       "version": "3.5.0.0",
       "type": "major",
       "changelog": "Updated autoaccept conditions, to work with the new button"
