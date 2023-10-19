@@ -666,7 +666,7 @@ namespace CS2_AutoAccept
                 Debug.WriteLine(valuePair.confidence);
 
                 // Check the returned value
-                if ((valuePair.text.ToLower().Contains("accept") && valuePair.confidence > .75) || colorSample.G > 150)
+                if ((valuePair.text.ToLower().Contains("accept") && valuePair.confidence > .75) || (colorSample.G > 150 && valuePair.text.Length > 1))
                 {
                     // PrintToLog("{Scanner} Match found");
                     // Move the cursor and click the accept button
