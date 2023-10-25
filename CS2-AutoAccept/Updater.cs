@@ -8,8 +8,8 @@ namespace CS2AutoAccept
     internal class Updater : IDisposable
     {
         private readonly string _repositoryOwner = "tsgsOFFICIAL";
-        private readonly string _repositoryName = "CS2-AutoAccept.exe";
-        private readonly string _folderPath = "CS2-AutoAccept.exe/bin/Release/net6.0-windows/publish/win-x86";
+        private readonly string _repositoryName = "CS2-AutoAccept";
+        private readonly string _folderPath = "CS2-AutoAccept/bin/Release/net6.0-windows/publish/win-x86";
         public event EventHandler<ProgressEventArgs>? DownloadProgress;
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace CS2AutoAccept
                 await downloader.DownloadDirectoryAsync(downloadDirectory);
                 try
                 {
-                    Process.Start(Path.Combine(downloadDirectory, "CS2-AutoAccept.exe"));
+                    Process.Start(Path.Combine(downloadDirectory, "CS2-AutoAccept"));
                     Environment.Exit(0);
                 }
                 catch (Exception)

@@ -70,7 +70,7 @@ namespace CS2_AutoAccept
             try
             {
                 RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
-                Run_at_startup_state.IsChecked = key.GetValue("CS2-AutoAccept.exe") != null;
+                Run_at_startup_state.IsChecked = key.GetValue("CS2-AutoAccept") != null;
             }
             catch (Exception ex)
             {
@@ -135,7 +135,7 @@ namespace CS2_AutoAccept
                     }
 
                     // Start the updated program, in the new default path
-                    Process.Start(Path.Combine(basePath, "CS2-AutoAccept.exe"));
+                    Process.Start(Path.Combine(basePath, "CS2-AutoAccept"));
                     Environment.Exit(0);
                 }
                 else
@@ -334,14 +334,14 @@ namespace CS2_AutoAccept
         private void Run_at_startup_state_Checked(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Run_at_startup_state_Checked}");
-            string exeLocation = $"{AppContext.BaseDirectory}CS2-AutoAccept.exe";
+            string exeLocation = $"{AppContext.BaseDirectory}CS2-AutoAccept";
             try
             {
                 RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
 
-                if (key.GetValue("CS2-AutoAccept.exe") == null)
+                if (key.GetValue("CS2-AutoAccept") == null)
                 {
-                    key.SetValue("CS2-AutoAccept.exe", exeLocation);
+                    key.SetValue("CS2-AutoAccept", exeLocation);
                 }
 
                 key.Close();
@@ -367,9 +367,9 @@ namespace CS2_AutoAccept
             {
                 RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
 
-                if (key.GetValue("CS2-AutoAccept.exe") != null)
+                if (key.GetValue("CS2-AutoAccept") != null)
                 {
-                    key.DeleteValue("CS2-AutoAccept.exe");
+                    key.DeleteValue("CS2-AutoAccept");
                 }
 
                 key.Close();
@@ -439,7 +439,7 @@ namespace CS2_AutoAccept
 
                     client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
 
-                    serverUpdateInfo = JsonSerializer.Deserialize<UpdateInfo>(await client.GetStringAsync("https://raw.githubusercontent.com/tsgsOFFICIAL/CS2-AutoAccept.exe/main/CS2-AutoAccept.exe/updateInfo.json")) ?? new UpdateInfo();
+                    serverUpdateInfo = JsonSerializer.Deserialize<UpdateInfo>(await client.GetStringAsync("https://raw.githubusercontent.com/tsgsOFFICIAL/CS2-AutoAccept/main/CS2-AutoAccept/updateInfo.json")) ?? new UpdateInfo();
                     serverVersion = serverUpdateInfo.Version.Split(".").Select(int.Parse).ToList();
                 }
 
