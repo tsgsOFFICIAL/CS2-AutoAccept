@@ -1,5 +1,7 @@
 # CS2-AutoAccept
 A program to automatically find and press "ACCEPT" for you, when entering a competitive match in CS2.
+<br>
+The #1 AutoAccept solution since *May 16, 2021!*
 
 **Live demo**
 <br>
