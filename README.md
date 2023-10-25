@@ -1,10 +1,10 @@
 # CS2-AutoAccept
 A program to automatically find and press "ACCEPT" for you, when entering a competitive match in CS2.
-<br>
+![](https://github.com/tsgsOFFICIAL/CS2-AutoAccept/blob/main/rgb_divider.gif)
 
 **Live demo**
 <br>
-![](https://github.com/tsgsOFFICIAL/CS2-AutoAccept.exe/blob/main/VID_20230907215625.gif)
+![](https://github.com/tsgsOFFICIAL/CS2-AutoAccept/blob/main/VID_20230907215625.gif)
 <br>
 
 ## FAQ
