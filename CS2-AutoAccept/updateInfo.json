@@ -1,0 +1,57 @@
+{
+  "version": "4.2.0.0",
+  "type": "minor",
+  "changelog": "Renamed GitHub solution for SEO",
+  "historic_versions": [
+    {
+      "version": "4.1.1.0",
+      "type": "patch",
+      "changelog": "Changed conditions for accept button"
+    },
+    {
+      "version": "4.1.0.0",
+      "type": "minor",
+      "changelog": "Updated conditions to work with any language, basing the conditions on colors instead of only text"
+    },
+    {
+      "version": "4.0.0.0",
+      "type": "major",
+      "changelog": "Updated conditions to work with any language, basing the conditions on colors instead of only text"
+    },
+    {
+      "version": "3.5.0.0",
+      "type": "major",
+      "changelog": "Updated autoaccept conditions, to work with the new button"
+    },
+    {
+      "version": "3.4.0.0",
+      "type": "minor",
+      "changelog": "Added a changelog feature, to see what the update is about, and if it's important"
+    },
+    {
+      "version": "3.3.2.0",
+      "type": "minor",
+      "changelog": "HOTFIX for update method"
+    },
+    {
+      "version": "3.0.0.0",
+      "type": "major",
+      "changelog": "Officially supports CS2, and automatic updates!"
+    },
+    {
+      "version": "2.1.9.0",
+      "type": "major",
+      "changelog": "Added CS2 Beta support"
+    },
+    {
+      "version": "2.0.0.0",
+      "type": "major",
+      "changelog": "Improved a lot, bug fixes"
+    },
+    {
+      "version": "1.0.0.0",
+      "type": "major",
+      "changelog": "First major release for CS:GO"
+    }
+  ]
+}
