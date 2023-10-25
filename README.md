@@ -1,6 +1,6 @@
 # CS2-AutoAccept
 A program to automatically find and press "ACCEPT" for you, when entering a competitive match in CS2.
-![](https://github.com/tsgsOFFICIAL/CS2-AutoAccept/blob/main/rgb_divider.gif)![](https://github.com/tsgsOFFICIAL/CS2-AutoAccept/blob/main/rgb_divider.gif)![](https://github.com/tsgsOFFICIAL/CS2-AutoAccept/blob/main/rgb_divider.gif)
+![](https://github.com/tsgsOFFICIAL/CS2-AutoAccept/blob/main/rgb_divider.gif)![](https://github.com/tsgsOFFICIAL/CS2-AutoAccept/blob/main/rgb_divider.gif)
 
 **Live demo**
 <br>
@@ -8,6 +8,7 @@ A program to automatically find and press "ACCEPT" for you, when entering a comp
 <br>
 
 ## FAQ
+![](https://github.com/tsgsOFFICIAL/CS2-AutoAccept/blob/main/rgb_divider.gif)![](https://github.com/tsgsOFFICIAL/CS2-AutoAccept/blob/main/rgb_divider.gif)
 
 **How does it work?**
 <br>
@@ -47,3 +48,5 @@ Extract it to "%appdata%\CS2 AutoAccept", to do this follow these steps:
 4. Extract the ZIP file inside this folder.
 5. Create a shortcut to the application by dragging the "CS2-AutoAccept.exe" file somewhere else, like your desktop and holding CTRL and SHIFT while letting it go.
 6. Enjoy :)
+
+![](https://github.com/tsgsOFFICIAL/CS2-AutoAccept/blob/main/rgb_divider.gif)![](https://github.com/tsgsOFFICIAL/CS2-AutoAccept/blob/main/rgb_divider.gif)
