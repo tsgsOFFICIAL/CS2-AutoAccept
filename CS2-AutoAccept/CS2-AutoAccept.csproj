@@ -11,7 +11,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Description>A program to automatically find and press "ACCEPT" for you, when entering a competitive match in CS2.</Description>
     <Copyright>©️ tsgsOFFICIAL - 2023</Copyright>
-    <FileVersion>4.2.0.0</FileVersion>
+    <FileVersion>4.3.0.0</FileVersion>
     <AssemblyName>CS2-AutoAccept</AssemblyName>
   </PropertyGroup>
 
@@ -85,7 +85,7 @@
     <None Include="bin\Release\net6.0-windows\publish\win-x86\createdump.exe" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept.dll.config" />
-    <None Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept" />
+    <None Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept.exe" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\CS2-AutoAccept.pdb" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\cs\Microsoft.VisualBasic.Forms.resources.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\cs\PresentationCore.resources.dll" />

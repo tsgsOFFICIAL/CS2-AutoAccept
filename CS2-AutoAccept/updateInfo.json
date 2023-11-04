@@ -1,8 +1,13 @@
 {
-  "version": "4.2.0.0",
+  "version": "4.3.0.0",
   "type": "minor",
-  "changelog": "Renamed GitHub solution for SEO",
+  "changelog": "Trained Tessract for better results",
   "historic_versions": [
+    {
+      "version": "4.2.0.0",
+      "type": "minor",
+      "changelog": "Renamed GitHub solution for SEO"
+    },
     {
       "version": "4.1.1.0",
       "type": "patch",

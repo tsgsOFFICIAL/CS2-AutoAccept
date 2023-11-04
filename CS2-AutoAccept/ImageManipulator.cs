@@ -7,129 +7,132 @@ namespace CS2_AutoAccept
     internal class ImageManipulator
     {
         /// <summary>
-        /// Sharpen an image
+        /// Resize image
         /// </summary>
-        /// <param Name="image"></param>
-        /// <returns>This method returns a sharpened image as a Bitmap</returns>
-        public static Bitmap Sharpen(Bitmap image)
+        /// <param name="bmp"></param>
+        /// <param name="newWidth"></param>
+        /// <param name="newHeight"></param>
+        /// <returns>This method returns a Bitmap that has been resized & optimised</returns>
+        public static Bitmap Resize(Bitmap bmp, int newWidth, int newHeight)
         {
-            Bitmap sharpenImage = new Bitmap(image.Width, image.Height);
+            Bitmap temp = bmp;
 
-            int filterWidth = 3;
-            int filterHeight = 3;
-            int w = image.Width;
-            int h = image.Height;
+            Bitmap bmap = new Bitmap(newWidth, newHeight, temp.PixelFormat);
 
-            double[,] filter = new double[filterWidth, filterHeight];
+            double nWidthFactor = (double)temp.Width / (double)newWidth;
+            double nHeightFactor = (double)temp.Height / (double)newHeight;
 
-            filter[0, 0] = filter[0, 1] = filter[0, 2] = filter[1, 0] = filter[1, 2] = filter[2, 0] = filter[2, 1] = filter[2, 2] = -1;
-            filter[1, 1] = 9;
+            double fx, fy, nx, ny;
+            int cx, cy, fr_x, fr_y;
+            Color color1 = new Color();
+            Color color2 = new Color();
+            Color color3 = new Color();
+            Color color4 = new Color();
+            byte nRed, nGreen, nBlue;
 
-            double factor = 1.0;
-            double bias = 0.0;
+            byte bp1, bp2;
 
-            Color[,] result = new Color[image.Width, image.Height];
-
-            for (int x = 0; x < w; ++x)
+            for (int i = 0; i < bmap.Width; ++i)
             {
-                for (int y = 0; y < h; ++y)
+                for (int j = 0; j < bmap.Height; ++j)
                 {
-                    double red = 0.0, green = 0.0, blue = 0.0;
+                    fr_x = (int)Math.Floor(i * nWidthFactor);
+                    fr_y = (int)Math.Floor(j * nHeightFactor);
+                    cx = fr_x + 1;
+                    if (cx >= temp.Width)
+                        cx = fr_x;
 
-                    //=====[REMOVE LINES]========================================================
-                    // Color must be read per filter entry, not per image pixel.
-                    Color imageColor = image.GetPixel(x, y);
-                    //===========================================================================
+                    cy = fr_y + 1;
 
-                    for (int filterX = 0; filterX < filterWidth; filterX++)
-                    {
-                        for (int filterY = 0; filterY < filterHeight; filterY++)
-                        {
-                            int imageX = (x - filterWidth / 2 + filterX + w) % w;
-                            int imageY = (y - filterHeight / 2 + filterY + h) % h;
+                    if (cy >= temp.Height)
+                        cy = fr_y;
 
-                            //=====[INSERT LINES]========================================================
-                            // Get the color here - once per fiter entry and image pixel.
-                            imageColor = image.GetPixel(imageX, imageY);
-                            //===========================================================================
+                    fx = i * nWidthFactor - fr_x;
+                    fy = j * nHeightFactor - fr_y;
+                    nx = 1.0 - fx;
+                    ny = 1.0 - fy;
 
-                            red += imageColor.R * filter[filterX, filterY];
-                            green += imageColor.G * filter[filterX, filterY];
-                            blue += imageColor.B * filter[filterX, filterY];
-                        }
-                        int r = Math.Min(Math.Max((int)(factor * red + bias), 0), 255);
-                        int g = Math.Min(Math.Max((int)(factor * green + bias), 0), 255);
-                        int b = Math.Min(Math.Max((int)(factor * blue + bias), 0), 255);
+                    color1 = temp.GetPixel(fr_x, fr_y);
+                    color2 = temp.GetPixel(cx, fr_y);
+                    color3 = temp.GetPixel(fr_x, cy);
+                    color4 = temp.GetPixel(cx, cy);
 
-                        result[x, y] = Color.FromArgb(r, g, b);
-                    }
+                    // Blue
+                    bp1 = (byte)(nx * color1.B + fx * color2.B);
+
+                    bp2 = (byte)(nx * color3.B + fx * color4.B);
+
+                    nBlue = (byte)(ny * (double)(bp1) + fy * (double)(bp2));
+
+                    // Green
+                    bp1 = (byte)(nx * color1.G + fx * color2.G);
+
+                    bp2 = (byte)(nx * color3.G + fx * color4.G);
+
+                    nGreen = (byte)(ny * (double)(bp1) + fy * (double)(bp2));
+
+                    // Red
+                    bp1 = (byte)(nx * color1.R + fx * color2.R);
+
+                    bp2 = (byte)(nx * color3.R + fx * color4.R);
+
+                    nRed = (byte)(ny * (double)(bp1) + fy * (double)(bp2));
+
+                    bmap.SetPixel(i, j, Color.FromArgb(255, nRed, nGreen, nBlue));
                 }
             }
-            for (int i = 0; i < w; ++i)
-            {
-                for (int j = 0; j < h; ++j)
-                {
-                    sharpenImage.SetPixel(i, j, result[i, j]);
-                }
-            }
-            return sharpenImage;
+
+            //bmap = SetGrayscale(bmap);
+            bmap = RemoveNoise(bmap);
+
+            return bmap;
+
         }
         /// <summary>
-        /// Adjust the contrast of an image
+        /// 
         /// </summary>
-        /// <param Name="Image"></param>
-        /// <param Name="Value"></param>
-        /// <returns>This method returns a Bitmap that has been adjusted in the contrast</returns>
-        public static Bitmap AdjustContrast(Bitmap Image, float Value)
+        /// <param name="img"></param>
+        /// <returns></returns>
+        public static Bitmap SetGrayscale(Bitmap img)
         {
-            Value = (100.0f + Value) / 100.0f;
-            Value *= Value;
-            Bitmap NewBitmap = (Bitmap)Image.Clone();
-            BitmapData data = NewBitmap.LockBits(new Rectangle(0, 0, NewBitmap.Width, NewBitmap.Height), ImageLockMode.ReadWrite, NewBitmap.PixelFormat);
-            int Height = NewBitmap.Height;
-            int Width = NewBitmap.Width;
+            Bitmap temp = (Bitmap)img;
+            Bitmap bmap = (Bitmap)temp.Clone();
+            Color c;
 
-            unsafe
+            for (int i = 0; i < bmap.Width; i++)
             {
-                for (int y = 0; y < Height; ++y)
+                for (int j = 0; j < bmap.Height; j++)
                 {
-                    byte* row = (byte*)data.Scan0 + (y * data.Stride);
-                    int columnOffset = 0;
-                    for (int x = 0; x < Width; ++x)
-                    {
-                        byte B = row[columnOffset];
-                        byte G = row[columnOffset + 1];
-                        byte R = row[columnOffset + 2];
+                    c = bmap.GetPixel(i, j);
+                    byte gray = (byte)(.299 * c.R + .587 * c.G + .114 * c.B);
 
-                        float Red = R / 255.0f;
-                        float Green = G / 255.0f;
-                        float Blue = B / 255.0f;
-                        Red = (((Red - 0.5f) * Value) + 0.5f) * 255.0f;
-                        Green = (((Green - 0.5f) * Value) + 0.5f) * 255.0f;
-                        Blue = (((Blue - 0.5f) * Value) + 0.5f) * 255.0f;
-
-                        int iR = (int)Red;
-                        iR = iR > 255 ? 255 : iR;
-                        iR = iR < 0 ? 0 : iR;
-                        int iG = (int)Green;
-                        iG = iG > 255 ? 255 : iG;
-                        iG = iG < 0 ? 0 : iG;
-                        int iB = (int)Blue;
-                        iB = iB > 255 ? 255 : iB;
-                        iB = iB < 0 ? 0 : iB;
-
-                        row[columnOffset] = (byte)iB;
-                        row[columnOffset + 1] = (byte)iG;
-                        row[columnOffset + 2] = (byte)iR;
-
-                        columnOffset += 4;
-                    }
+                    bmap.SetPixel(i, j, Color.FromArgb(gray, gray, gray));
                 }
             }
 
-            NewBitmap.UnlockBits(data);
+            return (Bitmap)bmap.Clone();
 
-            return NewBitmap;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bmap"></param>
+        /// <returns></returns>
+        public static Bitmap RemoveNoise(Bitmap bmap)
+        {
+            for (int i = 0; i < bmap.Width; i++)
+            {
+                for (int j = 0; j < bmap.Height; j++)
+                {
+                    Color pixel = bmap.GetPixel(i, j);
+                    if (pixel.R < 162 && pixel.G < 162 && pixel.B < 162)
+                        bmap.SetPixel(i, j, Color.Black);
+                    else if (pixel.R > 162 && pixel.G > 162 && pixel.B > 162)
+                        bmap.SetPixel(i, j, Color.White);
+                }
+            }
+
+            return bmap;
         }
     }
 }

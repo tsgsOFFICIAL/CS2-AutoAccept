@@ -655,9 +655,6 @@ namespace CS2_AutoAccept
                 // Adjust the contrast, then sharpen the image
                 bitmap = OptimiseImage(bitmap);
 
-                // Take a color sample, to match with letters
-                System.Drawing.Color colorSample = bitmap.GetPixel(bitmap.Width / 2, bitmap.Height / 2);
-
                 // Read the image using OCR
                 (string text, double confidence) valuePair = OCR(bitmap);
 
@@ -666,8 +663,9 @@ namespace CS2_AutoAccept
                 Debug.WriteLine(valuePair.confidence);
 
                 // Check the returned value
-                if ((valuePair.text.ToLower().Contains("accept") && valuePair.confidence > .75) || (colorSample.G > 150 && valuePair.text.Length > 5))
+                if (valuePair.text.ToLower().Contains("accept") && valuePair.confidence > .75)
                 {
+                    Debug.WriteLine("Accept conditions met");
                     // PrintToLog("{Scanner} Match found");
                     // Move the cursor and click the accept button
 
@@ -685,18 +683,13 @@ namespace CS2_AutoAccept
 
                     bitmap = CaptureScreen(_cancelWidth, _cancelHeight, _cancelPosX, _cancelPosY); // "Cancel Search" button
 
-
                     // Adjust the contrast, then sharpen the image
                     bitmap = OptimiseImage(bitmap);
 
-                    // Take a color sample, to match with letters
-                    colorSample = bitmap.GetPixel(bitmap.Width / 2, bitmap.Height / 2);
-
                     // Read the image using OCR
                     valuePair = OCR(bitmap);
-
                     // Check the returned value
-                    if ((!(valuePair.text.ToLower().Contains("cancel search") && valuePair.confidence > .75) || colorSample.R < 150) && !_run_Continuously)
+                    if (!(valuePair.text.ToLower().Contains("cancel search") && valuePair.confidence > .75) && !_run_Continuously)
                     {
                         Dispatcher.BeginInvoke(new Action(() =>
                         {
@@ -719,13 +712,13 @@ namespace CS2_AutoAccept
         private void CalculateSizes(string type)
         {
             // Base settings for 2560x1440
-            int acceptPosX = 1130;
-            int acceptPosY = 540;
-            int acceptWidth = 299;
-            int acceptHeight = 116;
-            int cancelPosX = 2001;
+            int acceptPosX = 1164;
+            int acceptPosY = 546;
+            int acceptWidth = 227;
+            int acceptHeight = 105;
+            int cancelPosX = 2050;
             int cancelPosY = 1347;
-            int cancelWidth = 386;
+            int cancelWidth = 400;
             int cancelHeight = 60;
             int baseWidth = 2560;
             int baseHeight = 1440;
@@ -838,8 +831,7 @@ namespace CS2_AutoAccept
         {
             // PrintToLog("{OptimiseImage}");
             // Adjust the contrast, then sharpen the image
-            bitmap = ImageManipulator.AdjustContrast(bitmap, 100);
-            bitmap = ImageManipulator.Sharpen(bitmap);
+            bitmap = ImageManipulator.Resize(bitmap, bitmap.Width * 2, bitmap.Height * 2);
 
             // PrintToLog("{OptimiseImage} SUCCESS");
             return bitmap;
@@ -871,9 +863,17 @@ namespace CS2_AutoAccept
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // PrintToLog("{OCR} " + ex.Message);
+                if (ex.Message.ToLower().Contains("failed to initialise tesseract engine"))
+                {
+                    string basePath = Path.Combine(_basePath, "CS2 AutoAccept");
+                    Process.Start(Path.Combine(basePath, "CS2-AutoAccept"));
+                    Environment.Exit(0);
+                    return ("", 100);
+                }
+
                 return ("", 100);
             }
         }
