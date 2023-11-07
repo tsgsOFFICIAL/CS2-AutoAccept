@@ -1,8 +1,13 @@
 {
-  "version": "4.3.0.0",
+  "version": "4.4.0.0",
   "type": "minor",
-  "changelog": "Trained Tessract for better results",
+  "changelog": "Automatically moves the program to its destination, the first time installig o",
   "historic_versions": [
+    {
+      "version": "4.3.0.0",
+      "type": "minor",
+      "changelog": "Trained Tessract for better results"
+    },
     {
       "version": "4.2.0.0",
       "type": "minor",

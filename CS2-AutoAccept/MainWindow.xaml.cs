@@ -81,6 +81,20 @@ namespace CS2_AutoAccept
                 System.Windows.MessageBox.Show(ex.Message, "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
+            #region delete old runPath
+            if (File.Exists(Path.Combine(_basePath, "DELETE_ME.tsgs")))
+            {
+                string folderToDelete = File.ReadAllText(Path.Combine(_basePath, "DELETE_ME.tsgs"));
+                try
+                {
+                    Directory.Delete(folderToDelete, true);
+                    File.Delete(Path.Combine(_basePath, "DELETE_ME.tsgs"));
+                }
+                catch (Exception)
+                { }
+            }
+            #endregion
+
             #region Update
             if (Directory.Exists(_updatePath))
             {
@@ -418,6 +432,8 @@ namespace CS2_AutoAccept
                     // Delete all the old files and folders
                     DeleteAllExceptFolder(_basePath, "");
                 }
+
+                File.WriteAllText(Path.Combine(_basePath, "DELETE_ME.tsgs"), runPath);
 
                 // Move all the new files and folders, to the basePath
                 foreach (string filePath in files)
