@@ -16,13 +16,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="bin\**" />
-    <EmbeddedResource Remove="bin\**" />
-    <None Remove="bin\**" />
-    <Page Remove="bin\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="background.png" />
     <None Remove="Discord white.png" />
     <None Remove="logo.png" />
@@ -481,7 +474,6 @@
     <None Include="bin\Release\net6.0-windows\publish\win-x86\System.Xml.XmlSerializer.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\System.Xml.XPath.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\System.Xml.XPath.XDocument.dll" />
-    <None Include="bin\Release\net6.0-windows\publish\win-x86\tessdata\eng.traineddata" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\Tesseract.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\Tesseract.Drawing.dll" />
     <None Include="bin\Release\net6.0-windows\publish\win-x86\tr\Microsoft.VisualBasic.Forms.resources.dll" />
