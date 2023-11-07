@@ -87,7 +87,11 @@ namespace CS2_AutoAccept
                 string folderToDelete = File.ReadAllText(Path.Combine(_basePath, "DELETE_ME.tsgs"));
                 try
                 {
-                    Directory.Delete(folderToDelete, true);
+                    if (Directory.Exists(folderToDelete))
+                    {
+                        Directory.Delete(folderToDelete, true);
+                    }
+
                     File.Delete(Path.Combine(_basePath, "DELETE_ME.tsgs"));
                 }
                 catch (Exception)

@@ -1,8 +1,13 @@
 {
-  "version": "4.4.0.0",
+  "version": "4.4.1.0",
   "type": "minor",
-  "changelog": "Automatically moves the program to its destination, the first time installig o",
+  "changelog": "Minor change to previous update",
   "historic_versions": [
+    {
+      "version": "4.4.0.0",
+      "type": "minor",
+      "changelog": "Automatically moves the program to its destination, the first time installing"
+    },
     {
       "version": "4.3.0.0",
       "type": "minor",
