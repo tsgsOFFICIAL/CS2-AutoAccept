@@ -58,14 +58,18 @@ namespace CS2_AutoAccept
         public MainWindow()
         {
             InitializeComponent();
+
+            _basePath = Path.Combine(Environment.ExpandEnvironmentVariables("%APPDATA%"), "CS2 AutoAccept");
+            _updatePath = Path.Combine(_basePath, "UPDATE");
+
+            ControlLocation();
+
             _ = UpdateHeaderVersion();
             updater = new Updater();
             updater.DownloadProgress += Updater_ProgressUpdated!;
             Thread GameRunningThread = new Thread(IsGameRunning);
             GameRunningThread.Start();
             GameRunningThread.IsBackground = true;
-            _basePath = Environment.ExpandEnvironmentVariables("%APPDATA%");
-            _updatePath = Path.Combine(_basePath, "CS2 AutoAccept", "UPDATE");
 
             try
             {
@@ -89,8 +93,7 @@ namespace CS2_AutoAccept
 
                 string lastFolderInPath = runPath.Split('\\')[^1];
 
-                string basePath = Path.Combine(_basePath, "CS2 AutoAccept");
-                string updatePath = Path.Combine(basePath, "UPDATE");
+                string updatePath = Path.Combine(_basePath, "UPDATE");
 
                 // If true, the exe was run from inside the UPDATE folder
                 if (lastFolderInPath == "UPDATE")
@@ -99,13 +102,13 @@ namespace CS2_AutoAccept
                     string[] updatedDirectories = Directory.GetDirectories(updatePath, "*", SearchOption.TopDirectoryOnly);
 
                     // Delete all the old files and folders
-                    DeleteAllExceptFolder(basePath, "UPDATE");
+                    DeleteAllExceptFolder(_basePath, "UPDATE");
 
                     // Move all the new files and folders, to the basePath
                     foreach (string filePath in updatedFiles)
                     {
                         string fileName = filePath.Substring(updatePath.Length + 1);
-                        string destinationPath = Path.Combine(basePath, fileName);
+                        string destinationPath = Path.Combine(_basePath, fileName);
 
                         try
                         {
@@ -121,7 +124,7 @@ namespace CS2_AutoAccept
                     foreach (string directoryPath in updatedDirectories)
                     {
                         string directoryName = directoryPath.Substring(updatePath.Length + 1);
-                        string destinationPath = Path.Combine(basePath, directoryName);
+                        string destinationPath = Path.Combine(_basePath, directoryName);
 
                         try
                         {
@@ -135,7 +138,7 @@ namespace CS2_AutoAccept
                     }
 
                     // Start the updated program, in the new default path
-                    Process.Start(Path.Combine(basePath, "CS2-AutoAccept"));
+                    Process.Start(Path.Combine(_basePath, "CS2-AutoAccept"));
                     Environment.Exit(0);
                 }
                 else
@@ -384,6 +387,77 @@ namespace CS2_AutoAccept
             Run_at_startup_state.Content = "Run at startup (OFF)";
         }
         #endregion
+        /// <summary>
+        /// Control the location of the application,
+        /// If not in the correct place Move it
+        /// </summary>
+        private void ControlLocation()
+        {
+            // Was the program ran from the correct folder?
+            string runPath = AppContext.BaseDirectory;
+
+            if (runPath.LastIndexOf('\\') == runPath.Length - 1)
+            {
+                runPath = runPath[..^1]; // Remove the last character
+            }
+
+            string lastFolderInPath = runPath.Split('\\')[^1];
+
+            if (lastFolderInPath != "CS2 AutoAccept")
+            {
+                string[] files = Directory.GetFiles(runPath, "*", SearchOption.TopDirectoryOnly);
+                string[] folders = Directory.GetDirectories(runPath, "*", SearchOption.TopDirectoryOnly);
+
+                // Does the correct folder exist?
+                if (!Directory.Exists(_basePath))
+                {
+                    Directory.CreateDirectory(_basePath);
+                }
+                else
+                {
+                    // Delete all the old files and folders
+                    DeleteAllExceptFolder(_basePath, "");
+                }
+
+                // Move all the new files and folders, to the basePath
+                foreach (string filePath in files)
+                {
+                    string fileName = filePath.Substring(runPath.Length + 1);
+                    string destinationPath = Path.Combine(_basePath, fileName);
+
+                    try
+                    {
+                        File.Copy(filePath, destinationPath, true);
+                        Debug.WriteLine($"Copied: {fileName}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Error copying {fileName}: {ex.Message}");
+                    }
+                }
+
+                foreach (string directoryPath in folders)
+                {
+                    string directoryName = directoryPath.Substring(runPath.Length + 1);
+                    string destinationPath = Path.Combine(_basePath, directoryName);
+
+                    try
+                    {
+                        Directory.Move(directoryPath, destinationPath);
+                        Debug.WriteLine($"Moved: {directoryName}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Error copying {directoryName}: {ex.Message}");
+                    }
+                }
+
+                // Start the updated program, in the new default path
+                Process.Start(Path.Combine(_basePath, "CS2-AutoAccept"));
+                Environment.Exit(0);
+
+            }
+        }
         /// <summary>
         /// Launch a web URL on Windows, Linux and OSX
         /// </summary>
@@ -868,8 +942,7 @@ namespace CS2_AutoAccept
                 // PrintToLog("{OCR} " + ex.Message);
                 if (ex.Message.ToLower().Contains("failed to initialise tesseract engine"))
                 {
-                    string basePath = Path.Combine(_basePath, "CS2 AutoAccept");
-                    Process.Start(Path.Combine(basePath, "CS2-AutoAccept"));
+                    Process.Start(Path.Combine(_basePath, "CS2-AutoAccept"));
                     Environment.Exit(0);
                     return ("", 100);
                 }
