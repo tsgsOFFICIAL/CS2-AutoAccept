@@ -62,7 +62,7 @@ namespace CS2_AutoAccept
             _basePath = Path.Combine(Environment.ExpandEnvironmentVariables("%APPDATA%"), "CS2 AutoAccept");
             _updatePath = Path.Combine(_basePath, "UPDATE");
 
-            ControlLocation();
+            //ControlLocation();
 
             _ = UpdateHeaderVersion();
             updater = new Updater();
@@ -82,21 +82,21 @@ namespace CS2_AutoAccept
             }
 
             #region Delete old runPath
-            if (File.Exists(Path.Combine(_basePath, "DELETE_ME.tsgs")))
-            {
-                string folderToDelete = File.ReadAllText(Path.Combine(_basePath, "DELETE_ME.tsgs"));
-                try
-                {
-                    if (Directory.Exists(folderToDelete))
-                    {
-                        Directory.Delete(folderToDelete, true);
-                    }
+            //if (File.Exists(Path.Combine(_basePath, "DELETE_ME.tsgs")))
+            //{
+            //    string folderToDelete = File.ReadAllText(Path.Combine(_basePath, "DELETE_ME.tsgs"));
+            //    try
+            //    {
+            //        if (Directory.Exists(folderToDelete))
+            //        {
+            //            Directory.Delete(folderToDelete, true);
+            //        }
 
-                    File.Delete(Path.Combine(_basePath, "DELETE_ME.tsgs"));
-                }
-                catch (Exception)
-                { }
-            }
+            //        File.Delete(Path.Combine(_basePath, "DELETE_ME.tsgs"));
+            //    }
+            //    catch (Exception)
+            //    { }
+            //}
             #endregion
 
             #region Update
