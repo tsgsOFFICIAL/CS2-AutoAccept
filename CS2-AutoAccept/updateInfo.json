@@ -1,6 +1,6 @@
 {
   "version": "4.4.1.0",
-  "type": "hotfix",
+  "type": "patch",
   "changelog": "Minor change to previous update",
   "historic_versions": [
     {
