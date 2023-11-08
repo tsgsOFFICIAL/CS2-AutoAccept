@@ -81,7 +81,7 @@ namespace CS2_AutoAccept
                 System.Windows.MessageBox.Show(ex.Message, "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            #region delete old runPath
+            #region Delete old runPath
             if (File.Exists(Path.Combine(_basePath, "DELETE_ME.tsgs")))
             {
                 string folderToDelete = File.ReadAllText(Path.Combine(_basePath, "DELETE_ME.tsgs"));
@@ -996,13 +996,23 @@ namespace CS2_AutoAccept
             {
                 if (Path.GetFileName(directory) != folderToKeep)
                 {
-                    Directory.Delete(directory, true);
+                    try
+                    {
+                        Directory.Delete(directory, true);
+                    }
+                    catch (Exception)
+                    { }
                 }
             }
 
             foreach (string file in Directory.GetFiles(directoryPath))
             {
-                File.Delete(file);
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (Exception)
+                { }
             }
 
             // Recursively process subdirectories
