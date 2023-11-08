@@ -415,7 +415,7 @@ namespace CS2_AutoAccept
                 runPath = runPath[..^1]; // Remove the last character
             }
 
-            if (runPath != _basePath)
+            if (runPath != _basePath && runPath != _updatePath)
             {
                 string[] files = Directory.GetFiles(runPath, "*", SearchOption.TopDirectoryOnly);
                 string[] folders = Directory.GetDirectories(runPath, "*", SearchOption.TopDirectoryOnly);
