@@ -62,7 +62,7 @@ namespace CS2_AutoAccept
             _basePath = Path.Combine(Environment.ExpandEnvironmentVariables("%APPDATA%"), "CS2 AutoAccept");
             _updatePath = Path.Combine(_basePath, "UPDATE");
 
-            //ControlLocation();
+            ControlLocation();
 
             _ = UpdateHeaderVersion();
             updater = new Updater();
@@ -82,21 +82,21 @@ namespace CS2_AutoAccept
             }
 
             #region Delete old runPath
-            //if (File.Exists(Path.Combine(_basePath, "DELETE_ME.tsgs")))
-            //{
-            //    string folderToDelete = File.ReadAllText(Path.Combine(_basePath, "DELETE_ME.tsgs"));
-            //    try
-            //    {
-            //        if (Directory.Exists(folderToDelete))
-            //        {
-            //            Directory.Delete(folderToDelete, true);
-            //        }
+            if (File.Exists(Path.Combine(_basePath, "DELETE_ME.tsgs")))
+            {
+                string folderToDelete = File.ReadAllText(Path.Combine(_basePath, "DELETE_ME.tsgs"));
+                try
+                {
+                    if (Directory.Exists(folderToDelete))
+                    {
+                        Directory.Delete(folderToDelete, true);
+                    }
 
-            //        File.Delete(Path.Combine(_basePath, "DELETE_ME.tsgs"));
-            //    }
-            //    catch (Exception)
-            //    { }
-            //}
+                    File.Delete(Path.Combine(_basePath, "DELETE_ME.tsgs"));
+                }
+                catch (Exception)
+                { }
+            }
             #endregion
 
             #region Update
@@ -109,15 +109,11 @@ namespace CS2_AutoAccept
                     runPath = runPath[..^1]; // Remove the last character
                 }
 
-                string lastFolderInPath = runPath.Split('\\')[^1];
-
-                string updatePath = Path.Combine(_basePath, "UPDATE");
-
                 // If true, the exe was run from inside the UPDATE folder
-                if (lastFolderInPath == "UPDATE")
+                if (runPath == _updatePath)
                 {
-                    string[] updatedFiles = Directory.GetFiles(updatePath, "*", SearchOption.TopDirectoryOnly);
-                    string[] updatedDirectories = Directory.GetDirectories(updatePath, "*", SearchOption.TopDirectoryOnly);
+                    string[] updatedFiles = Directory.GetFiles(_updatePath, "*", SearchOption.TopDirectoryOnly);
+                    string[] updatedDirectories = Directory.GetDirectories(_updatePath, "*", SearchOption.TopDirectoryOnly);
 
                     // Delete all the old files and folders
                     DeleteAllExceptFolder(_basePath, "UPDATE");
@@ -125,7 +121,7 @@ namespace CS2_AutoAccept
                     // Move all the new files and folders, to the basePath
                     foreach (string filePath in updatedFiles)
                     {
-                        string fileName = filePath.Substring(updatePath.Length + 1);
+                        string fileName = filePath.Substring(_updatePath.Length + 1);
                         string destinationPath = Path.Combine(_basePath, fileName);
 
                         try
@@ -141,7 +137,7 @@ namespace CS2_AutoAccept
 
                     foreach (string directoryPath in updatedDirectories)
                     {
-                        string directoryName = directoryPath.Substring(updatePath.Length + 1);
+                        string directoryName = directoryPath.Substring(_updatePath.Length + 1);
                         string destinationPath = Path.Combine(_basePath, directoryName);
 
                         try
@@ -164,7 +160,7 @@ namespace CS2_AutoAccept
                     // Try to delete the update folder, if not run from that path
                     try
                     {
-                        Directory.Delete(updatePath, true);
+                        Directory.Delete(_updatePath, true);
                     }
                     catch (Exception ex)
                     {
@@ -419,9 +415,7 @@ namespace CS2_AutoAccept
                 runPath = runPath[..^1]; // Remove the last character
             }
 
-            string lastFolderInPath = runPath.Split('\\')[^1];
-
-            if (lastFolderInPath != "CS2 AutoAccept")
+            if (runPath != _basePath)
             {
                 string[] files = Directory.GetFiles(runPath, "*", SearchOption.TopDirectoryOnly);
                 string[] folders = Directory.GetDirectories(runPath, "*", SearchOption.TopDirectoryOnly);
