@@ -1,8 +1,13 @@
 {
   "version": "4.4.2.0",
-  "type": "patch",
-  "changelog": "Minor change to previous update",
+  "type": "bugfix",
+  "changelog": "Reworked the control location method",
   "historic_versions": [
+    {
+      "version": "4.4.1.0",
+      "type": "patch",
+      "changelog": "Minor change to previous update"
+    },
     {
       "version": "4.4.0.0",
       "type": "minor",
