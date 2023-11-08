@@ -126,7 +126,7 @@ namespace CS2_AutoAccept
 
                         try
                         {
-                            File.Copy(filePath, destinationPath, true);
+                            File.Move(filePath, destinationPath, true);
                             Debug.WriteLine($"Copied: {fileName}");
                         }
                         catch (Exception ex)
