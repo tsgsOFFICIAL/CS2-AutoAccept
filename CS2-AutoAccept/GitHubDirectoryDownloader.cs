@@ -46,13 +46,13 @@ namespace CS2_AutoAccept
             httpClientHandler.AllowAutoRedirect = true;
             // Set the SSL/TLS version (for example, TLS 1.2)
             httpClientHandler.SslProtocols = SslProtocols.Tls12;
-            _httpClient.Timeout = new TimeSpan(0, 5, 0);
             //httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) =>
             //{
             //    return true;
             //};
 
             _httpClient = new HttpClient(httpClientHandler);
+            _httpClient.Timeout = new TimeSpan(0, 5, 0);
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "GitHubDirectoryDownloader");
             #endregion
 
