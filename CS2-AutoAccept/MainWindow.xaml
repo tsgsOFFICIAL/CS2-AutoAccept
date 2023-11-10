@@ -3,11 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CS2_AutoAccept"
+        xmlns:local="CS2_AutoAccept"
         mc:Ignorable="d"
         Title="CS2 AutoAccept by tsgsOFFICIAL" Height="450" Width="800"
         ResizeMode="CanResize"
         WindowStyle="None"
+        MinWidth="800"
+        MinHeight="450"
         Background="#353535"
         >
 
@@ -91,45 +93,83 @@
 
     <!-- Disable stretching of the window, while allowing it to be minimized from the tabbar -->
     <WindowChrome.WindowChrome>
-        <WindowChrome GlassFrameThickness="1" ResizeBorderThickness="0" CaptionHeight="0"/>
+        <WindowChrome GlassFrameThickness="1" ResizeBorderThickness="5" CaptionHeight="0"/>
     </WindowChrome.WindowChrome>
     <Grid>
         <!-- Background -->
         <Grid.Background>
-            <ImageBrush ImageSource="/background.png" Opacity=".5"></ImageBrush>
+            <ImageBrush ImageSource="/background.png"></ImageBrush>
         </Grid.Background>
 
+        <!-- Column & Row Definitions -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="60*"/>
+            <ColumnDefinition Width="40*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="8*"/>
+            <RowDefinition Height="92*"/>
+        </Grid.RowDefinitions>
+
         <!-- Custom header -->
-        <TextBlock Background="#1c1b1b" VerticalAlignment="Top" Height="30" MouseLeftButtonDown="WindowHeader_Mousedown"/>
-        <Image Source="/logo.png" MaxHeight="26" Margin="0,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" MouseLeftButtonDown="WindowHeader_Mousedown"/>
-        <TextBlock x:Name="HeaderTextBlock" Text="CS2 AutoAccept" FontFamily="Roboto" FontSize="15" Foreground="GhostWhite" Margin="30,2,0,420" MouseLeftButtonDown="WindowHeader_Mousedown"/>
-        <TextBlock Text="by tsgsOFFICIAL" FontFamily="Roboto" FontSize="12" Foreground="GhostWhite" Margin="30,16,675,414" MouseLeftButtonDown="WindowHeader_Mousedown"/>
-        <Button Background="Transparent" Content="&#x1F5D5;" FontSize="18" VerticalAlignment="Top" ToolTip="Minimize" Click="Button_Click_Minimize" Foreground="GhostWhite" BorderBrush="Transparent" Height="31" Width="30" HorizontalAlignment="Right" Margin="0,0,30,0" Style="{DynamicResource NavButtons}"/>
-        <Button Background="Transparent" Content="&#10006;" ToolTip="Close" Click="Button_Click_Close" Foreground="GhostWhite" BorderBrush="Transparent" Margin="770 0 0 420" Style="{DynamicResource CloseBtn}"/>
-        <Button Background="Transparent" x:Name="Button_Update" Click="Button_Update_Click" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="200,0,0,0" Height="30" BorderThickness="0" FontFamily="Roboto" FontSize="15" Foreground="GhostWhite" FontWeight="SemiBold" Cursor="Hand" Style="{DynamicResource NavButtons}"/>
+        <StackPanel Background="#1c1b1b" MouseLeftButtonDown="WindowHeader_Mousedown" Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <Image Source="/logo.png" MouseLeftButtonDown="WindowHeader_Mousedown" HorizontalAlignment="Left"/>
+            <StackPanel Margin="3.3,0,0,0" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <TextBlock Text="CS2 AutoAccept" FontFamily="Roboto" Foreground="GhostWhite" MouseLeftButtonDown="WindowHeader_Mousedown"/>
+                <TextBlock Text="by tsgsOFFICIAL" FontFamily="Roboto" Foreground="GhostWhite" MouseLeftButtonDown="WindowHeader_Mousedown"/>
+            </StackPanel>
+
+            <Button Background="Transparent" x:Name="Button_Update" Click="Button_Update_Click" Margin="20, 0, 0, 0" BorderThickness="0" FontFamily="Roboto" FontSize="15" Foreground="GhostWhite" FontWeight="SemiBold" Cursor="Hand" Style="{DynamicResource NavButtons}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Name="Min_btn" Background="Transparent" Content="&#x1F5D5;" ToolTip="Minimize" Click="Button_Click_Minimize" Foreground="GhostWhite" BorderBrush="Transparent" Style="{DynamicResource NavButtons}" Height="Auto" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" FontSize="18"/>
+            <Button Name="X_btn" Background="Transparent" Content="&#10006;" ToolTip="Close" Click="Button_Click_Close" Foreground="GhostWhite" BorderBrush="Transparent" Style="{DynamicResource CloseBtn}" Height="Auto" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
+        </StackPanel>
 
         <!-- Controls -->
-        <CheckBox x:Name="Program_state" Content="AutoAccept (OFF)" ToolTip="Will find the ACCEPT button, only for the current match" IsChecked="False" Margin="30,41,646,390" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Program_state_Checked" Unchecked="Program_state_Unchecked"/>
-        <CheckBox x:Name="Run_at_startup_state" Content="Run at startup (OFF)" ToolTip="Automatically start this app when your pc launches" IsChecked="False" Margin="30,71,632,360" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Run_at_startup_state_Checked" Unchecked="Run_at_startup_state_Unchecked"/>
-        <CheckBox x:Name="Program_state_continuously" Content="Auto Accept Every Match (OFF)" ToolTip="Will find the ACCEPT button for all matches, this will consume more cpu power while in game!" IsChecked="False" Margin="30,101,570,330" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Program_state_continuously_Checked" Unchecked="Program_state_continuously_Unchecked"/>
-        <!--<CheckBox x:Name="Panorama_state" Content="Panorama (NO)" IsChecked="False" Margin="30,60,646,374" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Panorama_state_Checked" Unchecked="Panorama_state_Unchecked"/>-->
-        <TextBlock x:Name="TextBlock_Monitor" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="13,340,320,89"/>
-        <TextBlock x:Name="TextBlock_MonitorSize" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="13,365,555,64"/>
-
-        <TextBlock x:Name="TextBlock_Progress" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" Margin="30,185,313,245" TextAlignment="Center" Visibility="Collapsed"/>
-        <ProgressBar x:Name="Progress_Download" HorizontalAlignment="Left" Height="30" Margin="30,0,0,0" Width="457" Visibility="Collapsed"/>
-
-        <Button x:Name="Button_LaunchCS" Margin="540,170,10,170" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" Content="Launch CS2" Cursor="Hand" ToolTip="Click here to launch CS2" Background="#3F169C80" Click="Button_Click_LaunchCS2" BorderThickness="0">
-            <Button.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="5"/>
+        <StackPanel Grid.Row="1">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type CheckBox}">
+                    <Setter Property="Margin" Value="10, 15, 0, 0"/>
                 </Style>
-            </Button.Resources>
-        </Button>
+            </StackPanel.Resources>
+
+            <CheckBox x:Name="Program_state" Content="AutoAccept (OFF)" ToolTip="Will find the ACCEPT button, only for the current match" IsChecked="False"  Foreground="Red" FontWeight="Bold" Checked="Program_state_Checked" Unchecked="Program_state_Unchecked"/>
+            <CheckBox x:Name="Run_at_startup_state" Content="Run at startup (OFF)" ToolTip="Automatically start this app when your pc launches" IsChecked="False" Foreground="Red" FontWeight="Bold" Checked="Run_at_startup_state_Checked" Unchecked="Run_at_startup_state_Unchecked"/>
+            <CheckBox x:Name="Program_state_continuously" Content="Auto Accept Every Match (OFF)" ToolTip="Will find the ACCEPT button for all matches, this will consume more cpu power while in game!" IsChecked="False" Foreground="Red" FontWeight="Bold" Checked="Program_state_continuously_Checked" Unchecked="Program_state_continuously_Unchecked"/>
+            <!--<CheckBox x:Name="Panorama_state" Content="Panorama (NO)" IsChecked="False" Margin="30,60,646,374" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Panorama_state_Checked" Unchecked="Panorama_state_Unchecked"/>-->
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Margin" Value="10, 0, 0, 15"/>
+                </Style>
+            </StackPanel.Resources>
+
+            <TextBlock x:Name="TextBlock_Monitor" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite"/>
+            <TextBlock x:Name="TextBlock_MonitorSize" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock x:Name="TextBlock_Progress" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite" TextAlignment="Center" Visibility="Collapsed"/>
+            <ProgressBar x:Name="Progress_Download" HorizontalAlignment="Left" Height="30" Width="457" Visibility="Collapsed"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" Margin="0, 0, 10, 10">
+            <Button x:Name="Button_LaunchCS" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" Content="Launch CS2" Cursor="Hand" ToolTip="Click here to launch CS2" Background="#3F169C80" Click="Button_Click_LaunchCS2" BorderThickness="0">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="5"/>
+                        <Setter Property="MinHeight" Value="110"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
 
         <!-- Socials -->
-        <TextBlock Text="Join the Discord!" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" Margin="574,296,44,125"/>
-        <Button Margin="540,330,10,10" Background="#FF7289DA" Cursor="Hand" Click="Button_Click_Discord" ToolTip="Join my Discord server, its a great place for asking questions and hanging out :)" BorderThickness="0">
+        <TextBlock Text="Join the Discord!" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" TextAlignment="Center"/>
+        <Button Background="#FF7289DA" Cursor="Hand" Click="Button_Click_Discord" ToolTip="Join my Discord server, its a great place for asking questions and hanging out :)" BorderThickness="0">
             <Image Source="/Discord white.png"/>
 
             <Button.Resources>
@@ -137,6 +177,7 @@
                     <Setter Property="CornerRadius" Value="5"/>
                 </Style>
             </Button.Resources>
-        </Button>
+            </Button>
+        </StackPanel>
     </Grid>
 </Window>
