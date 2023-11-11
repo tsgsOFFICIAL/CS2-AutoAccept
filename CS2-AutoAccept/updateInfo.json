@@ -1,10 +1,14 @@
 {
-  "version": "5.0.1.0",
+  "version": "5.0.2.0",
   "type": "patch",
-  "changelog": "Added maximize button to UI",
+  "changelog": "Fixed update animation",
   "historic_versions": [
     {
-
+      "version": "5.0.1.0",
+      "type": "patch",
+      "changelog": "Added maximize button to UI"
+    },
+    {
       "version": "5.0.0.0",
       "type": "major",
       "changelog": "Reworked the UI"

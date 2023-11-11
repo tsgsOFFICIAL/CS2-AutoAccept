@@ -194,6 +194,7 @@ namespace CS2_AutoAccept
                         Program_state.Visibility = Visibility.Visible;
                         Program_state_continuously.Visibility = Visibility.Visible;
                         Run_at_startup_state.Visibility = Visibility.Visible;
+                        Button_LaunchCS.Visibility = Visibility.Visible;
 
                         System.Windows.MessageBox.Show($"Update Failed, please try again later, or download it directly from the Github page!\n\nError Message: {e.Status}", "CS2 AutoAccept", MessageBoxButton.OK, MessageBoxImage.Error);
                         _updateFailed = true;
@@ -257,6 +258,7 @@ namespace CS2_AutoAccept
                 Program_state.Visibility = Visibility.Collapsed;
                 Program_state_continuously.Visibility = Visibility.Collapsed;
                 Run_at_startup_state.Visibility = Visibility.Collapsed;
+                Button_LaunchCS.Visibility = Visibility.Collapsed;
                 updater!.DownloadUpdate(_updatePath);
             }
             else
