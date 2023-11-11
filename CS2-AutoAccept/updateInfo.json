@@ -1,8 +1,14 @@
 {
-  "version": "5.0.0.0",
-  "type": "major",
-  "changelog": "Reworked the control location method",
+  "version": "5.0.1.0",
+  "type": "patch",
+  "changelog": "Added maximize button to UI",
   "historic_versions": [
+    {
+
+      "version": "5.0.0.0",
+      "type": "major",
+      "changelog": "Reworked the UI"
+    },
     {
       "version": "4.4.2.0",
       "type": "bugfix",

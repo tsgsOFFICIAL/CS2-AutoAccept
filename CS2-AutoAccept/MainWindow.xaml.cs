@@ -220,6 +220,18 @@ namespace CS2_AutoAccept
             WindowState = WindowState.Minimized;
         }
         /// <summary>
+        /// Maximize the window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void Button_Click_Maximize(object sender, RoutedEventArgs e)
+        {
+            if (WindowState.Equals(WindowState.Maximized))
+                WindowState = WindowState.Normal;
+            else
+                WindowState = WindowState.Maximized;
+        }
+        /// <summary>
         /// Close button
         /// </summary>
         /// <param Name="sender"></param>

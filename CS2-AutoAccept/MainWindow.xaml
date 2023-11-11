@@ -124,6 +124,7 @@
 
         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Name="Min_btn" Background="Transparent" Content="&#x1F5D5;" ToolTip="Minimize" Click="Button_Click_Minimize" Foreground="GhostWhite" BorderBrush="Transparent" Style="{DynamicResource NavButtons}" Height="Auto" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" FontSize="18"/>
+            <Button x:Name="Maximize_Button" Background="Transparent" Content="&#x1F5D6;" ToolTip="Maximize" Click="Button_Click_Maximize" Foreground="GhostWhite" BorderBrush="Transparent" Style="{DynamicResource NavButtons}" Height="Auto" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" FontSize="18"/>
             <Button Name="X_btn" Background="Transparent" Content="&#10006;" ToolTip="Close" Click="Button_Click_Close" Foreground="GhostWhite" BorderBrush="Transparent" Style="{DynamicResource CloseBtn}" Height="Auto" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
         </StackPanel>
 
