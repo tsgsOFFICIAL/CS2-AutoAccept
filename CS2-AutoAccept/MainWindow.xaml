@@ -159,18 +159,17 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" Margin="0, 0, 10, 10">
-            <Button x:Name="Button_LaunchCS" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" Content="Launch CS2" Cursor="Hand" ToolTip="Click here to launch CS2" Background="#3F169C80" Click="Button_Click_LaunchCS2" BorderThickness="0">
+            <Button x:Name="Button_LaunchCS" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" Content="Launch CS2" Cursor="Hand" ToolTip="Click here to launch CS2" Background="#3F169C80" Click="Button_Click_LaunchCS2" BorderThickness="0" Width="{Binding Path=ActualWidth, ElementName=Button_Discord}" Height="{Binding Path=ActualHeight, ElementName=Button_Discord}">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="5"/>
-                        <Setter Property="MinHeight" Value="110"/>
                     </Style>
                 </Button.Resources>
             </Button>
 
         <!-- Socials -->
         <TextBlock Text="Join the Discord!" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" TextAlignment="Center"/>
-        <Button Background="#FF7289DA" Cursor="Hand" Click="Button_Click_Discord" ToolTip="Join my Discord server, its a great place for asking questions and hanging out :)" BorderThickness="0">
+        <Button x:Name="Button_Discord" Background="#FF7289DA" Cursor="Hand" Click="Button_Click_Discord" ToolTip="Join my Discord server, its a great place for asking questions and hanging out :)" BorderThickness="0">
             <Image Source="/Discord white.png"/>
 
             <Button.Resources>
