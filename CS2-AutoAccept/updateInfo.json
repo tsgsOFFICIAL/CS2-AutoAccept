@@ -1,8 +1,13 @@
 {
-  "version": "5.0.3.0",
-  "type": "patch",
-  "changelog": "Matched button's dimensions",
+  "version": "5.1.0.0",
+  "type": "minor",
+  "changelog": "Added retry if teammate doesn't accept",
   "historic_versions": [
+    {
+      "version": "5.0.3.0",
+      "type": "patch",
+      "changelog": "Matched button's dimensions"
+    },
     {
       "version": "5.0.2.0",
       "type": "patch",

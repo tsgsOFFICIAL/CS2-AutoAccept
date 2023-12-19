@@ -749,7 +749,6 @@ namespace CS2_AutoAccept
             CancellationToken ct = (CancellationToken)obj;
             while (!ct.IsCancellationRequested)
             {
-
                 // PrintToLog("{Scanner}");
                 // Take a screenshot of the accept button
                 Bitmap bitmap = CaptureScreen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
@@ -790,9 +789,14 @@ namespace CS2_AutoAccept
 
                     // Read the image using OCR
                     valuePair = OCR(bitmap);
+                    Debug.WriteLine("OCR RESULTS:");
+                    Debug.WriteLine(valuePair.text);
+                    Debug.WriteLine(valuePair.confidence);
+
                     // Check the returned value
                     if (!(valuePair.text.ToLower().Contains("cancel search") && valuePair.confidence > .75) && !_run_Continuously)
                     {
+                        Debug.WriteLine("Match was initiated");
                         Dispatcher.BeginInvoke(new Action(() =>
                         {
                             Program_state.IsChecked = false;
@@ -800,8 +804,25 @@ namespace CS2_AutoAccept
 
                         return;
                     }
+                    else if (valuePair.text.ToLower().Contains("go") && valuePair.confidence > .9)
+                    {
+                        Debug.WriteLine("Teammates failed to accept, pressing go again");
 
-                    // PrintToLog("{Scanner} Match cancelled");
+                        int clickPosX = _cancelPosX + (_cancelWidth / 2);
+                        int clickPosY = _cancelPosY + (_cancelHeight / 2);
+
+                        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(clickPosX, clickPosY);
+
+                        X = (uint)System.Windows.Forms.Cursor.Position.X;
+                        Y = (uint)System.Windows.Forms.Cursor.Position.Y;
+
+                        mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+
+                        // Wait 5 seconds, to not waste cpu power
+                        Thread.Sleep(5 * 1000);
+                    }
+
+                    //PrintToLog("{Scanner} Match cancelled");
                 }
 
                 Thread.Sleep(1000);
