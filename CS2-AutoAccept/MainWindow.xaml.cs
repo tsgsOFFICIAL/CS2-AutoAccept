@@ -59,6 +59,19 @@ namespace CS2_AutoAccept
         {
             InitializeComponent();
 
+            // Access command line arguments
+            string[] args = Environment.GetCommandLineArgs();
+
+            foreach (string arg in args)
+            {
+                if (arg.ToLower().Equals("start cs2"))
+                {
+                    LaunchWeb("steam://rungameid/730");
+                    Button_LaunchCS.Content = "Launching CS2";
+                    _gameRunExtraDelay = 15;
+                }
+            }
+
             _basePath = Path.Combine(Environment.ExpandEnvironmentVariables("%APPDATA%"), "CS2 AutoAccept");
             _updatePath = Path.Combine(_basePath, "UPDATE");
 
