@@ -75,7 +75,7 @@ namespace CS2_AutoAccept
             _basePath = Path.Combine(Environment.ExpandEnvironmentVariables("%APPDATA%"), "CS2 AutoAccept");
             _updatePath = Path.Combine(_basePath, "UPDATE");
 
-            ControlLocation();
+            //ControlLocation();
 
             _ = UpdateHeaderVersion();
             updater = new Updater();
@@ -833,6 +833,36 @@ namespace CS2_AutoAccept
 
                         // Wait 5 seconds, to not waste cpu power
                         Thread.Sleep(5 * 1000);
+                    }
+                    else
+                    {
+                        // Take a screenshot of the accept button
+                        bitmap = CaptureScreen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
+
+                        // Adjust the contrast, then sharpen the image
+                        bitmap = OptimiseImage(bitmap);
+
+                        // Read the image using OCR
+                        valuePair = OCR(bitmap);
+
+                        Debug.WriteLine("OCR RESULTS:");
+                        Debug.WriteLine(valuePair.text);
+                        Debug.WriteLine(valuePair.confidence);
+
+                        // Check the returned value
+                        if (valuePair.text.ToLower().Contains("accept") && valuePair.confidence > .75)
+                        {
+                            Debug.WriteLine("Accept conditions met");
+
+                            // Move the cursor and click the accept button
+
+                            System.Windows.Forms.Cursor.Position = new System.Drawing.Point(_clickPosX, _clickPosY);
+
+                            X = (uint)System.Windows.Forms.Cursor.Position.X;
+                            Y = (uint)System.Windows.Forms.Cursor.Position.Y;
+
+                            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+                        }
                     }
 
                     //PrintToLog("{Scanner} Match cancelled");

@@ -1,8 +1,13 @@
 {
-  "version": "5.1.1.0",
-  "type": "very minor",
-  "changelog": "Added command line arguments",
+  "version": "5.1.2.0",
+  "type": "minor",
+  "changelog": "Added re-bounce for accept",
   "historic_versions": [
+    {
+      "version": "5.1.1.0",
+      "type": "very minor",
+      "changelog": "Added command line arguments"
+    },
     {
       "version": "5.1.0.0",
       "type": "minor",
