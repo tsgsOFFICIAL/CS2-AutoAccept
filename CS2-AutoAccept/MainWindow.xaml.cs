@@ -75,7 +75,7 @@ namespace CS2_AutoAccept
             _basePath = Path.Combine(Environment.ExpandEnvironmentVariables("%APPDATA%"), "CS2 AutoAccept");
             _updatePath = Path.Combine(_basePath, "UPDATE");
 
-            //ControlLocation();
+            ControlLocation();
 
             _ = UpdateHeaderVersion();
             updater = new Updater();
