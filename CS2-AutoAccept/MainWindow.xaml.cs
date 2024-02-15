@@ -18,6 +18,7 @@ using CS2AutoAccept;
 using System.Net.Http.Headers;
 using System.Linq;
 using System.Text.Json;
+using CS2_AutoAccept.Models;
 
 namespace CS2_AutoAccept
 {
@@ -74,6 +75,8 @@ namespace CS2_AutoAccept
 
             _basePath = Path.Combine(Environment.ExpandEnvironmentVariables("%APPDATA%"), "CS2 AutoAccept");
             _updatePath = Path.Combine(_basePath, "UPDATE");
+
+            RestoreSizeIfSaved();
 
             ControlLocation();
 
@@ -427,7 +430,49 @@ namespace CS2_AutoAccept
             Run_at_startup_state.Foreground = new SolidColorBrush(Colors.Red);
             Run_at_startup_state.Content = "Run at startup (OFF)";
         }
+        /// <summary>
+        /// Run when window size is changed
+        /// </summary>
+        private void WindowSizeChangedEventHandler(object sender, SizeChangedEventArgs e)
+        {
+            double newWidth = e.NewSize.Width;
+            double newHeight = e.NewSize.Height;
+
+            SettingsModel userSettings = new SettingsModel(newWidth, newHeight);
+
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+            };
+
+            string jsonString = JsonSerializer.Serialize(userSettings, jsonOptions);
+
+            File.WriteAllText(Path.Combine(_basePath, "settings.cs2_auto"), jsonString);
+        }
         #endregion
+        /// <summary>
+        /// Restore the window size, if it was previously opened & changed
+        /// </summary>
+        private void RestoreSizeIfSaved()
+        {
+            // Get a reference to the current WPF application
+            System.Windows.Application wpfApp = System.Windows.Application.Current;
+
+            // Access the main window of the application (assuming it's of type Window)
+            Window mainWindow = wpfApp.MainWindow;
+
+            string jsonString = File.ReadAllText(Path.Combine(_basePath, "settings.cs2_auto"));
+            SettingsModel? userSettings = JsonSerializer.Deserialize<SettingsModel>(jsonString) ?? new SettingsModel();
+
+            if (userSettings.WindowWidth != null && userSettings.WindowHeight != null)
+            {
+                // Set the size of the main window
+                mainWindow.Width = (double)userSettings.WindowWidth;
+                mainWindow.Height = (double)userSettings.WindowHeight;
+            }
+
+            mainWindow.SizeChanged += WindowSizeChangedEventHandler;
+        }
         /// <summary>
         /// Control the location of the application,
         /// If not in the correct place Move it
@@ -555,7 +600,7 @@ namespace CS2_AutoAccept
                     client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
 
                     serverUpdateInfo = JsonSerializer.Deserialize<UpdateInfo>(await client.GetStringAsync("https://raw.githubusercontent.com/tsgsOFFICIAL/CS2-AutoAccept/main/CS2-AutoAccept/updateInfo.json")) ?? new UpdateInfo();
-                    serverVersion = serverUpdateInfo.Version.Split(".").Select(int.Parse).ToList();
+                    serverVersion = serverUpdateInfo.Version!.Split(".").Select(int.Parse).ToList();
                 }
 
                 // PrintToLog("{UpdateHeaderVersion} You are up-to-date!");
