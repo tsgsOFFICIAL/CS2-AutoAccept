@@ -118,6 +118,8 @@ namespace CS2_AutoAccept
             #region Update
             if (Directory.Exists(_updatePath))
             {
+                File.Copy(Path.Combine(_basePath, "settings.cs2_auto"), Path.Combine(_updatePath, "settings.cs2_auto"));
+
                 string runPath = AppContext.BaseDirectory;
 
                 if (runPath.LastIndexOf('\\') == runPath.Length - 1)
