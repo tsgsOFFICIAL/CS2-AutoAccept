@@ -19,6 +19,8 @@ using System.Net.Http.Headers;
 using System.Linq;
 using System.Text.Json;
 using CS2_AutoAccept.Models;
+using Microsoft.Toolkit.Uwp.Notifications;
+using System.Windows.Interop;
 
 namespace CS2_AutoAccept
 {
@@ -27,6 +29,7 @@ namespace CS2_AutoAccept
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region DLL Imports
         #region DLL Imports For Mouse Manipulation
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint cButtons, uint dwExtraInfo);
@@ -36,6 +39,21 @@ namespace CS2_AutoAccept
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
         #endregion
+        #region DLL Imports For Keybinds
+        private const int WM_HOTKEY = 0x0312;
+
+        [DllImport("user32.dll")]
+        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+
+        [DllImport("user32.dll")]
+        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+        private HwndSource _source;
+        private int _hotkeyPlusId;
+        private int _hotkeyMinusId;
+        #endregion
+        #endregion
+
         private Updater? updater;
         private Screen? _activeScreen;
         private Thread? _scannerThread;
@@ -59,6 +77,8 @@ namespace CS2_AutoAccept
         public MainWindow()
         {
             InitializeComponent();
+            Loaded += MainWindow_Loaded;
+            Closed += MainWindow_Closed!;
 
             // Access command line arguments
             string[] args = Environment.GetCommandLineArgs();
@@ -78,11 +98,12 @@ namespace CS2_AutoAccept
 
             RestoreSizeIfSaved();
 
-            ControlLocation();
+            //ControlLocation();
 
             _ = UpdateHeaderVersion();
             updater = new Updater();
             updater.DownloadProgress += Updater_ProgressUpdated!;
+
             Thread GameRunningThread = new Thread(IsGameRunning);
             GameRunningThread.Start();
             GameRunningThread.IsBackground = true;
@@ -145,11 +166,11 @@ namespace CS2_AutoAccept
                         try
                         {
                             File.Move(filePath, destinationPath, true);
-                            Debug.WriteLine($"Copied: {fileName}");
+                            //Debug.WriteLine($"Copied: {fileName}");
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
-                            Debug.WriteLine($"Error copying {fileName}: {ex.Message}");
+                            //Debug.WriteLine($"Error copying {fileName}: {ex.Message}");
                         }
                     }
 
@@ -161,11 +182,11 @@ namespace CS2_AutoAccept
                         try
                         {
                             Directory.Move(directoryPath, destinationPath);
-                            Debug.WriteLine($"Moved: {directoryName}");
+                            //Debug.WriteLine($"Moved: {directoryName}");
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
-                            Debug.WriteLine($"Error copying {directoryName}: {ex.Message}");
+                            //Debug.WriteLine($"Error copying {directoryName}: {ex.Message}");
                         }
                     }
 
@@ -180,9 +201,9 @@ namespace CS2_AutoAccept
                     {
                         Directory.Delete(_updatePath, true);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        Debug.WriteLine($"Failed to delete the update directoryPath: {ex.Message}");
+                        //Debug.WriteLine($"Failed to delete the update directoryPath: {ex.Message}");
                     }
                 }
             }
@@ -453,6 +474,92 @@ namespace CS2_AutoAccept
         }
         #endregion
         /// <summary>
+        /// Listens for keybinds
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <param name="msg"></param>
+        /// <param name="wParam"></param>
+        /// <param name="lParam"></param>
+        /// <param name="handled"></param>
+        /// <returns></returns>
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            // Keybinds available are: 
+            // NumPad + = Start AutoAccept
+            // Numpad ++ = Start AutoAccept 24/7
+            // NumPad - = Stop AutoAccept
+            if (msg == WM_HOTKEY)
+            {
+                int id = wParam.ToInt32();
+
+                if (id == _hotkeyPlusId)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        // If the program is already running
+                        if (Program_state.IsChecked ?? false)
+                        {
+                            Program_state_continuously.IsChecked = true;
+                            ShowNotification("AutoAccept 24/7 activated!", "AutoAccept 24/7 has been activated!");
+                        }
+                        else
+                        {
+                            Program_state.IsChecked = true;
+                            ShowNotification("AutoAccept activated!", "AutoAccept has been activated!");
+                        }
+                    });
+                }
+                else if (id == _hotkeyMinusId)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        if (Program_state.IsChecked ?? false)
+                        {
+                            Program_state.IsChecked = false;
+                            ShowNotification("AutoAccept canceled!", "AutoAccept has been canceled!");
+                        }
+                    });
+                }
+            }
+
+            return IntPtr.Zero;
+        }
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            IntPtr hWnd = new WindowInteropHelper(this).Handle;
+            _source = HwndSource.FromHwnd(hWnd);
+            _source.AddHook(WndProc);
+
+            // Register '+' hotkey
+            const uint MOD_NONE = 0x0000;
+            const uint VK_PLUS = 0xBB; // OEM '+'
+            const uint VK_NUMPAD_PLUS = 0x6B; // Numpad '+'
+
+            _hotkeyPlusId = GetHashCode();
+            RegisterHotKey(hWnd, _hotkeyPlusId, MOD_NONE, VK_PLUS);
+            RegisterHotKey(hWnd, _hotkeyPlusId, MOD_NONE, VK_NUMPAD_PLUS);
+
+            // Register '-' hotkey
+            const uint VK_MINUS = 0xBD; // OEM '-'
+            const uint VK_NUMPAD_MINUS = 0x6D; // Numpad '-'
+
+            _hotkeyMinusId = GetHashCode() + 1; // Use a different id for '-' hotkey
+            RegisterHotKey(hWnd, _hotkeyMinusId, MOD_NONE, VK_MINUS);
+            RegisterHotKey(hWnd, _hotkeyMinusId, MOD_NONE, VK_NUMPAD_MINUS);
+        }
+
+        private void MainWindow_Closed(object sender, EventArgs e)
+        {
+            if (_source != null)
+            {
+                _source.RemoveHook(WndProc);
+                _source = null!;
+            }
+
+            UnregisterHotKey(new WindowInteropHelper(this).Handle, _hotkeyPlusId);
+            UnregisterHotKey(new WindowInteropHelper(this).Handle, _hotkeyMinusId);
+        }
+        /// <summary>
         /// Restore the window size, if it was previously opened & changed
         /// </summary>
         private void RestoreSizeIfSaved()
@@ -516,11 +623,11 @@ namespace CS2_AutoAccept
                     try
                     {
                         File.Copy(filePath, destinationPath, true);
-                        Debug.WriteLine($"Copied: {fileName}");
+                        //Debug.WriteLine($"Copied: {fileName}");
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        Debug.WriteLine($"Error copying {fileName}: {ex.Message}");
+                        //Debug.WriteLine($"Error copying {fileName}: {ex.Message}");
                     }
                 }
 
@@ -532,11 +639,11 @@ namespace CS2_AutoAccept
                     try
                     {
                         Directory.Move(directoryPath, destinationPath);
-                        Debug.WriteLine($"Moved: {directoryName}");
+                        //Debug.WriteLine($"Moved: {directoryName}");
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        Debug.WriteLine($"Error copying {directoryName}: {ex.Message}");
+                        //Debug.WriteLine($"Error copying {directoryName}: {ex.Message}");
                     }
                 }
 
@@ -634,10 +741,10 @@ namespace CS2_AutoAccept
                 Button_Update.ToolTip += $"\n\nChangelog: {serverUpdateInfo.Changelog}\nType: {serverUpdateInfo.Type}";
                 // Catch if the client.DownloadString failed, maybe the link changed, the server is down or the client is offline
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // PrintToLog("{UpdateHeaderVersion} EXCEPTION: " + ex.Message);
-                Debug.WriteLine(ex.Message);
+                //Debug.WriteLine(ex.Message);
                 Button_Update.Foreground = new SolidColorBrush(Colors.Red);
                 Button_Update.Content = "You're offline!";
                 Button_Update.ToolTip = $"You are on version ({clientVersion[0]}.{clientVersion[1]}.{clientVersion[2]}.{clientVersion[3]})";
@@ -819,14 +926,14 @@ namespace CS2_AutoAccept
                 // Read the image using OCR
                 (string text, double confidence) valuePair = OCR(bitmap);
 
-                Debug.WriteLine("OCR RESULTS:");
-                Debug.WriteLine(valuePair.text);
-                Debug.WriteLine(valuePair.confidence);
+                //Debug.WriteLine("OCR RESULTS:");
+                //Debug.WriteLine(valuePair.text);
+                //Debug.WriteLine(valuePair.confidence);
 
                 // Check the returned value
                 if (valuePair.text.ToLower().Contains("accept") && valuePair.confidence > .75)
                 {
-                    Debug.WriteLine("Accept conditions met");
+                    //Debug.WriteLine("Accept conditions met");
                     // PrintToLog("{Scanner} Match found");
                     // Move the cursor and click the accept button
 
@@ -849,14 +956,14 @@ namespace CS2_AutoAccept
 
                     // Read the image using OCR
                     valuePair = OCR(bitmap);
-                    Debug.WriteLine("OCR RESULTS:");
-                    Debug.WriteLine(valuePair.text);
-                    Debug.WriteLine(valuePair.confidence);
+                    //Debug.WriteLine("OCR RESULTS:");
+                    //Debug.WriteLine(valuePair.text);
+                    //Debug.WriteLine(valuePair.confidence);
 
                     // Check the returned value
                     if (!(valuePair.text.ToLower().Contains("cancel search") && valuePair.confidence > .75) && !_run_Continuously)
                     {
-                        Debug.WriteLine("Match was initiated");
+                        //Debug.WriteLine("Match was initiated");
                         Dispatcher.BeginInvoke(new Action(() =>
                         {
                             Program_state.IsChecked = false;
@@ -866,7 +973,7 @@ namespace CS2_AutoAccept
                     }
                     else if (valuePair.text.ToLower().Contains("go") && valuePair.confidence > .9)
                     {
-                        Debug.WriteLine("Teammates failed to accept, pressing go again");
+                        //Debug.WriteLine("Teammates failed to accept, pressing go again");
 
                         int clickPosX = _cancelPosX + (_cancelWidth / 2);
                         int clickPosY = _cancelPosY + (_cancelHeight / 2);
@@ -892,14 +999,14 @@ namespace CS2_AutoAccept
                         // Read the image using OCR
                         valuePair = OCR(bitmap);
 
-                        Debug.WriteLine("OCR RESULTS:");
-                        Debug.WriteLine(valuePair.text);
-                        Debug.WriteLine(valuePair.confidence);
+                        //Debug.WriteLine("OCR RESULTS:");
+                        //Debug.WriteLine(valuePair.text);
+                        //Debug.WriteLine(valuePair.confidence);
 
                         // Check the returned value
                         if (valuePair.text.ToLower().Contains("accept") && valuePair.confidence > .75)
                         {
-                            Debug.WriteLine("Accept conditions met");
+                            //Debug.WriteLine("Accept conditions met");
 
                             // Move the cursor and click the accept button
 
@@ -1170,6 +1277,16 @@ namespace CS2_AutoAccept
             }
 
             return true;
+        }
+        private void ShowNotification(string title, string message)
+        {
+            new ToastContentBuilder()
+                .AddText(title)
+                .AddText(message)
+                .Show(toast =>
+                {
+                    toast.ExpirationTime = DateTime.Now.AddSeconds(1);
+                });
         }
     }
 }

@@ -10,8 +10,7 @@
         WindowStyle="None"
         MinWidth="800"
         MinHeight="450"
-        Background="#353535"
-        >
+        Background="#353535">
 
     <!-- Window resrouces -->
     <Window.Resources>
@@ -139,7 +138,6 @@
             <CheckBox x:Name="Program_state" Content="AutoAccept (OFF)" ToolTip="Will find the ACCEPT button, only for the current match" IsChecked="False"  Foreground="Red" FontWeight="Bold" Checked="Program_state_Checked" Unchecked="Program_state_Unchecked"/>
             <CheckBox x:Name="Run_at_startup_state" Content="Run at startup (OFF)" ToolTip="Automatically start this app when your pc launches" IsChecked="False" Foreground="Red" FontWeight="Bold" Checked="Run_at_startup_state_Checked" Unchecked="Run_at_startup_state_Unchecked"/>
             <CheckBox x:Name="Program_state_continuously" Content="Auto Accept Every Match (OFF)" ToolTip="Will find the ACCEPT button for all matches, this will consume more cpu power while in game!" IsChecked="False" Foreground="Red" FontWeight="Bold" Checked="Program_state_continuously_Checked" Unchecked="Program_state_continuously_Unchecked"/>
-            <!--<CheckBox x:Name="Panorama_state" Content="Panorama (NO)" IsChecked="False" Margin="30,60,646,374" FontSize="12" Foreground="Red" FontWeight="Bold" Checked="Panorama_state_Checked" Unchecked="Panorama_state_Unchecked"/>-->
         </StackPanel>
 
         <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
