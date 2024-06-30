@@ -1,8 +1,13 @@
 {
-  "version": "5.1.4.1",
+  "version": "5.1.4.2",
   "type": "minor",
-  "changelog": "Fixed a bug with app location",
+  "changelog": "Fixed a small issue with Program state",
   "historic_versions": [
+    {
+      "version": "5.1.4.1",
+      "type": "minor",
+      "changelog": "Fixed a bug with app location"
+    },
     {
       "version": "5.1.4.0",
       "type": "major",

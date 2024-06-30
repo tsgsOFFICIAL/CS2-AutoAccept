@@ -496,16 +496,19 @@ namespace CS2_AutoAccept
                 {
                     Dispatcher.Invoke(() =>
                     {
-                        // If the program is already running
-                        if (Program_state.IsChecked ?? false)
+                        if (Program_state.IsEnabled)
                         {
-                            Program_state_continuously.IsChecked = true;
-                            ShowNotification("AutoAccept 24/7 activated!", "AutoAccept 24/7 has been activated!");
-                        }
-                        else
-                        {
-                            Program_state.IsChecked = true;
-                            ShowNotification("AutoAccept activated!", "AutoAccept has been activated!");
+                            // If the program is already running
+                            if (Program_state.IsChecked ?? false)
+                            {
+                                Program_state_continuously.IsChecked = true;
+                                ShowNotification("AutoAccept 24/7 activated!", "AutoAccept 24/7 has been activated!");
+                            }
+                            else
+                            {
+                                Program_state.IsChecked = true;
+                                ShowNotification("AutoAccept activated!", "AutoAccept has been activated!");
+                            }
                         }
                     });
                 }
@@ -513,10 +516,13 @@ namespace CS2_AutoAccept
                 {
                     Dispatcher.Invoke(() =>
                     {
-                        if (Program_state.IsChecked ?? false)
+                        if (Program_state.IsEnabled)
                         {
-                            Program_state.IsChecked = false;
-                            ShowNotification("AutoAccept canceled!", "AutoAccept has been canceled!");
+                            if (Program_state.IsChecked ?? false)
+                            {
+                                Program_state.IsChecked = false;
+                                ShowNotification("AutoAccept canceled!", "AutoAccept has been canceled!");
+                            }
                         }
                     });
                 }
@@ -570,14 +576,20 @@ namespace CS2_AutoAccept
             // Access the main window of the application (assuming it's of type Window)
             Window mainWindow = wpfApp.MainWindow;
 
-            string jsonString = File.ReadAllText(Path.Combine(_basePath, "settings.cs2_auto"));
-            SettingsModel? userSettings = JsonSerializer.Deserialize<SettingsModel>(jsonString) ?? new SettingsModel();
-
-            if (userSettings.WindowWidth != null && userSettings.WindowHeight != null)
+            try
             {
-                // Set the size of the main window
-                mainWindow.Width = (double)userSettings.WindowWidth;
-                mainWindow.Height = (double)userSettings.WindowHeight;
+                string jsonString = File.ReadAllText(Path.Combine(_basePath, "settings.cs2_auto"));
+                SettingsModel? userSettings = JsonSerializer.Deserialize<SettingsModel>(jsonString) ?? new SettingsModel();
+
+                if (userSettings.WindowWidth != null && userSettings.WindowHeight != null)
+                {
+                    // Set the size of the main window
+                    mainWindow.Width = (double)userSettings.WindowWidth;
+                    mainWindow.Height = (double)userSettings.WindowHeight;
+                }
+            }
+            catch (Exception)
+            {
             }
 
             mainWindow.SizeChanged += WindowSizeChangedEventHandler;
