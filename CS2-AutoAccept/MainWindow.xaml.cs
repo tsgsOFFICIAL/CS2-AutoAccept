@@ -98,7 +98,7 @@ namespace CS2_AutoAccept
 
             RestoreSizeIfSaved();
 
-            //ControlLocation();
+            ControlLocation();
 
             _ = UpdateHeaderVersion();
             updater = new Updater();
