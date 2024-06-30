@@ -39,7 +39,7 @@ To report any issues or bugs, go to my Github page and create an issue for the p
 
 ## Where can I download this?
 
-You should be able to download it [HERE](https://download-directory.github.io/?url=https://github.com/tsgsOFFICIAL/CS2-AutoAccept/tree/main/CS2-AutoAccept/bin/Release/net6.0-windows/publish/win-x86).
+You should be able to download it [HERE](https://download-directory.github.io/?url=https://github.com/tsgsOFFICIAL/CS2-AutoAccept/tree/main/CS2-AutoAccept/bin/Release/net6.0-windows10.0.17763.0/publish/win-x86).
 Simply extract it from the zip file, and you should be ready to go.
 Extract it to "%appdata%\CS2 AutoAccept", to do this follow these steps:
 1. Press Windows key + R key at the same time (opens RUN).
