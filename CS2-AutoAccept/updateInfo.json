@@ -1,8 +1,13 @@
 {
-  "version": "5.1.4.2",
+  "version": "5.1.4.3",
   "type": "minor",
-  "changelog": "Fixed a small issue with Program state",
+  "changelog": "Accidentally removed tessdata, now included again.",
   "historic_versions": [
+    {
+      "version": "5.1.4.2",
+      "type": "minor",
+      "changelog": "Fixed a small issue with Program state"
+    },
     {
       "version": "5.1.4.1",
       "type": "minor",
