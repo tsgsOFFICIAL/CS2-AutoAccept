@@ -74,7 +74,7 @@ namespace CS2_AutoAccept
         private int _gameRunExtraDelay = 0; // Seconds
         private string _basePath;
         private string _updatePath;
-        private readonly bool debugMode = true;
+        private readonly bool debugMode = false;
         public MainWindow()
         {
             InitializeComponent();
