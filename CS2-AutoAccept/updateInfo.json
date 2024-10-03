@@ -1,8 +1,13 @@
 {
-  "version": "5.1.4.3",
+  "version": "5.1.4.4",
   "type": "minor",
-  "changelog": "Accidentally removed tessdata, now included again.",
+  "changelog": "Minor bug fix.",
   "historic_versions": [
+    {
+      "version": "5.1.4.3",
+      "type": "minor",
+      "changelog": "Accidentally removed tessdata, now included again."
+    },
     {
       "version": "5.1.4.2",
       "type": "minor",

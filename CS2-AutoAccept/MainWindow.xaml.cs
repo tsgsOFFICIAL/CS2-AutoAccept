@@ -74,6 +74,7 @@ namespace CS2_AutoAccept
         private int _gameRunExtraDelay = 0; // Seconds
         private string _basePath;
         private string _updatePath;
+        private readonly bool debugMode = true;
         public MainWindow()
         {
             InitializeComponent();
@@ -98,7 +99,10 @@ namespace CS2_AutoAccept
 
             RestoreSizeIfSaved();
 
-            ControlLocation();
+            if (!debugMode)
+            {
+                ControlLocation();
+            }
 
             _ = UpdateHeaderVersion();
             updater = new Updater();
@@ -137,7 +141,7 @@ namespace CS2_AutoAccept
             #endregion
 
             #region Update
-            if (Directory.Exists(_updatePath))
+            if (Directory.Exists(_updatePath) && !debugMode)
             {
                 File.Copy(Path.Combine(_basePath, "settings.cs2_auto"), Path.Combine(_updatePath, "settings.cs2_auto"));
 
@@ -1201,7 +1205,8 @@ namespace CS2_AutoAccept
                 if (ex.Message.ToLower().Contains("failed to initialise tesseract engine"))
                 {
                     Process.Start(Path.Combine(_basePath, "CS2-AutoAccept"));
-                    Environment.Exit(0);
+                    ShowNotification("Error", ex.Message);
+                    //Environment.Exit(0);
                     return ("", 100);
                 }
 
