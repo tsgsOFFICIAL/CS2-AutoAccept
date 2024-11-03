@@ -16,7 +16,6 @@ using System.Windows.Forms;
 using System.Windows.Media;
 using CS2_AutoAccept.Models;
 using System.Threading.Tasks;
-using System.Windows.Interop;
 using System.Net.Http.Headers;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -39,25 +38,13 @@ namespace CS2_AutoAccept
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
         #endregion
-        #region DLL Imports For Keybinds
-        private const int WM_HOTKEY = 0x0312;
-
-        [DllImport("user32.dll")]
-        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
-
-        [DllImport("user32.dll")]
-        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
-
-        private HwndSource _source;
-        private int _hotkeyPlusId;
-        private int _hotkeyMinusId;
-        #endregion
         #endregion
 
         private Updater? updater;
         private Screen? _activeScreen;
         private Thread? _scannerThread;
         private CancellationTokenSource? cts;
+        private bool _scannerIsActive = false;
         private bool _run_Continuously = false;
         private bool _updateAvailable = false;
         private bool _updateFailed = false;
@@ -75,11 +62,30 @@ namespace CS2_AutoAccept
         private string _basePath;
         private string _updatePath;
         private readonly bool debugMode = false;
+        public ICommand ToggleWindowCommand  { get; }
+        public ICommand CloseCommand { get; }
+        private bool _isTrayIconVisible;
+
+        public bool IsTrayIconVisible
+        {
+            get => _isTrayIconVisible;
+            set
+            {
+                _isTrayIconVisible = value;
+                UpdateTrayIconVisibility();
+            }
+        }
         public MainWindow()
         {
             InitializeComponent();
-            Loaded += MainWindow_Loaded;
-            Closed += MainWindow_Closed!;
+            IsTrayIconVisible = true;
+            DataContext = this;
+
+            ToggleWindowCommand  = new RelayCommand(o => ToggleWindowState());
+            CloseCommand = new RelayCommand(o => CloseApplication());
+
+            // Event handler for double-click on TaskbarIcon
+            MyNotifyIcon.TrayMouseDoubleClick += OnTrayIconDoubleClick;
 
             // Access command line arguments
             string[] args = Environment.GetCommandLineArgs();
@@ -214,7 +220,59 @@ namespace CS2_AutoAccept
             #endregion
 
         }
+        private void ToggleWindowState()
+        {
+            if (WindowState == WindowState.Minimized)
+            {
+                Show();
+                WindowState = WindowState.Normal;
+            }
+            else
+            {
+                WindowState = WindowState.Minimized;
+                Hide();
+            }
+        }
+
+        private void CloseApplication()
+        {
+            Close();
+        }
+        private void UpdateTrayIconVisibility()
+        {
+            // Show or hide the tray icon based on IsTrayIconVisible
+            MyNotifyIcon.Visibility = IsTrayIconVisible ? Visibility.Visible : Visibility.Collapsed;
+        }
         #region EventHandlers
+        protected override void OnStateChanged(EventArgs e)
+        {
+            base.OnStateChanged(e);
+
+            // Find context menu items and update texts based on WindowState
+            var menu = (System.Windows.Controls.ContextMenu)MyNotifyIcon.ContextMenu;
+            var toggleMenuItem = (System.Windows.Controls.MenuItem)menu.Items[0];
+
+            if (WindowState == WindowState.Minimized)
+            {
+                string toolTipText = _scannerIsActive == true ? "AutoAccept is running in the background" : "CS2 AutoAccept is minimized";
+
+                Hide();
+                ShowNotification("CS2 AutoAccept", toolTipText);
+                toggleMenuItem.Header = "Restore";
+                MyNotifyIcon.ToolTipText = toolTipText;
+            }
+            else
+            {
+                toggleMenuItem.Header = "Minimize";
+                MyNotifyIcon.ToolTipText = "CS2 AutoAccept by tsgsOFFICIAL";
+            }
+        }
+        private void OnTrayIconDoubleClick(object sender, RoutedEventArgs e)
+        {
+            // Show the window and restore it to normal state
+            Show();
+            WindowState = WindowState.Normal;
+        }
         /// <summary>
         /// Event handler for download progress
         /// </summary>
@@ -282,7 +340,7 @@ namespace CS2_AutoAccept
         /// <param Name="e"></param>
         private void Button_Click_Close(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
         /// <summary>
         /// Open Github to download the newest version
@@ -352,6 +410,7 @@ namespace CS2_AutoAccept
             _scannerThread = new Thread(new ParameterizedThreadStart(Scanner)) { IsBackground = true };
             cts = new CancellationTokenSource();
             _scannerThread.Start(cts!.Token);
+            _scannerIsActive = true;
             // Change to a brighter color
             Program_state.Foreground = new SolidColorBrush(Colors.LawnGreen);
             Program_state.Content = "AutoAccept (ON)";
@@ -366,6 +425,7 @@ namespace CS2_AutoAccept
             // PrintToLog("{Program_state_Unchecked}");
             cts!.Cancel();
             Program_state_continuously.IsChecked = false;
+           _scannerIsActive = false;
 
             // Change to a darker color
             Program_state.Foreground = new SolidColorBrush(Colors.Red);
@@ -477,98 +537,6 @@ namespace CS2_AutoAccept
             File.WriteAllText(Path.Combine(_basePath, "settings.cs2_auto"), jsonString);
         }
         #endregion
-        /// <summary>
-        /// Listens for keybinds
-        /// </summary>
-        /// <param name="hwnd"></param>
-        /// <param name="msg"></param>
-        /// <param name="wParam"></param>
-        /// <param name="lParam"></param>
-        /// <param name="handled"></param>
-        /// <returns></returns>
-        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            // Keybinds available are: 
-            // NumPad + = Start AutoAccept
-            // Numpad ++ = Start AutoAccept 24/7
-            // NumPad - = Stop AutoAccept
-            if (msg == WM_HOTKEY)
-            {
-                int id = wParam.ToInt32();
-
-                if (id == _hotkeyPlusId)
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                        if (Program_state.IsEnabled)
-                        {
-                            // If the program is already running
-                            if (Program_state.IsChecked ?? false)
-                            {
-                                Program_state_continuously.IsChecked = true;
-                                ShowNotification("AutoAccept 24/7 activated!", "AutoAccept 24/7 has been activated!");
-                            }
-                            else
-                            {
-                                Program_state.IsChecked = true;
-                                ShowNotification("AutoAccept activated!", "AutoAccept has been activated!");
-                            }
-                        }
-                    });
-                }
-                else if (id == _hotkeyMinusId)
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                        if (Program_state.IsEnabled)
-                        {
-                            if (Program_state.IsChecked ?? false)
-                            {
-                                Program_state.IsChecked = false;
-                                ShowNotification("AutoAccept canceled!", "AutoAccept has been canceled!");
-                            }
-                        }
-                    });
-                }
-            }
-
-            return IntPtr.Zero;
-        }
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            IntPtr hWnd = new WindowInteropHelper(this).Handle;
-            _source = HwndSource.FromHwnd(hWnd);
-            _source.AddHook(WndProc);
-
-            // Register '+' hotkey
-            const uint MOD_NONE = 0x0000;
-            const uint VK_PLUS = 0xBB; // OEM '+'
-            const uint VK_NUMPAD_PLUS = 0x6B; // Numpad '+'
-
-            _hotkeyPlusId = GetHashCode();
-            RegisterHotKey(hWnd, _hotkeyPlusId, MOD_NONE, VK_PLUS);
-            RegisterHotKey(hWnd, _hotkeyPlusId, MOD_NONE, VK_NUMPAD_PLUS);
-
-            // Register '-' hotkey
-            const uint VK_MINUS = 0xBD; // OEM '-'
-            const uint VK_NUMPAD_MINUS = 0x6D; // Numpad '-'
-
-            _hotkeyMinusId = GetHashCode() + 1; // Use a different id for '-' hotkey
-            RegisterHotKey(hWnd, _hotkeyMinusId, MOD_NONE, VK_MINUS);
-            RegisterHotKey(hWnd, _hotkeyMinusId, MOD_NONE, VK_NUMPAD_MINUS);
-        }
-
-        private void MainWindow_Closed(object sender, EventArgs e)
-        {
-            if (_source != null)
-            {
-                _source.RemoveHook(WndProc);
-                _source = null!;
-            }
-
-            UnregisterHotKey(new WindowInteropHelper(this).Handle, _hotkeyPlusId);
-            UnregisterHotKey(new WindowInteropHelper(this).Handle, _hotkeyMinusId);
-        }
         /// <summary>
         /// Restore the window size, if it was previously opened & changed
         /// </summary>
@@ -1305,5 +1273,24 @@ namespace CS2_AutoAccept
                     toast.ExpirationTime = DateTime.Now.AddSeconds(1);
                 });
         }
+    }
+
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object> _execute;
+        private readonly Func<object, bool> _canExecute;
+
+        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
+        {
+            _execute = execute;
+            _canExecute = canExecute;
+        }
+
+        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
+
+        public void Execute(object parameter) => _execute(parameter);
+
+        public event EventHandler CanExecuteChanged;
+        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 }
