@@ -30,29 +30,29 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\CS2-AutoAccept.deps.json" />
-    <Content Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\CS2-AutoAccept.runtimeconfig.json" />
+    <Content Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\CS2-AutoAccept.deps.json" />
+    <Content Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\CS2-AutoAccept.runtimeconfig.json" />
     <Content Include="logo.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\CS2-AutoAccept.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\CS2-AutoAccept.dll.config" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\CS2-AutoAccept.exe" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\CS2-AutoAccept.pdb" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\git2-a418d9d.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\Hardcodet.NotifyIcon.Wpf.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\LibGit2Sharp.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\Microsoft.Toolkit.Uwp.Notifications.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\Microsoft.Windows.SDK.NET.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\tessdata\eng.traineddata" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\Tesseract.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\Tesseract.Drawing.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\WinRT.Runtime.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\x64\leptonica-1.82.0.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\x64\tesseract50.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\x86\leptonica-1.82.0.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\win-x86\x86\tesseract50.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\CS2-AutoAccept.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\CS2-AutoAccept.dll.config" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\CS2-AutoAccept.exe" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\CS2-AutoAccept.pdb" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\git2-a418d9d.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Hardcodet.NotifyIcon.Wpf.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\LibGit2Sharp.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Microsoft.Toolkit.Uwp.Notifications.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Microsoft.Windows.SDK.NET.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\tessdata\eng.traineddata" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Tesseract.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Tesseract.Drawing.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\WinRT.Runtime.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\x64\leptonica-1.82.0.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\x64\tesseract50.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\x86\leptonica-1.82.0.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\x86\tesseract50.dll" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml.user" />
   </ItemGroup>
 
