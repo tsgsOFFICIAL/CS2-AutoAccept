@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
+    <WindowsSdkPackageVersion>10.0.17763.46</WindowsSdkPackageVersion>
     <RootNamespace>CS2_AutoAccept</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
@@ -11,15 +12,15 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Description>A program to automatically find and press "ACCEPT" for you, when entering a competitive match in CS2.</Description>
     <Copyright>©️ tsgsOFFICIAL - 2024</Copyright>
-    <FileVersion>5.1.4.5</FileVersion>
+    <FileVersion>5.1.5.0</FileVersion>
     <AssemblyName>CS2-AutoAccept</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="bin\Release\net6.0-windows10.0.17763.0\**" />
-    <EmbeddedResource Remove="bin\Release\net6.0-windows10.0.17763.0\**" />
-    <None Remove="bin\Release\net6.0-windows10.0.17763.0\**" />
-    <Page Remove="bin\Release\net6.0-windows10.0.17763.0\**" />
+    <Compile Remove="bin\Release\net6.0-windows10.0.17763.0\publish\**" />
+    <EmbeddedResource Remove="bin\Release\net6.0-windows10.0.17763.0\publish\**" />
+    <None Remove="bin\Release\net6.0-windows10.0.17763.0\publish\**" />
+    <Page Remove="bin\Release\net6.0-windows10.0.17763.0\publish\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -159,6 +160,7 @@
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\fr\WindowsBase.resources.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\fr\WindowsFormsIntegration.resources.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\git2-a418d9d.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Hardcodet.NotifyIcon.Wpf.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\hostfxr.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\hostpolicy.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\it\Microsoft.VisualBasic.Forms.resources.dll" />
@@ -225,7 +227,7 @@
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Microsoft.Win32.SystemEvents.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Microsoft.Windows.SDK.NET.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\mscordaccore.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\mscordaccore_x86_x86_6.0.3324.36610.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\mscordaccore_x86_x86_6.0.3524.45918.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\mscordbi.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\mscorlib.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\mscorrc.dll" />
@@ -555,6 +557,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
     <PackageReference Include="LibGit2Sharp" Version="0.30.0" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
     <PackageReference Include="Tesseract" Version="5.2.0" />
@@ -582,4 +585,9 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="tessdata\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

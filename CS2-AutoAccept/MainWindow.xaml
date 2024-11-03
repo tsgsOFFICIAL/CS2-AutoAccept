@@ -1,6 +1,7 @@
 ﻿<Window x:Class="CS2_AutoAccept.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="CS2_AutoAccept"
@@ -94,7 +95,7 @@
     <WindowChrome.WindowChrome>
         <WindowChrome GlassFrameThickness="1" ResizeBorderThickness="5" CaptionHeight="0"/>
     </WindowChrome.WindowChrome>
-    <Grid>
+    <Grid>        
         <!-- Background -->
         <Grid.Background>
             <ImageBrush ImageSource="/background.png"></ImageBrush>
@@ -165,17 +166,27 @@
                 </Button.Resources>
             </Button>
 
-        <!-- Socials -->
-        <TextBlock Text="Join the Discord!" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" TextAlignment="Center"/>
-        <Button x:Name="Button_Discord" Background="#FF7289DA" Cursor="Hand" Click="Button_Click_Discord" ToolTip="Join my Discord server, its a great place for asking questions and hanging out :)" BorderThickness="0">
-            <Image Source="/Discord white.png"/>
+            <!-- Socials -->
+            <TextBlock Text="Join the Discord!" FontFamily="Roboto" FontSize="24" Foreground="GhostWhite" TextAlignment="Center"/>
+            <Button x:Name="Button_Discord" Background="#FF7289DA" Cursor="Hand" Click="Button_Click_Discord" ToolTip="Join my Discord server, its a great place for asking questions and hanging out :)" BorderThickness="0">
+                <Image Source="/Discord white.png"/>
 
-            <Button.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="5"/>
-                </Style>
-            </Button.Resources>
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
             </Button>
         </StackPanel>
+
+        <!-- NotifyIcon, that minimizes to system tray -->
+        <tb:TaskbarIcon x:Name="MyNotifyIcon" IconSource="/logo.png" ToolTipText="CS2 AutoAccept by tsgsOFFICIAL" DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Visibility="Collapsed">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Minimize" Command="{Binding ToggleWindowCommand }" />
+                    <MenuItem Header="Exit" Command="{Binding CloseCommand}" />
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
     </Grid>
 </Window>
