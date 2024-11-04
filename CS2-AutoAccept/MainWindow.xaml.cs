@@ -483,7 +483,7 @@ namespace CS2_AutoAccept
 
                 if (key.GetValue("CS2-AutoAccept") == null)
                 {
-                    key.SetValue("CS2-AutoAccept", $"{exePath} --minimize");
+                    key.SetValue("CS2-AutoAccept", $"\"{exePath}\" --minimize");
                 }
 
                 key.Close();
