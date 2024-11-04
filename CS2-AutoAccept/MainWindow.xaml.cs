@@ -62,7 +62,7 @@ namespace CS2_AutoAccept
         private string _basePath;
         private string _updatePath;
         private readonly bool debugMode = false;
-        public ICommand ToggleWindowCommand  { get; }
+        public ICommand ToggleWindowCommand { get; }
         public ICommand CloseCommand { get; }
         private bool _isTrayIconVisible;
 
@@ -78,27 +78,15 @@ namespace CS2_AutoAccept
         public MainWindow()
         {
             InitializeComponent();
+            Loaded += MainWindow_Loaded;
             IsTrayIconVisible = true;
             DataContext = this;
 
-            ToggleWindowCommand  = new RelayCommand(o => ToggleWindowState());
+            ToggleWindowCommand = new RelayCommand(o => ToggleWindowState());
             CloseCommand = new RelayCommand(o => CloseApplication());
 
             // Event handler for double-click on TaskbarIcon
             MyNotifyIcon.TrayMouseDoubleClick += OnTrayIconDoubleClick;
-
-            // Access command line arguments
-            string[] args = Environment.GetCommandLineArgs();
-
-            foreach (string arg in args)
-            {
-                if (arg.ToLower().Equals("start cs2"))
-                {
-                    LaunchWeb("steam://rungameid/730");
-                    Button_LaunchCS.Content = "Launching CS2";
-                    _gameRunExtraDelay = 15;
-                }
-            }
 
             _basePath = Path.Combine(Environment.ExpandEnvironmentVariables("%APPDATA%"), "CS2 AutoAccept");
             _updatePath = Path.Combine(_basePath, "UPDATE");
@@ -218,7 +206,6 @@ namespace CS2_AutoAccept
                 }
             }
             #endregion
-
         }
         private void ToggleWindowState()
         {
@@ -244,6 +231,26 @@ namespace CS2_AutoAccept
             MyNotifyIcon.Visibility = IsTrayIconVisible ? Visibility.Visible : Visibility.Collapsed;
         }
         #region EventHandlers
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Access command line arguments
+            string[] args = Environment.GetCommandLineArgs();
+
+            foreach (string arg in args)
+            {
+                if (arg.ToLower().Equals("start cs2"))
+                {
+                    LaunchWeb("steam://rungameid/730");
+                    Button_LaunchCS.Content = "Launching CS2";
+                    _gameRunExtraDelay = 15;
+                }
+
+                if (arg.ToLower().Equals("--minimize"))
+                {
+                    WindowState = WindowState.Minimized;
+                }
+            }
+        }
         protected override void OnStateChanged(EventArgs e)
         {
             base.OnStateChanged(e);
@@ -425,7 +432,7 @@ namespace CS2_AutoAccept
             // PrintToLog("{Program_state_Unchecked}");
             cts!.Cancel();
             Program_state_continuously.IsChecked = false;
-           _scannerIsActive = false;
+            _scannerIsActive = false;
 
             // Change to a darker color
             Program_state.Foreground = new SolidColorBrush(Colors.Red);
@@ -468,14 +475,15 @@ namespace CS2_AutoAccept
         private void Run_at_startup_state_Checked(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Run_at_startup_state_Checked}");
-            string exeLocation = $"{AppContext.BaseDirectory}CS2-AutoAccept";
+            string exePath = GetExePath();
+
             try
             {
                 RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
 
                 if (key.GetValue("CS2-AutoAccept") == null)
                 {
-                    key.SetValue("CS2-AutoAccept", exeLocation);
+                    key.SetValue("CS2-AutoAccept", $"{exePath} --minimize");
                 }
 
                 key.Close();
@@ -537,6 +545,15 @@ namespace CS2_AutoAccept
             File.WriteAllText(Path.Combine(_basePath, "settings.cs2_auto"), jsonString);
         }
         #endregion
+        private string GetExePath()
+        {
+            string? exeLocation5 = Process.GetCurrentProcess().MainModule?.FileName;
+
+            string executingDir = AppDomain.CurrentDomain.BaseDirectory;
+            string executingName = Path.GetFileNameWithoutExtension(Environment.GetCommandLineArgs()[0]);
+
+            return exeLocation5 ?? $"{Path.Combine(executingDir, executingName)}.exe";
+        }
         /// <summary>
         /// Restore the window size, if it was previously opened & changed
         /// </summary>

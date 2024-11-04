@@ -1,8 +1,13 @@
 {
-  "version": "5.1.5.0",
-  "type": "major",
-  "changelog": "Removed keybinds temporarily & added system tray icon as requested.",
+  "version": "5.1.5.1",
+  "type": "Bugfix",
+  "changelog": "Fixed a bug where the application would not start with windows.",
   "historic_versions": [
+    {
+      "version": "5.1.5.0",
+      "type": "major",
+      "changelog": "Removed keybinds temporarily & added system tray icon as requested."
+    },
     {
       "version": "5.1.4.5",
       "type": "minor",
