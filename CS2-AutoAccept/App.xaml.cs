@@ -10,23 +10,25 @@ namespace CS2_AutoAccept
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+            Directory.SetCurrentDirectory(AppContext.BaseDirectory);
+
             // Check if another instance of the app is already running
             Mutex mutex = new Mutex(true, "CS2-AutoAccept by tsgsOFFICIAL", out bool createdNew);
             string[] args = Environment.GetCommandLineArgs();
-            bool updated = false;
+            bool ignoreMutexRule = false; // This is true if the application is started as a replacement, for example when updating or when an error occurs.
 
             foreach (string arg in args)
             {
-                // Application was updated
-                if (arg.ToLower().Equals("--updated"))
+                // Application was ignoreMutexRule
+                if (arg.ToLower().Equals("--updated") || arg.ToLower().Equals("--restart"))
                 {
-                    updated = true;
+                    ignoreMutexRule = true;
                     break;
                 }
             }
 
             // If another instance exists, trigger the event and exit
-            if (!createdNew && !updated)
+            if (!createdNew && !ignoreMutexRule)
             {
                 // Create a MemoryMappedFile to notify the other instance
                 using (MemoryMappedFile mmf = MemoryMappedFile.CreateOrOpen("CS2_AutoAccept_MMF", 1024))
@@ -40,7 +42,13 @@ namespace CS2_AutoAccept
 
                 // Shutdown the second instance
                 Current.Shutdown();
-                mutex.ReleaseMutex();
+
+                // Ensure mutex is released only if it was created successfully
+                if (createdNew)
+                {
+                    mutex.ReleaseMutex();
+                }
+
                 return;
             }
 

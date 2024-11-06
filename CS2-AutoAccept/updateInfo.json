@@ -1,8 +1,13 @@
 {
-  "version": "5.1.5.2",
-  "type": "Feature",
-  "changelog": "Improved the automatic update flow.",
+  "version": "5.1.5.3",
+  "type": "Bug",
+  "changelog": "Fixed AppContext bug, where Tesseract wouldn't launch after rebooting'.",
   "historic_versions": [
+    {
+      "version": "5.1.5.2",
+      "type": "Feature",
+      "changelog": "Improved the automatic update flow."
+    },
     {
       "version": "5.1.5.1",
       "type": "Bugfix",

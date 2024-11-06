@@ -703,7 +703,7 @@ namespace CS2_AutoAccept
                 }
 
                 // Start the updated program, in the new default path
-                Process.Start(Path.Combine(_basePath, "CS2-AutoAccept"));
+                Process.Start(Path.Combine(_basePath, "CS2-AutoAccept"), "--restarted");
                 Environment.Exit(0);
             }
         }
@@ -1242,8 +1242,8 @@ namespace CS2_AutoAccept
                 // PrintToLog("{OCR} " + ex.Message);
                 if (ex.Message.ToLower().Contains("failed to initialise tesseract engine"))
                 {
-                    Process.Start(Path.Combine(_basePath, "CS2-AutoAccept"));
-                    ShowNotification("Error", ex.Message);
+                    Process.Start(Path.Combine(_basePath, "CS2-AutoAccept"), "--restart");
+                    ShowNotification("CS2 AutoAccept", "Tesseract failed to initialise, restarting the application.. " + ex.Message);
                     Environment.Exit(0);
                     return ("", 100);
                 }
