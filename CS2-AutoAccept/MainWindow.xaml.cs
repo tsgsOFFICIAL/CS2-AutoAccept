@@ -18,6 +18,7 @@ using CS2_AutoAccept.Models;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
 using System.Collections.Generic;
+using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 using Microsoft.Toolkit.Uwp.Notifications;
 
@@ -28,7 +29,6 @@ namespace CS2_AutoAccept
     /// </summary>
     public partial class MainWindow : Window
     {
-        #region DLL Imports
         #region DLL Imports For Mouse Manipulation
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint cButtons, uint dwExtraInfo);
@@ -37,7 +37,6 @@ namespace CS2_AutoAccept
         private const int MOUSEEVENTF_LEFTUP = 0x04;
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
-        #endregion
         #endregion
 
         private Updater? updater;
@@ -78,7 +77,9 @@ namespace CS2_AutoAccept
         public MainWindow()
         {
             InitializeComponent();
-            Loaded += MainWindow_Loaded;
+
+            // Subscribe to the event when another instance tries to start
+            Task.Run(() => OnAnotherInstanceStarted());
             IsTrayIconVisible = true;
             DataContext = this;
 
@@ -90,6 +91,8 @@ namespace CS2_AutoAccept
 
             _basePath = Path.Combine(Environment.ExpandEnvironmentVariables("%APPDATA%"), "CS2 AutoAccept");
             _updatePath = Path.Combine(_basePath, "UPDATE");
+
+            Loaded += MainWindow_Loaded;
 
             RestoreSizeIfSaved();
 
@@ -189,7 +192,7 @@ namespace CS2_AutoAccept
                     }
 
                     // Start the updated program, in the new default path
-                    Process.Start(Path.Combine(_basePath, "CS2-AutoAccept"));
+                    Process.Start(Path.Combine(_basePath, "CS2-AutoAccept"), "--updated");
                     Environment.Exit(0);
                 }
                 else
@@ -231,6 +234,41 @@ namespace CS2_AutoAccept
             MyNotifyIcon.Visibility = IsTrayIconVisible ? Visibility.Visible : Visibility.Collapsed;
         }
         #region EventHandlers
+        // Handle the event when another instance tries to start
+        private void OnAnotherInstanceStarted()
+        {
+            using (MemoryMappedFile mmf = MemoryMappedFile.CreateOrOpen("CS2_AutoAccept_MMF", 1024))
+            using (MemoryMappedViewStream view = mmf.CreateViewStream())
+            {
+                BinaryReader reader = new BinaryReader(view);
+                EventWaitHandle signal = new EventWaitHandle(false, EventResetMode.AutoReset, "CS2_AutoAccept_Event");
+                Mutex mutex = new Mutex(false, "CS2-AutoAccept by tsgsOFFICIAL");
+
+                while (true)
+                {
+                    signal.WaitOne();
+                    mutex.WaitOne();
+                    reader.BaseStream.Position = 0;
+                    string message = reader.ReadString();
+
+                    if (message == "New instance started")
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            // Bring the existing window to the front if it's minimized
+                            if (WindowState == WindowState.Minimized)
+                            {
+                                Show();
+                                WindowState = WindowState.Normal;
+                            }
+                        });
+                    }
+
+                    mutex.ReleaseMutex();
+                }
+            }
+        }
+
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // Access command line arguments
@@ -245,9 +283,24 @@ namespace CS2_AutoAccept
                     _gameRunExtraDelay = 15;
                 }
 
+                // Application was started minimized
                 if (arg.ToLower().Equals("--minimize"))
                 {
                     WindowState = WindowState.Minimized;
+                }
+
+                // Application was updated
+                if (arg.ToLower().Equals("--updated"))
+                {
+                    // Try to delete the update folder
+                    try
+                    {
+                        Directory.Delete(_updatePath, true);
+                    }
+                    catch (Exception)
+                    { }
+
+                    ShowNotification("CS2 AutoAccept", "CS2 AutoAccept has been updated!");
                 }
             }
         }
@@ -583,13 +636,14 @@ namespace CS2_AutoAccept
 
             mainWindow.SizeChanged += WindowSizeChangedEventHandler;
         }
+
         /// <summary>
-        /// Control the location of the application,
-        /// If not in the correct place Move it
+        /// Ensures the application is running from the correct folder. If not, it moves the necessary files and folders
+        /// to the correct base path and restarts the application from there.
         /// </summary>
         private void ControlLocation()
         {
-            // Was the program ran from the correct folder?
+            // Was the program ran from the correct folder (_basePath or _updatePath)?
             string runPath = AppContext.BaseDirectory;
 
             if (runPath.LastIndexOf('\\') == runPath.Length - 1)
@@ -651,7 +705,6 @@ namespace CS2_AutoAccept
                 // Start the updated program, in the new default path
                 Process.Start(Path.Combine(_basePath, "CS2-AutoAccept"));
                 Environment.Exit(0);
-
             }
         }
         /// <summary>
@@ -1191,7 +1244,7 @@ namespace CS2_AutoAccept
                 {
                     Process.Start(Path.Combine(_basePath, "CS2-AutoAccept"));
                     ShowNotification("Error", ex.Message);
-                    //Environment.Exit(0);
+                    Environment.Exit(0);
                     return ("", 100);
                 }
 
