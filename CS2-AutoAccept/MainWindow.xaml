@@ -95,7 +95,7 @@
     <WindowChrome.WindowChrome>
         <WindowChrome GlassFrameThickness="1" ResizeBorderThickness="5" CaptionHeight="0"/>
     </WindowChrome.WindowChrome>
-    <Grid>        
+    <Grid>
         <!-- Background -->
         <Grid.Background>
             <ImageBrush ImageSource="/background.png"></ImageBrush>
