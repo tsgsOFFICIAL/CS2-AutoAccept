@@ -113,10 +113,10 @@
 
         <!-- Custom header -->
         <StackPanel Background="#1c1b1b" MouseLeftButtonDown="WindowHeader_Mousedown" Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal">
-            <Image Source="/logo.png" MouseLeftButtonDown="WindowHeader_Mousedown" HorizontalAlignment="Left"/>
+            <Image Source="/logo.png" HorizontalAlignment="Left"/>
             <StackPanel Margin="3.3,0,0,0" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <TextBlock Text="CS2 AutoAccept" FontFamily="Roboto" Foreground="GhostWhite" MouseLeftButtonDown="WindowHeader_Mousedown"/>
-                <TextBlock Text="by tsgsOFFICIAL" FontFamily="Roboto" Foreground="GhostWhite" MouseLeftButtonDown="WindowHeader_Mousedown"/>
+                <TextBlock Text="CS2 AutoAccept" FontFamily="Roboto" Foreground="GhostWhite" />
+                <TextBlock Text="by tsgsOFFICIAL" FontFamily="Roboto" Foreground="GhostWhite" />
             </StackPanel>
 
             <Button Background="Transparent" x:Name="Button_Update" Click="Button_Update_Click" Margin="20, 0, 0, 0" BorderThickness="0" FontFamily="Roboto" FontSize="15" Foreground="GhostWhite" FontWeight="SemiBold" Cursor="Hand" Style="{DynamicResource NavButtons}"/>
