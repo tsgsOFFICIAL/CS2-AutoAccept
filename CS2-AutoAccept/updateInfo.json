@@ -1,8 +1,13 @@
 {
-  "version": "5.1.5.4",
-  "type": "Bug",
-  "changelog": "Fixed a bug, where the program would crash upon clicking the logo in the top left corner.",
+  "version": "5.1.5.5",
+  "type": "Feature",
+  "changelog": "Improved AutoAccept conditions on low resolution monitors, with color accuracy.",
   "historic_versions": [
+    {
+      "version": "5.1.5.4",
+      "type": "Bug",
+      "changelog": "Fixed a bug, where the program would crash upon clicking the logo in the top left corner."
+    },
     {
       "version": "5.1.5.3",
       "type": "Bug",

@@ -598,7 +598,7 @@ namespace CS2_AutoAccept
             File.WriteAllText(Path.Combine(_basePath, "settings.cs2_auto"), jsonString);
         }
         #endregion
-        private string GetExePath()
+        private static string GetExePath()
         {
             string? exeLocation5 = Process.GetCurrentProcess().MainModule?.FileName;
 
@@ -711,7 +711,7 @@ namespace CS2_AutoAccept
         /// Launch a web URL on Windows, Linux and OSX
         /// </summary>
         /// <param Name="url">The URL to open in the standard browser</param>
-        private void LaunchWeb(string url)
+        private static void LaunchWeb(string url)
         {
             // PrintToLog("{LaunchWeb}");
             try
@@ -909,7 +909,7 @@ namespace CS2_AutoAccept
         /// <param Name="a">a, here it's width</param>
         /// <param Name="b">b, here it's height</param>
         /// <returns>This method returns the Greatest Common Divisor</returns>
-        private int GCD(int a, int b)
+        private static int GCD(int a, int b)
         {
             int Remainder;
 
@@ -921,6 +921,43 @@ namespace CS2_AutoAccept
             }
 
             return a;
+        }
+        private static System.Drawing.Color GetMostFrequentColor(Bitmap bitmap)
+        {
+            Dictionary<System.Drawing.Color, int> colorFrequency = new Dictionary<System.Drawing.Color, int>();
+
+            for (int x = 0; x < bitmap.Width; x++)
+            {
+                for (int y = 0; y < bitmap.Height; y++)
+                {
+                    System.Drawing.Color pixelColor = bitmap.GetPixel(x, y);
+
+                    // If color is already in the dictionary, increment the count
+                    if (colorFrequency.ContainsKey(pixelColor))
+                    {
+                        colorFrequency[pixelColor]++;
+                    }
+                    else
+                    {
+                        colorFrequency[pixelColor] = 1;
+                    }
+                }
+            }
+
+            // Find the color with the highest frequency
+            System.Drawing.Color mostFrequentColor = System.Drawing.Color.Empty;
+            int maxFrequency = 0;
+
+            foreach (KeyValuePair<System.Drawing.Color, int> pair in colorFrequency)
+            {
+                if (pair.Value > maxFrequency)
+                {
+                    maxFrequency = pair.Value;
+                    mostFrequentColor = pair.Key;
+                }
+            }
+
+            return mostFrequentColor;
         }
         /// <summary>
         /// Take a screen capture assuming the screen is 16:9
@@ -939,7 +976,7 @@ namespace CS2_AutoAccept
                 Bitmap captureBitmap = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
                 // Creating a Rectangle object which will capture our Screen
-                Rectangle captureRectangle = _activeScreen!.Bounds;
+                Rectangle captureRectangle = _activeScreen?.Bounds ?? new Rectangle(0, 0, w, h);
 
                 // Creating a New Graphics Object
                 Graphics captureGraphics = Graphics.FromImage(captureBitmap);
@@ -967,6 +1004,9 @@ namespace CS2_AutoAccept
             if (obj is null)
                 return;
 
+            double confidenceThreshold = 0.5;
+            System.Drawing.Color targetColor = System.Drawing.Color.FromArgb(255, 54, 183, 82);
+
             CancellationToken ct = (CancellationToken)obj;
             while (!ct.IsCancellationRequested)
             {
@@ -974,106 +1014,100 @@ namespace CS2_AutoAccept
                 // Take a screenshot of the accept button
                 Bitmap bitmap = CaptureScreen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
 
-                // Adjust the contrast, then sharpen the image
-                bitmap = OptimiseImage(bitmap);
+                Bitmap greyBitmap = OptimiseImage(bitmap);
 
                 // Read the image using OCR
-                (string text, double confidence) valuePair = OCR(bitmap);
+                (string text, double confidence) valuePair = OCR(greyBitmap);
 
-                //Debug.WriteLine("OCR RESULTS:");
-                //Debug.WriteLine(valuePair.text);
-                //Debug.WriteLine(valuePair.confidence);
-
-                // Check the returned value
-                if (valuePair.text.ToLower().Contains("accept") && valuePair.confidence > .75)
+                // Control OCR output
+                if (valuePair.text.ToLower().Contains("accept"))
                 {
-                    //Debug.WriteLine("Accept conditions met");
-                    // PrintToLog("{Scanner} Match found");
-                    // Move the cursor and click the accept button
+                    System.Drawing.Color mostFrequentColor = GetMostFrequentColor(bitmap); // Get the most frequent color in the original image
 
-                    System.Windows.Forms.Cursor.Position = new System.Drawing.Point(_clickPosX, _clickPosY);
-
-                    uint X = (uint)System.Windows.Forms.Cursor.Position.X;
-                    uint Y = (uint)System.Windows.Forms.Cursor.Position.Y;
-
-                    mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
-
-                    // PrintToLog("{Scanner} Match accpeted");
-
-                    // Wait 30 seconds, to see if everyone accepted the match
-                    Thread.Sleep(30 * 1000);
-
-                    bitmap = CaptureScreen(_cancelWidth, _cancelHeight, _cancelPosX, _cancelPosY); // "Cancel Search" button
-
-                    // Adjust the contrast, then sharpen the image
-                    bitmap = OptimiseImage(bitmap);
-
-                    // Read the image using OCR
-                    valuePair = OCR(bitmap);
-                    //Debug.WriteLine("OCR RESULTS:");
-                    //Debug.WriteLine(valuePair.text);
-                    //Debug.WriteLine(valuePair.confidence);
-
-                    // Check the returned value
-                    if (!(valuePair.text.ToLower().Contains("cancel search") && valuePair.confidence > .75) && !_run_Continuously)
+                    if (valuePair.confidence > confidenceThreshold || targetColor == mostFrequentColor)
                     {
-                        //Debug.WriteLine("Match was initiated");
-                        Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            Program_state.IsChecked = false;
-                        }));
+                        // PrintToLog("{Scanner} Match found");
+                        // Move the cursor and click the accept button
+                        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(_clickPosX, _clickPosY);
 
-                        return;
-                    }
-                    else if (valuePair.text.ToLower().Contains("go") && valuePair.confidence > .9)
-                    {
-                        //Debug.WriteLine("Teammates failed to accept, pressing go again");
-
-                        int clickPosX = _cancelPosX + (_cancelWidth / 2);
-                        int clickPosY = _cancelPosY + (_cancelHeight / 2);
-
-                        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(clickPosX, clickPosY);
-
-                        X = (uint)System.Windows.Forms.Cursor.Position.X;
-                        Y = (uint)System.Windows.Forms.Cursor.Position.Y;
+                        uint X = (uint)System.Windows.Forms.Cursor.Position.X;
+                        uint Y = (uint)System.Windows.Forms.Cursor.Position.Y;
 
                         mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
 
-                        // Wait 5 seconds, to not waste cpu power
-                        Thread.Sleep(5 * 1000);
-                    }
-                    else
-                    {
-                        // Take a screenshot of the accept button
-                        bitmap = CaptureScreen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
+                        // PrintToLog("{Scanner} Match accpeted");
+
+                        // Wait 30 seconds, to see if everyone accepted the match
+                        Thread.Sleep(30 * 1000);
+
+                        bitmap = CaptureScreen(_cancelWidth, _cancelHeight, _cancelPosX, _cancelPosY); // "Cancel Search" button
 
                         // Adjust the contrast, then sharpen the image
-                        bitmap = OptimiseImage(bitmap);
+                        greyBitmap = OptimiseImage(bitmap);
 
                         // Read the image using OCR
-                        valuePair = OCR(bitmap);
-
-                        //Debug.WriteLine("OCR RESULTS:");
-                        //Debug.WriteLine(valuePair.text);
-                        //Debug.WriteLine(valuePair.confidence);
+                        valuePair = OCR(greyBitmap);
 
                         // Check the returned value
-                        if (valuePair.text.ToLower().Contains("accept") && valuePair.confidence > .75)
+                        bool condition = !(valuePair.text.ToLower().Contains("cancel search") && valuePair.confidence > confidenceThreshold)
+                            && !_run_Continuously;
+
+                        if (condition)
                         {
-                            //Debug.WriteLine("Accept conditions met");
+                            //Debug.WriteLine("Match was initiated");
+                            Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                Program_state.IsChecked = false;
+                            }));
 
-                            // Move the cursor and click the accept button
+                            return;
+                        }
+                        else if (valuePair.text.ToLower().Contains("go") && valuePair.confidence > confidenceThreshold)
+                        {
+                            //Debug.WriteLine("Teammates failed to accept, pressing go again");
 
-                            System.Windows.Forms.Cursor.Position = new System.Drawing.Point(_clickPosX, _clickPosY);
+                            int clickPosX = _cancelPosX + (_cancelWidth / 2);
+                            int clickPosY = _cancelPosY + (_cancelHeight / 2);
+
+                            System.Windows.Forms.Cursor.Position = new System.Drawing.Point(clickPosX, clickPosY);
 
                             X = (uint)System.Windows.Forms.Cursor.Position.X;
                             Y = (uint)System.Windows.Forms.Cursor.Position.Y;
 
                             mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+
+                            // Wait 5 seconds, to not waste cpu power
+                            Thread.Sleep(5 * 1000);
+                        }
+                        else
+                        {
+                            // Take a screenshot of the accept button
+                            bitmap = CaptureScreen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
+                            greyBitmap = OptimiseImage(bitmap);
+
+                            // Read the image using OCR
+                            valuePair = OCR(greyBitmap);
+
+                            // Check the returned value
+                            if (valuePair.text.ToLower().Contains("accept"))
+                            {
+                                mostFrequentColor = GetMostFrequentColor(bitmap); // Get the most frequent color in the original image
+                                
+                                if (valuePair.confidence > confidenceThreshold || targetColor == mostFrequentColor)
+                                {
+                                    //Debug.WriteLine("Accept conditions met");
+
+                                    // Move the cursor and click the accept button
+                                    System.Windows.Forms.Cursor.Position = new System.Drawing.Point(_clickPosX, _clickPosY);
+
+                                    X = (uint)System.Windows.Forms.Cursor.Position.X;
+                                    Y = (uint)System.Windows.Forms.Cursor.Position.Y;
+
+                                    mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+                                }
+                            }
                         }
                     }
-
-                    //PrintToLog("{Scanner} Match cancelled");
                 }
 
                 Thread.Sleep(1000);
@@ -1201,11 +1235,10 @@ namespace CS2_AutoAccept
         /// </summary>
         /// <param Name="bitmap">The image to optimise</param>
         /// <returns>This method returns a bitmap, optimised for OCR</returns>
-        private Bitmap OptimiseImage(Bitmap bitmap)
+        private static Bitmap OptimiseImage(Bitmap bitmap)
         {
             // PrintToLog("{OptimiseImage}");
-            // Adjust the contrast, then sharpen the image
-            bitmap = ImageManipulator.Resize(bitmap, bitmap.Width * 2, bitmap.Height * 2);
+            bitmap = ImageManipulator.SetGrayscale(bitmap);
 
             // PrintToLog("{OptimiseImage} SUCCESS");
             return bitmap;
@@ -1256,7 +1289,7 @@ namespace CS2_AutoAccept
         /// </summary>
         /// <param Name="img">Image/Bitmap</param>
         /// <returns>This method returns a Byte[] containing the Image</returns>
-        private byte[] ImageToByte(Image img)
+        private static byte[] ImageToByte(Image img)
         {
             // PrintToLog("{ImageToByte}");
             using (MemoryStream stream = new MemoryStream())
@@ -1271,7 +1304,7 @@ namespace CS2_AutoAccept
         /// </summary>
         /// <param name="directoryPath">Directory To Clear</param>
         /// <param name="folderToKeep">Folder to keep</param>
-        private void DeleteAllExceptFolder(string directoryPath, string folderToKeep)
+        private static void DeleteAllExceptFolder(string directoryPath, string folderToKeep)
         {
             foreach (string directory in Directory.GetDirectories(directoryPath))
             {
@@ -1309,7 +1342,7 @@ namespace CS2_AutoAccept
         /// Prints to the log
         /// </summary>
         /// <param Name="log">Text to log</param>
-        private async Task<bool> PrintToLog(string log)
+        private static async Task<bool> PrintToLog(string log)
         {
             try
             {
@@ -1333,7 +1366,7 @@ namespace CS2_AutoAccept
 
             return true;
         }
-        private void ShowNotification(string title, string message)
+        private static void ShowNotification(string title, string message)
         {
             new ToastContentBuilder()
                 .AddText(title)
