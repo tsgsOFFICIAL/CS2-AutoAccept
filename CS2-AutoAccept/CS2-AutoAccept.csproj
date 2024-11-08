@@ -160,6 +160,7 @@
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\fr\WindowsBase.resources.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\fr\WindowsFormsIntegration.resources.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\git2-a418d9d.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\GlobalHotKey.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Hardcodet.NotifyIcon.Wpf.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\hostfxr.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\hostpolicy.dll" />
