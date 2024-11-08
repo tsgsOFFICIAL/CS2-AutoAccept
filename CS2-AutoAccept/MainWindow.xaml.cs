@@ -45,7 +45,7 @@ namespace CS2_AutoAccept
         private Updater? updater;
         private Screen? _activeScreen;
         private Thread? _scannerThread;
-        private CancellationTokenSource? cts;
+        private CancellationTokenSource? _scannerCancellationTokenSource;
         private bool _scannerIsActive = false;
         private bool _run_Continuously = false;
         private bool _updateAvailable = false;
@@ -239,6 +239,7 @@ namespace CS2_AutoAccept
             _hotKeyManager.Dispose();
 
             Close();
+            Environment.Exit(0);
         }
         private void UpdateTrayIconVisibility()
         {
@@ -430,12 +431,12 @@ namespace CS2_AutoAccept
                     {
                         if (!_scannerIsActive)
                         {
-                            Program_state_Checked(this, new RoutedEventArgs());
+                            Program_state.IsChecked = true;
                             ShowGameOverlay("AutoAccept ON");
                         }
                         else
                         {
-                            Program_state_Unchecked(this, new RoutedEventArgs());
+                            Program_state.IsChecked = false;
                             ShowGameOverlay("AutoAccept OFF");
                         }
                     }
@@ -608,13 +609,12 @@ namespace CS2_AutoAccept
             {
                 // PrintToLog("{Program_state_Checked}");
                 _scannerThread = new Thread(new ParameterizedThreadStart(Scanner)) { IsBackground = true };
-                cts = new CancellationTokenSource();
-                _scannerThread.Start(cts!.Token);
+                _scannerCancellationTokenSource = new CancellationTokenSource();
+                _scannerThread.Start(_scannerCancellationTokenSource!.Token);
                 _scannerIsActive = true;
                 // Change to a brighter color
                 Program_state.Foreground = new SolidColorBrush(Colors.LawnGreen);
                 Program_state.Content = "AutoAccept (ON)";
-                Program_state.IsChecked = true;
             }
         }
         /// <summary>
@@ -627,14 +627,13 @@ namespace CS2_AutoAccept
             if (_scannerIsActive)
             {
                 // PrintToLog("{Program_state_Unchecked}");
-                cts!.Cancel();
+                _scannerCancellationTokenSource!.Cancel();
                 Program_state_continuously.IsChecked = false;
                 _scannerIsActive = false;
 
                 // Change to a darker color
                 Program_state.Foreground = new SolidColorBrush(Colors.Red);
                 Program_state.Content = "AutoAccept (OFF)";
-                Program_state.IsChecked = false;
             }
         }
         /// <summary>
