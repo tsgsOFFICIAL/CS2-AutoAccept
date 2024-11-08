@@ -89,6 +89,32 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style TargetType="Button" x:Key="CustomButtonStyle">
+            <Setter Property="FontFamily" Value="Roboto" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border BorderThickness="1" 
+                            CornerRadius="4"
+                            Padding="4"
+                            x:Name="ButtonBorder"
+                            Background="AliceBlue">
+                                <Border.BorderBrush>
+                                    <SolidColorBrush x:Name="ButtonBorderBrush" Color="Black"/>
+                                </Border.BorderBrush>
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#C0C0C0" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <!-- Disable stretching of the window, while allowing it to be minimized from the tabbar -->
@@ -136,7 +162,17 @@
                 </Style>
             </StackPanel.Resources>
 
-            <CheckBox x:Name="Program_state" Content="AutoAccept (OFF)" ToolTip="Will find the ACCEPT button, only for the current match" IsChecked="False"  Foreground="Red" FontWeight="Bold" Checked="Program_state_Checked" Unchecked="Program_state_Unchecked"/>
+            <StackPanel Orientation="Horizontal">
+                <CheckBox x:Name="Program_state" Content="AutoAccept (OFF)" ToolTip="Will find the ACCEPT button, only for the current match" IsChecked="False"  Foreground="Red" FontWeight="Bold" Checked="Program_state_Checked" Unchecked="Program_state_Unchecked"/>
+                
+                <!-- TextBlock to show current hotkey -->
+                <TextBlock x:Name="CurrentHotkeyText"  Text="Hotkey: None" VerticalAlignment="Bottom" Margin="10, 0, 0, 0"  Foreground="GhostWhite"/>
+
+                <!-- Button to set and clear hotkey -->
+                <Button x:Name="SetHotkeyButton" Margin="10, 0, 0, 0" Style="{StaticResource CustomButtonStyle}" VerticalAlignment="Bottom" Click="SetToggleOnOffHotkeyButton_Click" ToolTip="Set a global hotkey to toggle ON/OFF">Set Hotkey</Button>
+                <Button x:Name="ClearHotkeyButton" Margin="10, 0, 0, 0" Style="{StaticResource CustomButtonStyle}" VerticalAlignment="Bottom" Click="ClearToggleOnOffHotkeyButton_Click" ToolTip="Clear the global hotkey to toggle ON/OFF">Clear Hotkey</Button>
+            </StackPanel>
+
             <CheckBox x:Name="Run_at_startup_state" Content="Run at startup (OFF)" ToolTip="Automatically start this app when your pc launches" IsChecked="False" Foreground="Red" FontWeight="Bold" Checked="Run_at_startup_state_Checked" Unchecked="Run_at_startup_state_Unchecked"/>
             <CheckBox x:Name="Program_state_continuously" Content="Auto Accept Every Match (OFF)" ToolTip="Will find the ACCEPT button for all matches, this will consume more cpu power while in game!" IsChecked="False" Foreground="Red" FontWeight="Bold" Checked="Program_state_continuously_Checked" Unchecked="Program_state_continuously_Unchecked"/>
         </StackPanel>

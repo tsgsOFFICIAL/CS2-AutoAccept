@@ -2,6 +2,7 @@
 using System.IO;
 using Tesseract;
 using System.Linq;
+using GlobalHotKey;
 using CS2AutoAccept;
 using System.Windows;
 using System.Drawing;
@@ -39,6 +40,8 @@ namespace CS2_AutoAccept
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
         #endregion
 
+        private HotKeyManager _hotKeyManager;
+        private Dictionary<string, KeyGesture> _hotkeyMap;
         private Updater? updater;
         private Screen? _activeScreen;
         private Thread? _scannerThread;
@@ -47,6 +50,7 @@ namespace CS2_AutoAccept
         private bool _run_Continuously = false;
         private bool _updateAvailable = false;
         private bool _updateFailed = false;
+        private bool _notificationIsOpen = false;
         private int _acceptPosX;
         private int _acceptPosY;
         private int _acceptWidth;
@@ -64,7 +68,6 @@ namespace CS2_AutoAccept
         public ICommand ToggleWindowCommand { get; }
         public ICommand CloseCommand { get; }
         private bool _isTrayIconVisible;
-
         public bool IsTrayIconVisible
         {
             get => _isTrayIconVisible;
@@ -74,6 +77,7 @@ namespace CS2_AutoAccept
                 UpdateTrayIconVisibility();
             }
         }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -141,6 +145,7 @@ namespace CS2_AutoAccept
             if (Directory.Exists(_updatePath) && !debugMode)
             {
                 File.Copy(Path.Combine(_basePath, "settings.cs2_auto"), Path.Combine(_updatePath, "settings.cs2_auto"));
+                File.Copy(Path.Combine(_basePath, "hotkeys.cs2_auto"), Path.Combine(_updatePath, "hotkeys.cs2_auto"));
 
                 string runPath = AppContext.BaseDirectory;
 
@@ -226,6 +231,13 @@ namespace CS2_AutoAccept
 
         private void CloseApplication()
         {
+            _hotkeyMap.TryGetValue("ToggleOnOff", out KeyGesture? _toggleOnOffKeyGesture);
+
+            if (_toggleOnOffKeyGesture != null)
+                _hotKeyManager.Unregister(_toggleOnOffKeyGesture.Key, _toggleOnOffKeyGesture.Modifiers);
+
+            _hotKeyManager.Dispose();
+
             Close();
         }
         private void UpdateTrayIconVisibility()
@@ -233,7 +245,94 @@ namespace CS2_AutoAccept
             // Show or hide the tray icon based on IsTrayIconVisible
             MyNotifyIcon.Visibility = IsTrayIconVisible ? Visibility.Visible : Visibility.Collapsed;
         }
+        /// <summary>
+        /// Saves the specified hotkeys to a file with a label for each.
+        /// </summary>
+        /// <param name="hotkeyMap">A dictionary of hotkey labels and their corresponding key gestures.</param>
+        private void SaveHotkeysToFile(Dictionary<string, KeyGesture> hotkeyMap)
+        {
+            string[] hotkeyLines = hotkeyMap
+                .Where(pair => pair.Value != null)
+                .Select(pair => $"{pair.Key}:{pair.Value.Modifiers} + {pair.Value.Key}")
+                .ToArray();
+
+            File.WriteAllLines(Path.Combine(_basePath, "hotkeys.cs2_auto"), hotkeyLines);
+        }
+        /// <summary>
+        /// Reads the hotkey configuration from a file and returns a dictionary of hotkey labels and KeyGesture objects.
+        /// </summary>
+        /// <returns>
+        /// A dictionary of hotkey labels and their corresponding KeyGesture configurations if the file exists and is valid; otherwise, an empty dictionary.
+        /// </returns>
+        private Dictionary<string, KeyGesture> ReadHotkeysFromFile()
+        {
+            string hotkeyFilePath = Path.Combine(_basePath, "hotkeys.cs2_auto");
+            Dictionary<string, KeyGesture> hotkeyMap = new Dictionary<string, KeyGesture>();
+
+            if (File.Exists(hotkeyFilePath))
+            {
+                string[] hotkeyLines = File.ReadAllLines(hotkeyFilePath);
+
+                foreach (string hotkeyLine in hotkeyLines)
+                {
+                    string[] parts = hotkeyLine.Split(':');
+                    if (parts.Length == 2)
+                    {
+                        string label = parts[0].Trim();
+                        string[] keyParts = parts[1].Split('+');
+
+                        if (keyParts.Length == 2)
+                        {
+                            ModifierKeys modifiers = (ModifierKeys)Enum.Parse(typeof(ModifierKeys), keyParts[0].Trim());
+                            Key key = (Key)Enum.Parse(typeof(Key), keyParts[1].Trim());
+
+                            hotkeyMap[label] = new KeyGesture(key, modifiers);
+                        }
+                    }
+                }
+            }
+
+            return hotkeyMap;
+        }
+
         #region EventHandlers
+        private void SetToggleOnOffHotkeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            HotkeyDialog hotkeyDialog = new HotkeyDialog();
+
+            if (hotkeyDialog.ShowDialog() == true)
+            {
+                _hotkeyMap.TryGetValue("ToggleOnOff", out KeyGesture? _toggleOnOffKeyGesture);
+
+                if (_toggleOnOffKeyGesture != null)
+                {
+                    _hotKeyManager.Unregister(_toggleOnOffKeyGesture.Key, _toggleOnOffKeyGesture.Modifiers);
+                    _hotkeyMap.Remove("ToggleOnOff");
+                }
+
+                if (hotkeyDialog.SelectedHotkey != null)
+                {
+                    _hotkeyMap.Add("ToggleOnOff", hotkeyDialog.SelectedHotkey);
+                    CurrentHotkeyText.Text = $"Hotkey: {hotkeyDialog.SelectedHotkey.Modifiers} + {hotkeyDialog.SelectedHotkey.Key}";
+                    _hotKeyManager.Register(hotkeyDialog.SelectedHotkey.Key, hotkeyDialog.SelectedHotkey.Modifiers);
+                    SaveHotkeysToFile(_hotkeyMap);
+                }
+                else
+                {
+                    CurrentHotkeyText.Text = "Hotkey: None";
+                }
+            }
+        }
+        private void ClearToggleOnOffHotkeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            _hotkeyMap.TryGetValue("ToggleOnOff", out KeyGesture? _toggleOnOffKeyGesture);
+            if (_toggleOnOffKeyGesture != null)
+                _hotKeyManager.Unregister(_toggleOnOffKeyGesture.Key, _toggleOnOffKeyGesture.Modifiers);
+
+            _hotkeyMap.Remove("ToggleOnOff");
+            CurrentHotkeyText.Text = "Hotkey: None";
+            SaveHotkeysToFile(_hotkeyMap);
+        }
         // Handle the event when another instance tries to start
         private void OnAnotherInstanceStarted()
         {
@@ -268,7 +367,6 @@ namespace CS2_AutoAccept
                 }
             }
         }
-
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // Access command line arguments
@@ -301,6 +399,46 @@ namespace CS2_AutoAccept
                     { }
 
                     ShowNotification("CS2 AutoAccept", "CS2 AutoAccept has been updated!");
+                }
+            }
+
+            // Create a new HotKeyManager
+            _hotKeyManager = new HotKeyManager();
+
+            // Read hotkeys from file
+            _hotkeyMap = ReadHotkeysFromFile();
+
+            _hotkeyMap.TryGetValue("ToggleOnOff", out KeyGesture? _toggleOnOffKeyGesture);
+
+            if (_toggleOnOffKeyGesture != null)
+            {
+                _hotKeyManager.Register(_toggleOnOffKeyGesture.Key, _toggleOnOffKeyGesture.Modifiers);
+                CurrentHotkeyText.Text = $"Hotkey: {_toggleOnOffKeyGesture.Modifiers} + {_toggleOnOffKeyGesture.Key}";
+            }
+
+            _hotKeyManager.KeyPressed += HotKeyManager_KeyPressed;
+        }
+        private void HotKeyManager_KeyPressed(object? sender, KeyPressedEventArgs e)
+        {
+            _hotkeyMap.TryGetValue("ToggleOnOff", out KeyGesture? _toggleOnOffKeyGesture);
+
+            if (_toggleOnOffKeyGesture != null)
+            {
+                if (e.HotKey.Key == _toggleOnOffKeyGesture.Key)
+                {
+                    if (!_notificationIsOpen)
+                    {
+                        if (!_scannerIsActive)
+                        {
+                            Program_state_Checked(this, new RoutedEventArgs());
+                            ShowGameOverlay("AutoAccept ON");
+                        }
+                        else
+                        {
+                            Program_state_Unchecked(this, new RoutedEventArgs());
+                            ShowGameOverlay("AutoAccept OFF");
+                        }
+                    }
                 }
             }
         }
@@ -400,7 +538,7 @@ namespace CS2_AutoAccept
         /// <param Name="e"></param>
         private void Button_Click_Close(object sender, RoutedEventArgs e)
         {
-            Close();
+            CloseApplication();
         }
         /// <summary>
         /// Open Github to download the newest version
@@ -466,14 +604,18 @@ namespace CS2_AutoAccept
         /// <param Name="e"></param>
         private void Program_state_Checked(object sender, RoutedEventArgs e)
         {
-            // PrintToLog("{Program_state_Checked}");
-            _scannerThread = new Thread(new ParameterizedThreadStart(Scanner)) { IsBackground = true };
-            cts = new CancellationTokenSource();
-            _scannerThread.Start(cts!.Token);
-            _scannerIsActive = true;
-            // Change to a brighter color
-            Program_state.Foreground = new SolidColorBrush(Colors.LawnGreen);
-            Program_state.Content = "AutoAccept (ON)";
+            if (Program_state.IsEnabled)
+            {
+                // PrintToLog("{Program_state_Checked}");
+                _scannerThread = new Thread(new ParameterizedThreadStart(Scanner)) { IsBackground = true };
+                cts = new CancellationTokenSource();
+                _scannerThread.Start(cts!.Token);
+                _scannerIsActive = true;
+                // Change to a brighter color
+                Program_state.Foreground = new SolidColorBrush(Colors.LawnGreen);
+                Program_state.Content = "AutoAccept (ON)";
+                Program_state.IsChecked = true;
+            }
         }
         /// <summary>
         /// State OFF event
@@ -482,14 +624,18 @@ namespace CS2_AutoAccept
         /// <param Name="e"></param>
         private void Program_state_Unchecked(object sender, RoutedEventArgs e)
         {
-            // PrintToLog("{Program_state_Unchecked}");
-            cts!.Cancel();
-            Program_state_continuously.IsChecked = false;
-            _scannerIsActive = false;
+            if (_scannerIsActive)
+            {
+                // PrintToLog("{Program_state_Unchecked}");
+                cts!.Cancel();
+                Program_state_continuously.IsChecked = false;
+                _scannerIsActive = false;
 
-            // Change to a darker color
-            Program_state.Foreground = new SolidColorBrush(Colors.Red);
-            Program_state.Content = "AutoAccept (OFF)";
+                // Change to a darker color
+                Program_state.Foreground = new SolidColorBrush(Colors.Red);
+                Program_state.Content = "AutoAccept (OFF)";
+                Program_state.IsChecked = false;
+            }
         }
         /// <summary>
         /// 24/7 State ON event
@@ -598,6 +744,7 @@ namespace CS2_AutoAccept
             File.WriteAllText(Path.Combine(_basePath, "settings.cs2_auto"), jsonString);
         }
         #endregion
+
         private static string GetExePath()
         {
             string? exeLocation5 = Process.GetCurrentProcess().MainModule?.FileName;
@@ -1092,7 +1239,7 @@ namespace CS2_AutoAccept
                             if (valuePair.text.ToLower().Contains("accept"))
                             {
                                 mostFrequentColor = GetMostFrequentColor(bitmap); // Get the most frequent color in the original image
-                                
+
                                 if (valuePair.confidence > confidenceThreshold || targetColor == mostFrequentColor)
                                 {
                                     //Debug.WriteLine("Accept conditions met");
@@ -1365,6 +1512,55 @@ namespace CS2_AutoAccept
             }
 
             return true;
+        }
+        private void ShowGameOverlay(string message)
+        {
+            if (_activeScreen != null)
+            {
+                _notificationIsOpen = true;
+
+                // Calculate the overlays left and top position, based on the active screen
+                // It should be centered on the screen
+                int overlayWidth = 600;
+                int overlayHeight = 250;
+                int overlayleft = _activeScreen.Bounds.Left + (_activeScreen.Bounds.Width / 2) - (overlayWidth / 2);
+                int overlayTop = _activeScreen.Bounds.Top + (_activeScreen.Bounds.Height / 2) - (overlayHeight / 2);
+
+                Window overlay = new Window
+                {
+                    Title = "CS2 AutoAccept",
+                    Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(192, 0, 0, 0)),
+                    Width = overlayWidth,
+                    Height = overlayHeight,
+                    Topmost = true,
+                    WindowStyle = WindowStyle.None,
+                    AllowsTransparency = true,
+                    WindowStartupLocation = WindowStartupLocation.Manual,
+                    Left = overlayleft,
+                    Top = overlayTop,
+                    ShowInTaskbar = false,
+                    Content = new System.Windows.Controls.TextBlock
+                    {
+                        Text = message,
+                        Foreground = System.Windows.Media.Brushes.White,
+                        FontSize = 60,
+                        HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        TextAlignment = TextAlignment.Center
+                    }
+                };
+
+                overlay.Show();
+
+                Task.Delay(1000).ContinueWith(_ =>
+                {
+                    overlay.Dispatcher.Invoke(() =>
+                    {
+                        overlay.Hide();
+                        _notificationIsOpen = false;
+                    });
+                });
+            }
         }
         private static void ShowNotification(string title, string message)
         {
