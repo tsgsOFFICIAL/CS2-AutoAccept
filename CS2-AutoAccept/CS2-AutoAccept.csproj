@@ -12,7 +12,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Description>A program to automatically find and press "ACCEPT" for you, when entering a competitive match in CS2.</Description>
     <Copyright>©️ tsgsOFFICIAL - 2024</Copyright>
-    <FileVersion>5.2.0.1</FileVersion>
+    <FileVersion>5.2.0.2</FileVersion>
     <AssemblyName>CS2-AutoAccept</AssemblyName>
   </PropertyGroup>
 
@@ -26,7 +26,10 @@
   <ItemGroup>
     <None Remove="background.png" />
     <None Remove="Discord white.png" />
+    <None Remove="discord.png" />
+    <None Remove="github.png" />
     <None Remove="logo.png" />
+    <None Remove="tsgs.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -569,7 +572,10 @@
   <ItemGroup>
     <Resource Include="background.png" />
     <Resource Include="Discord white.png" />
+    <Resource Include="discord.png" />
+    <Resource Include="github.png" />
     <Resource Include="logo.png" />
+    <Resource Include="tsgs.png" />
   </ItemGroup>
 
   <ItemGroup>

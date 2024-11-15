@@ -164,7 +164,7 @@
 
             <StackPanel Orientation="Horizontal">
                 <CheckBox x:Name="Program_state" Content="AutoAccept (OFF)" ToolTip="Will find the ACCEPT button, only for the current match" IsChecked="False"  Foreground="Red" FontWeight="Bold" Checked="Program_state_Checked" Unchecked="Program_state_Unchecked"/>
-                
+
                 <!-- TextBlock to show current hotkey -->
                 <TextBlock x:Name="CurrentHotkeyText"  Text="Hotkey: None" VerticalAlignment="Bottom" Margin="10, 0, 0, 0"  Foreground="GhostWhite"/>
 
@@ -219,8 +219,123 @@
         <tb:TaskbarIcon x:Name="MyNotifyIcon" IconSource="/logo.png" ToolTipText="CS2 AutoAccept by tsgsOFFICIAL" DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Visibility="Collapsed">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Minimize" Command="{Binding ToggleWindowCommand }" />
+                    <!--MenuItem with centered icon and text-->
+                    <MenuItem Header="CS2 AutoAccept" IsEnabled="False" Foreground="LightGray">
+                        <MenuItem.Icon>
+                            <Canvas Width="24" Height="24" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <Image Source="/tsgs.png" Width="24" Height="24" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6, 0"/>
+                            </Canvas>
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                    <Separator Margin="0"/>
+
+                    <MenuItem x:Name="StartCS2" Header="Start CS2" Command="{Binding StartCS2Command}">
+                        <MenuItem.Icon>
+                            <Canvas Width="24" Height="24" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <Image Source="/logo.png" Width="24" Height="24" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6, 0"/>
+                            </Canvas>
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                    <MenuItem x:Name="JoinDiscord" Header="Join Discord" Command="{Binding JoinDiscordCommand}">
+                        <MenuItem.Icon>
+                            <Canvas Width="24" Height="24" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <Image Source="/discord.png" Width="24" Height="24" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6, 0"/>
+                            </Canvas>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    
+                    <MenuItem x:Name="OpenGithub" Header="Open Github" Command="{Binding OpenGithubCommand}">
+                        <MenuItem.Icon>
+                            <Canvas Width="24" Height="24" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <Image Source="/github.png" Width="24" Height="24" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6, 0"/>
+                            </Canvas>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    
+                    <MenuItem x:Name="MinimizeAndRestore" Header="Minimize" Command="{Binding ToggleWindowCommand}" />
                     <MenuItem Header="Exit" Command="{Binding CloseCommand}" />
+
+                    <!--Define a style for the ContextMenu-->
+                    <ContextMenu.Resources>
+                        <!--Set background and foreground colors for MenuItems-->
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Background" Value="#353535"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="FontFamily" Value="Roboto"/>
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="Padding" Value="10, 6"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="Margin" Value="0,1,0,1"/>
+
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type MenuItem}">
+                                        <Border x:Name="templateRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true">
+                                            <Grid VerticalAlignment="Center">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <ContentPresenter x:Name="Icon" ContentSource="Icon" HorizontalAlignment="Center" Height="16" Width="16" Margin="2,5,5,5" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center"/>
+                                                <ContentPresenter ContentSource="Header" Grid.Column="1" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="Icon" Value="{x:Null}">
+                                                <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
+                                            </Trigger>
+                                            <Trigger Property="IsHighlighted" Value="True">
+                                                <Setter Property="Background" TargetName="templateRoot" Value="#999999"/>
+                                            </Trigger>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="LightGray"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+
+                        <!--Style for the ContextMenu itself-->
+                        <Style TargetType="ContextMenu">
+                            <Setter Property="Background" Value="#353535"/>
+                            <Setter Property="BorderBrush" Value="Transparent"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ContextMenu">
+                                        <Border 
+                                            Background="{TemplateBinding Background}" 
+                                            BorderBrush="{TemplateBinding BorderBrush}" 
+                                            BorderThickness="{TemplateBinding BorderThickness}" 
+                                            CornerRadius="6" 
+                                            SnapsToDevicePixels="True" 
+                                            Padding="10">
+                                            
+                                            <Grid>
+                                                <ItemsPresenter/>
+                                            </Grid>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+
+                        <!--Style for separators-->
+                        <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
+                            <Setter Property="OverridesDefaultStyle" Value="true" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Separator}">
+                                        <Border Height="1" Margin="4,4,4,0" Background="LightGray" HorizontalAlignment="Stretch"/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ContextMenu.Resources>
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>

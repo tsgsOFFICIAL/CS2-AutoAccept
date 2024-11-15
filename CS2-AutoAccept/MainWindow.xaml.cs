@@ -67,6 +67,9 @@ namespace CS2_AutoAccept
         private readonly bool debugMode = false;
         public ICommand ToggleWindowCommand { get; }
         public ICommand CloseCommand { get; }
+        public ICommand OpenGithubCommand { get; }
+        public ICommand JoinDiscordCommand { get; }
+        public ICommand StartCS2Command { get; }
         private bool _isTrayIconVisible;
         public bool IsTrayIconVisible
         {
@@ -89,6 +92,9 @@ namespace CS2_AutoAccept
 
             ToggleWindowCommand = new RelayCommand(o => ToggleWindowState());
             CloseCommand = new RelayCommand(o => CloseApplication());
+            OpenGithubCommand = new RelayCommand(o => LaunchWeb("https://github.com/tsgsOFFICIAL/CS2-AutoAccept"));
+            JoinDiscordCommand = new RelayCommand(o => LaunchWeb("https://discord.gg/Cddu5aJ"));
+            StartCS2Command = new RelayCommand(o => LaunchWeb("steam://rungameid/730"));
 
             // Event handler for double-click on TaskbarIcon
             MyNotifyIcon.TrayMouseDoubleClick += OnTrayIconDoubleClick;
@@ -215,6 +221,7 @@ namespace CS2_AutoAccept
             }
             #endregion
         }
+
         private void ToggleWindowState()
         {
             if (WindowState == WindowState.Minimized)
@@ -449,7 +456,7 @@ namespace CS2_AutoAccept
 
             // Find context menu items and update texts based on WindowState
             var menu = (System.Windows.Controls.ContextMenu)MyNotifyIcon.ContextMenu;
-            var toggleMenuItem = (System.Windows.Controls.MenuItem)menu.Items[0];
+            var toggleMenuItem = (System.Windows.Controls.MenuItem)MinimizeAndRestore;
 
             if (WindowState == WindowState.Minimized)
             {
@@ -981,6 +988,7 @@ namespace CS2_AutoAccept
                         TextBlock_MonitorSize.Text = $"Display Size: {_activeScreen.Bounds.Width}x{_activeScreen.Bounds.Height} ({AspectRatio()})";
                         Button_LaunchCS.Visibility = Visibility.Collapsed;
                         Button_LaunchCS.Content = "Launch CS2";
+                        StartCS2.Visibility = Visibility.Collapsed;
                     }));
 
                     CalculateSizes(AspectRatio());
@@ -999,6 +1007,7 @@ namespace CS2_AutoAccept
                         Program_state_continuously.IsEnabled = false;
                         Button_LaunchCS.Content = "Launch CS2";
                         Button_LaunchCS.Visibility = Visibility.Visible;
+                        StartCS2.Visibility = Visibility.Visible;
                     }));
                 }
             }
@@ -1523,7 +1532,7 @@ namespace CS2_AutoAccept
                 int overlayWidth = 600;
                 int overlayHeight = 250;
                 int overlayleft = _activeScreen.Bounds.Left + (_activeScreen.Bounds.Width / 2) - (overlayWidth / 2);
-                int overlayTop = _activeScreen.Bounds.Top + (_activeScreen.Bounds.Height / 2) - (overlayHeight / 2);
+                int overlayTop = _acceptPosY + overlayHeight;
 
                 Window overlay = new Window
                 {
