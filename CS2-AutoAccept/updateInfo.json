@@ -1,8 +1,13 @@
 {
-  "version": "5.2.0.2",
+  "version": "5.2.0.3",
   "type": "Feature",
-  "changelog": "Improved system tray context menu.",
+  "changelog": "Automatic updates.",
   "historic_versions": [
+    {
+      "version": "5.2.0.2",
+      "type": "Feature",
+      "changelog": "Improved system tray context menu."
+    },
     {
       "version": "5.2.0.1",
       "type": "Bug",

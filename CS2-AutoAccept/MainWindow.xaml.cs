@@ -115,6 +115,10 @@ namespace CS2_AutoAccept
             updater = new Updater();
             updater.DownloadProgress += Updater_ProgressUpdated!;
 
+            Thread UpdateThread = new Thread(CheckForUpdate);
+            UpdateThread.Start();
+            UpdateThread.IsBackground = true;
+
             Thread GameRunningThread = new Thread(IsGameRunning);
             GameRunningThread.Start();
             GameRunningThread.IsBackground = true;
@@ -301,6 +305,37 @@ namespace CS2_AutoAccept
             }
 
             return hotkeyMap;
+        }
+        private async void CheckForUpdate()
+        {
+            if (_updateAvailable)
+            {
+                updater!.DownloadUpdate(_updatePath);
+                await Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    _updateFailed = false;
+                    Button_Update.IsEnabled = false;
+                    Button_Update.Content = "Updating...";
+                    Program_state.IsChecked = false;
+                    Program_state.Visibility = Visibility.Collapsed;
+                    CurrentHotkeyText.Visibility = Visibility.Collapsed;
+                    SetHotkeyButton.Visibility = Visibility.Collapsed;
+                    ClearHotkeyButton.Visibility = Visibility.Collapsed;
+                    Program_state_continuously.Visibility = Visibility.Collapsed;
+                    Run_at_startup_state.Visibility = Visibility.Collapsed;
+                    Button_LaunchCS.Visibility = Visibility.Collapsed;
+                }));
+            }
+            else
+            {
+                await Dispatcher.BeginInvoke(new Action(async () =>
+                {
+                    _updateAvailable = await UpdateHeaderVersion();
+                }));
+            }
+
+            Thread.Sleep(5 * 60 * 1000);
+            CheckForUpdate();
         }
 
         #region EventHandlers
@@ -553,26 +588,10 @@ namespace CS2_AutoAccept
         /// </summary>
         /// <param Name="sender"></param>
         /// <param Name="e"></param>
-        private async void Button_Update_Click(object sender, RoutedEventArgs e)
+        private void Button_Update_Click(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Button_Update_Click}");
-            if (_updateAvailable)
-            {
-                _updateFailed = false;
-                Button_Update.IsEnabled = false;
-                Button_Update.Content = "Updating...";
-                Program_state.IsChecked = false;
-                Program_state.Visibility = Visibility.Collapsed;
-                Program_state_continuously.Visibility = Visibility.Collapsed;
-                Run_at_startup_state.Visibility = Visibility.Collapsed;
-                Button_LaunchCS.Visibility = Visibility.Collapsed;
-                updater!.DownloadUpdate(_updatePath);
-            }
-            else
-            {
-                _updateAvailable = await UpdateHeaderVersion();
-            }
-
+            CheckForUpdate();
         }
         /// <summary>
         /// Open Discord
