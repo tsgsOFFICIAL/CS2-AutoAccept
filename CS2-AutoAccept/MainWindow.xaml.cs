@@ -306,11 +306,11 @@ namespace CS2_AutoAccept
 
             return hotkeyMap;
         }
-        private async void CheckForUpdate()
+        private void CheckForUpdate()
         {
             if (!_updateAvailable)
             {
-                await Dispatcher.BeginInvoke(new Action(async () =>
+                Dispatcher.BeginInvoke(new Action(async () =>
                 {
                     _updateAvailable = await UpdateHeaderVersion();
                 }));
@@ -570,10 +570,29 @@ namespace CS2_AutoAccept
         /// </summary>
         /// <param Name="sender"></param>
         /// <param Name="e"></param>
-        private void Button_Update_Click(object sender, RoutedEventArgs e)
+        private async void Button_Update_Click(object sender, RoutedEventArgs e)
         {
             // PrintToLog("{Button_Update_Click}");
-            CheckForUpdate();
+            if (_updateAvailable)
+            {
+                updater!.DownloadUpdate(_updatePath);
+
+                _updateFailed = false;
+                Button_Update.IsEnabled = false;
+                Button_Update.Content = "Updating...";
+                Program_state.IsChecked = false;
+                Program_state.Visibility = Visibility.Collapsed;
+                CurrentHotkeyText.Visibility = Visibility.Collapsed;
+                SetHotkeyButton.Visibility = Visibility.Collapsed;
+                ClearHotkeyButton.Visibility = Visibility.Collapsed;
+                Program_state_continuously.Visibility = Visibility.Collapsed;
+                Run_at_startup_state.Visibility = Visibility.Collapsed;
+                Button_LaunchCS.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                _updateAvailable = await UpdateHeaderVersion();
+            }
         }
         /// <summary>
         /// Open Discord
