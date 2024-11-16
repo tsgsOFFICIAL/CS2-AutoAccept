@@ -308,34 +308,16 @@ namespace CS2_AutoAccept
         }
         private async void CheckForUpdate()
         {
-            if (_updateAvailable)
-            {
-                updater!.DownloadUpdate(_updatePath);
-                await Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    _updateFailed = false;
-                    Button_Update.IsEnabled = false;
-                    Button_Update.Content = "Updating...";
-                    Program_state.IsChecked = false;
-                    Program_state.Visibility = Visibility.Collapsed;
-                    CurrentHotkeyText.Visibility = Visibility.Collapsed;
-                    SetHotkeyButton.Visibility = Visibility.Collapsed;
-                    ClearHotkeyButton.Visibility = Visibility.Collapsed;
-                    Program_state_continuously.Visibility = Visibility.Collapsed;
-                    Run_at_startup_state.Visibility = Visibility.Collapsed;
-                    Button_LaunchCS.Visibility = Visibility.Collapsed;
-                }));
-            }
-            else
+            if (!_updateAvailable)
             {
                 await Dispatcher.BeginInvoke(new Action(async () =>
                 {
                     _updateAvailable = await UpdateHeaderVersion();
                 }));
-            }
 
-            Thread.Sleep(5 * 60 * 1000);
-            CheckForUpdate();
+                Thread.Sleep(5 * 60 * 1000);
+                CheckForUpdate();
+            }
         }
 
         #region EventHandlers
