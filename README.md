@@ -17,7 +17,7 @@ If it finds the accept button, it takes over your mouse, points it at the button
 
 **Does this work with Panorama UI?**
 <br>
-Not sure, but try it out and report errors :)
+Yes it works with Panorama UI, which is the new default in CS2.
 
 **Does it work with VAC?**
 <br>
