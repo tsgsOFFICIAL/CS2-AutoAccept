@@ -154,8 +154,24 @@ namespace CS2_AutoAccept
             #region Update
             if (Directory.Exists(_updatePath) && !debugMode)
             {
-                File.Copy(Path.Combine(_basePath, "settings.cs2_auto"), Path.Combine(_updatePath, "settings.cs2_auto"));
-                File.Copy(Path.Combine(_basePath, "hotkeys.cs2_auto"), Path.Combine(_updatePath, "hotkeys.cs2_auto"));
+                try
+                {
+                    File.Copy(Path.Combine(_basePath, "settings.cs2_auto"), Path.Combine(_updatePath, "settings.cs2_auto"));
+                }
+                catch (Exception)
+                { }
+                try
+                {
+                    File.Copy(Path.Combine(_basePath, "hotkeys.cs2_auto"), Path.Combine(_updatePath, "hotkeys.cs2_auto"));
+                }
+                catch (Exception)
+                { }
+                try
+                {
+                    File.Copy(Path.Combine(_basePath, "sha_cache.cs2_auto"), Path.Combine(_updatePath, "sha_cache.cs2_auto"));
+                }
+                catch (Exception)
+                { }
 
                 string runPath = AppContext.BaseDirectory;
 
