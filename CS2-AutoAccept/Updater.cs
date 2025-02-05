@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.Diagnostics;
 using CS2_AutoAccept;
-using System.Diagnostics;
+using System.IO;
+using System;
 
 namespace CS2AutoAccept
 {
@@ -16,21 +16,21 @@ namespace CS2AutoAccept
         /// Download the update
         /// </summary>
         /// <param name="downloadDirectory">Where to download to locally</param>
-        internal async void DownloadUpdate(string downloadDirectory)
+        internal async void DownloadUpdate(string basePath, string downloadDirectory)
         {
-            using (GitHubDirectoryDownloader downloader = new GitHubDirectoryDownloader(_repositoryOwner, _repositoryName, _folderPath))
+            using (GitHubDirectoryDownloader downloader = new GitHubDirectoryDownloader(_repositoryOwner, _repositoryName, _folderPath, basePath))
             {
                 downloader.ProgressUpdated += OnProgressChanged!;
 
-                await downloader.DownloadDirectoryAsync(downloadDirectory);
                 try
                 {
+                    await downloader.DownloadDirectoryAsync(downloadDirectory);
                     Process.Start(Path.Combine(downloadDirectory, "CS2-AutoAccept"));
                     Environment.Exit(0);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                
+                    Debug.WriteLine(ex.Message);
                 }
             }
         }

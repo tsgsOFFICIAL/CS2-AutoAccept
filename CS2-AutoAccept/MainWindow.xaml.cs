@@ -575,7 +575,7 @@ namespace CS2_AutoAccept
             // PrintToLog("{Button_Update_Click}");
             if (_updateAvailable)
             {
-                updater!.DownloadUpdate(_updatePath);
+                updater!.DownloadUpdate(_basePath, _updatePath);
 
                 _updateFailed = false;
                 Button_Update.IsEnabled = false;

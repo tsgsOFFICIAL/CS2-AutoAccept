@@ -1,207 +1,212 @@
 {
-  "version": "5.2.0.5",
+  "version": "5.2.0.6",
   "type": "Feature",
-  "changelog": "Automatic updates.",
-  "historic_versions": [
-    {
-      "version": "5.2.0.4",
-      "type": "Feature",
-      "changelog": "Automatic updates."
-    },
-    {
-      "version": "5.2.0.3",
-      "type": "Feature",
-      "changelog": "Automatic updates."
-    },
-    {
-      "version": "5.2.0.2",
-      "type": "Feature",
-      "changelog": "Improved system tray context menu."
-    },
-    {
-      "version": "5.2.0.1",
-      "type": "Bug",
-      "changelog": "Fixed a minor bug with the internal threads."
-    },
-    {
-      "version": "5.2.0.0",
-      "type": "Feature",
-      "changelog": "Added the ability to set & use hotkeys."
-    },
-    {
-      "version": "5.1.5.5",
-      "type": "Feature",
-      "changelog": "Improved AutoAccept conditions on low resolution monitors, with color accuracy."
-    },
-    {
-      "version": "5.1.5.4",
-      "type": "Bug",
-      "changelog": "Fixed a bug, where the program would crash upon clicking the logo in the top left corner."
-    },
-    {
-      "version": "5.1.5.3",
-      "type": "Bug",
-      "changelog": "Fixed AppContext bug, where Tesseract wouldn't launch after rebooting'."
-    },
-    {
-      "version": "5.1.5.2",
-      "type": "Feature",
-      "changelog": "Improved the automatic update flow."
-    },
-    {
-      "version": "5.1.5.1",
-      "type": "Bugfix",
-      "changelog": "Fixed a bug where the application would not start with windows."
-    },
-    {
-      "version": "5.1.5.0",
-      "type": "major",
-      "changelog": "Removed keybinds temporarily & added system tray icon as requested."
-    },
-    {
-      "version": "5.1.4.5",
-      "type": "minor",
-      "changelog": "Minor bug fix."
-    },
-    {
-      "version": "5.1.4.4",
-      "type": "minor",
-      "changelog": "Minor bug fix."
-    },
-    {
-      "version": "5.1.4.3",
-      "type": "minor",
-      "changelog": "Accidentally removed tessdata, now included again."
-    },
-    {
-      "version": "5.1.4.2",
-      "type": "minor",
-      "changelog": "Fixed a small issue with Program state"
-    },
-    {
-      "version": "5.1.4.1",
-      "type": "minor",
-      "changelog": "Fixed a bug with app location"
-    },
-    {
-      "version": "5.1.4.0",
-      "type": "major",
-      "changelog": "Added keybinds & notifications"
-    },
-    {
-      "version": "5.1.3.0",
-      "type": "minor",
-      "changelog": "Added a bit of user preferences/settings"
-    },
-    {
-      "version": "5.1.2.0",
-      "type": "minor",
-      "changelog": "Added re-tries for accept"
-    },
-    {
-      "version": "5.1.1.0",
-      "type": "very minor",
-      "changelog": "Added command line arguments"
-    },
-    {
-      "version": "5.1.0.0",
-      "type": "minor",
-      "changelog": "Added retry if teammate doesn't accept"
-    },
-    {
-      "version": "5.0.3.0",
-      "type": "patch",
-      "changelog": "Matched button's dimensions"
-    },
-    {
-      "version": "5.0.2.0",
-      "type": "patch",
-      "changelog": "Fixed update animation"
-    },
-    {
-      "version": "5.0.1.0",
-      "type": "patch",
-      "changelog": "Added maximize button to UI"
-    },
-    {
-      "version": "5.0.0.0",
-      "type": "major",
-      "changelog": "Reworked the UI"
-    },
-    {
-      "version": "4.4.2.0",
-      "type": "bugfix",
-      "changelog": "Reworked the control location method"
-    },
-    {
-      "version": "4.4.1.0",
-      "type": "patch",
-      "changelog": "Minor change to previous update"
-    },
-    {
-      "version": "4.4.0.0",
-      "type": "minor",
-      "changelog": "Automatically moves the program to its destination, the first time installing"
-    },
-    {
-      "version": "4.3.0.0",
-      "type": "minor",
-      "changelog": "Trained Tessract for better results"
-    },
-    {
-      "version": "4.2.0.0",
-      "type": "minor",
-      "changelog": "Renamed GitHub solution for SEO"
-    },
-    {
-      "version": "4.1.1.0",
-      "type": "patch",
-      "changelog": "Changed conditions for accept button"
-    },
-    {
-      "version": "4.1.0.0",
-      "type": "minor",
-      "changelog": "Updated conditions to work with any language, basing the conditions on colors instead of only text"
-    },
-    {
-      "version": "4.0.0.0",
-      "type": "major",
-      "changelog": "Updated conditions to work with any language, basing the conditions on colors instead of only text"
-    },
-    {
-      "version": "3.5.0.0",
-      "type": "major",
-      "changelog": "Updated autoaccept conditions, to work with the new button"
-    },
-    {
-      "version": "3.4.0.0",
-      "type": "minor",
-      "changelog": "Added a changelog feature, to see what the update is about, and if it's important"
-    },
-    {
-      "version": "3.3.2.0",
-      "type": "minor",
-      "changelog": "HOTFIX for update method"
-    },
-    {
-      "version": "3.0.0.0",
-      "type": "major",
-      "changelog": "Officially supports CS2, and automatic updates!"
-    },
-    {
-      "version": "2.1.9.0",
-      "type": "major",
-      "changelog": "Added CS2 Beta support"
-    },
-    {
-      "version": "2.0.0.0",
-      "type": "major",
-      "changelog": "Improved a lot, bug fixes"
-    },
-    {
-      "version": "1.0.0.0",
-      "type": "major",
-      "changelog": "First major release for CS:GO"
-    }
-  ]
+  "changelog": "Partial updates",
+    "historic_versions": [
+        {
+            "version": "5.2.0.5",
+            "type": "Feature",
+            "changelog": "Automatic updates."
+        },
+        {
+            "version": "5.2.0.4",
+            "type": "Feature",
+            "changelog": "Automatic updates."
+        },
+        {
+            "version": "5.2.0.3",
+            "type": "Feature",
+            "changelog": "Automatic updates."
+        },
+        {
+            "version": "5.2.0.2",
+            "type": "Feature",
+            "changelog": "Improved system tray context menu."
+        },
+        {
+            "version": "5.2.0.1",
+            "type": "Bug",
+            "changelog": "Fixed a minor bug with the internal threads."
+        },
+        {
+            "version": "5.2.0.0",
+            "type": "Feature",
+            "changelog": "Added the ability to set & use hotkeys."
+        },
+        {
+            "version": "5.1.5.5",
+            "type": "Feature",
+            "changelog": "Improved AutoAccept conditions on low resolution monitors, with color accuracy."
+        },
+        {
+            "version": "5.1.5.4",
+            "type": "Bug",
+            "changelog": "Fixed a bug, where the program would crash upon clicking the logo in the top left corner."
+        },
+        {
+            "version": "5.1.5.3",
+            "type": "Bug",
+            "changelog": "Fixed AppContext bug, where Tesseract wouldn't launch after rebooting'."
+        },
+        {
+            "version": "5.1.5.2",
+            "type": "Feature",
+            "changelog": "Improved the automatic update flow."
+        },
+        {
+            "version": "5.1.5.1",
+            "type": "Bugfix",
+            "changelog": "Fixed a bug where the application would not start with windows."
+        },
+        {
+            "version": "5.1.5.0",
+            "type": "major",
+            "changelog": "Removed keybinds temporarily & added system tray icon as requested."
+        },
+        {
+            "version": "5.1.4.5",
+            "type": "minor",
+            "changelog": "Minor bug fix."
+        },
+        {
+            "version": "5.1.4.4",
+            "type": "minor",
+            "changelog": "Minor bug fix."
+        },
+        {
+            "version": "5.1.4.3",
+            "type": "minor",
+            "changelog": "Accidentally removed tessdata, now included again."
+        },
+        {
+            "version": "5.1.4.2",
+            "type": "minor",
+            "changelog": "Fixed a small issue with Program state"
+        },
+        {
+            "version": "5.1.4.1",
+            "type": "minor",
+            "changelog": "Fixed a bug with app location"
+        },
+        {
+            "version": "5.1.4.0",
+            "type": "major",
+            "changelog": "Added keybinds & notifications"
+        },
+        {
+            "version": "5.1.3.0",
+            "type": "minor",
+            "changelog": "Added a bit of user preferences/settings"
+        },
+        {
+            "version": "5.1.2.0",
+            "type": "minor",
+            "changelog": "Added re-tries for accept"
+        },
+        {
+            "version": "5.1.1.0",
+            "type": "very minor",
+            "changelog": "Added command line arguments"
+        },
+        {
+            "version": "5.1.0.0",
+            "type": "minor",
+            "changelog": "Added retry if teammate doesn't accept"
+        },
+        {
+            "version": "5.0.3.0",
+            "type": "patch",
+            "changelog": "Matched button's dimensions"
+        },
+        {
+            "version": "5.0.2.0",
+            "type": "patch",
+            "changelog": "Fixed update animation"
+        },
+        {
+            "version": "5.0.1.0",
+            "type": "patch",
+            "changelog": "Added maximize button to UI"
+        },
+        {
+            "version": "5.0.0.0",
+            "type": "major",
+            "changelog": "Reworked the UI"
+        },
+        {
+            "version": "4.4.2.0",
+            "type": "bugfix",
+            "changelog": "Reworked the control location method"
+        },
+        {
+            "version": "4.4.1.0",
+            "type": "patch",
+            "changelog": "Minor change to previous update"
+        },
+        {
+            "version": "4.4.0.0",
+            "type": "minor",
+            "changelog": "Automatically moves the program to its destination, the first time installing"
+        },
+        {
+            "version": "4.3.0.0",
+            "type": "minor",
+            "changelog": "Trained Tessract for better results"
+        },
+        {
+            "version": "4.2.0.0",
+            "type": "minor",
+            "changelog": "Renamed GitHub solution for SEO"
+        },
+        {
+            "version": "4.1.1.0",
+            "type": "patch",
+            "changelog": "Changed conditions for accept button"
+        },
+        {
+            "version": "4.1.0.0",
+            "type": "minor",
+            "changelog": "Updated conditions to work with any language, basing the conditions on colors instead of only text"
+        },
+        {
+            "version": "4.0.0.0",
+            "type": "major",
+            "changelog": "Updated conditions to work with any language, basing the conditions on colors instead of only text"
+        },
+        {
+            "version": "3.5.0.0",
+            "type": "major",
+            "changelog": "Updated autoaccept conditions, to work with the new button"
+        },
+        {
+            "version": "3.4.0.0",
+            "type": "minor",
+            "changelog": "Added a changelog feature, to see what the update is about, and if it's important"
+        },
+        {
+            "version": "3.3.2.0",
+            "type": "minor",
+            "changelog": "HOTFIX for update method"
+        },
+        {
+            "version": "3.0.0.0",
+            "type": "major",
+            "changelog": "Officially supports CS2, and automatic updates!"
+        },
+        {
+            "version": "2.1.9.0",
+            "type": "major",
+            "changelog": "Added CS2 Beta support"
+        },
+        {
+            "version": "2.0.0.0",
+            "type": "major",
+            "changelog": "Improved a lot, bug fixes"
+        },
+        {
+            "version": "1.0.0.0",
+            "type": "major",
+            "changelog": "First major release for CS:GO"
+        }
+    ]
 }

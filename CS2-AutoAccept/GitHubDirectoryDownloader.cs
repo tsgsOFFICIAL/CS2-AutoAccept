@@ -1,33 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Security;
-using System.Security.Authentication;
-using System.Text.Json;
+﻿using System.Security.Authentication;
 using System.Text.Json.Serialization;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Text.Json;
+using System.Net.Http;
+using System.Linq;
+using System.IO;
+using System.Net;
+using System;
 
 namespace CS2_AutoAccept
 {
     /// <summary>
     /// Downloads a directory from a GitHub repository with support for async operations, progress reporting, and proper disposal.
     /// </summary>
-    public class GitHubDirectoryDownloader : IDisposable
+    public partial class GitHubDirectoryDownloader : IDisposable
     {
         private readonly HttpClient _httpClient;
         private readonly string _repositoryOwner;
         private readonly string _repositoryName;
         private readonly string _folderPath;
+        private readonly string _basePath;
         private long _totalFileSize = 0;
         private long _downloadedFileSize = 0;
         private object _lockTotalSize = new object();
         private object _lockDownloadedSize = new object();
         private List<Task> _downloadTasks;
         private List<Task> _subfolderTasks;
+        private Dictionary<string, string> _fileHashes; // For storing file paths and SHA values
+        private readonly string _shaCacheFile;
+        private HashSet<string> _currentFiles;
         public event EventHandler<ProgressEventArgs>? ProgressUpdated;
 
         /// <summary>
@@ -36,7 +39,7 @@ namespace CS2_AutoAccept
         /// <param name="repositoryOwner">Repository Owner</param>
         /// <param name="repositoryName">Repository Name</param>
         /// <param name="folderPath">Folder path in repository</param>
-        public GitHubDirectoryDownloader(string repositoryOwner, string repositoryName, string folderPath)
+        public GitHubDirectoryDownloader(string repositoryOwner, string repositoryName, string folderPath, string basePath)
         {
             #region HttpClient Settings
             //specify to use TLS 1.2 as default connection
@@ -53,7 +56,7 @@ namespace CS2_AutoAccept
 
             _httpClient = new HttpClient(httpClientHandler);
             _httpClient.Timeout = new TimeSpan(0, 5, 0);
-            _httpClient.DefaultRequestHeaders.Add("User-Agent", "GitHubDirectoryDownloader");
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "GithubDirectoryDownloader");
             #endregion
 
             _repositoryOwner = repositoryOwner;
@@ -61,6 +64,30 @@ namespace CS2_AutoAccept
             _folderPath = folderPath;
             _downloadTasks = new List<Task>();
             _subfolderTasks = new List<Task>();
+            _basePath = basePath;
+            _shaCacheFile = Path.Combine(_basePath, "sha_cache.cs2_auto");
+            _currentFiles = new HashSet<string>();
+            _fileHashes = LoadSHAHashes() ?? new Dictionary<string, string>(); // Load the SHA cache or initialize a new one
+        }
+        private void SaveSHAHashes(HashSet<string> currentFiles)
+        {
+            // Remove stale entries from the SHA cache
+            _fileHashes = _fileHashes
+                .Where(kv => currentFiles.Contains(kv.Key))
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+
+            string cacheJson = JsonSerializer.Serialize(_fileHashes);
+            File.WriteAllText(_shaCacheFile, cacheJson);
+        }
+
+        private Dictionary<string, string>? LoadSHAHashes()
+        {
+            if (File.Exists(_shaCacheFile))
+            {
+                string cacheJson = File.ReadAllText(_shaCacheFile);
+                return JsonSerializer.Deserialize<Dictionary<string, string>>(cacheJson);
+            }
+            return null;
         }
         /// <summary>
         /// Starts a Task that downloads a GitHub directory asynchronously
@@ -69,11 +96,20 @@ namespace CS2_AutoAccept
         /// <returns>This method returns a Task, meaning it's awaitable</returns>
         public async Task DownloadDirectoryAsync(string downloadPath)
         {
-            await StartDownloadAsync(downloadPath);
+            try
+            {
+                await StartDownloadAsync(downloadPath);
 
-            Debug.WriteLine("waiting for tasks to complete");
-            await Task.WhenAll(_downloadTasks);
-            await Task.WhenAll(_subfolderTasks);
+                Debug.WriteLine("waiting for tasks to complete");
+                await Task.WhenAll(_downloadTasks);
+                await Task.WhenAll(_subfolderTasks);
+
+                SaveSHAHashes(_currentFiles);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
         /// <summary>
         /// Downloads a GitHub directory asynchronously
@@ -91,9 +127,28 @@ namespace CS2_AutoAccept
             // Rate limit was reached.
             if (responseMessage.Contains("API rate limit exceeded"))
             {
-                OnProgressChanged(new ProgressEventArgs(0, "API rate limit exceeded"));
+                // Get the rate limit reset time (epoch seconds)
+                string? resetTimeString = response.Headers.GetValues("x-ratelimit-reset").FirstOrDefault();
+
+                if (long.TryParse(resetTimeString, out long resetEpoch))
+                {
+                    // Convert epoch seconds to DateTime in UTC
+                    DateTime resetUtc = DateTimeOffset.FromUnixTimeSeconds(resetEpoch).UtcDateTime;
+
+                    // Convert UTC to local time
+                    DateTime resetLocal = resetUtc.ToLocalTime();
+
+                    Debug.WriteLine($"Rate limit resets at: {resetLocal}");
+                    OnProgressChanged(new ProgressEventArgs(0, $"API rate limit exceeded, try again after {resetLocal.ToLongTimeString()}"));
+                }
+                else
+                {
+                    Debug.WriteLine("Failed to parse x-ratelimit-reset header.");
+                    OnProgressChanged(new ProgressEventArgs(0, $"API rate limit exceeded, try again later"));
+                }
+
                 Dispose();
-                return;
+                throw new Exception("API rate limit exceeded");
             }
 
             if (response.IsSuccessStatusCode)
@@ -118,10 +173,27 @@ namespace CS2_AutoAccept
                         case "file":
                             string downloadUrl = item.DownloadUrl!;
                             string localFilePath = Path.Combine(downloadPath, item.Name!);
+                            string oldFilePath = Path.Combine(downloadPath.Replace("\\UPDATE", ""), item.Name!);
 
-                            lock (_downloadTasks)
+                            // Check if file needs to be downloaded
+                            string? localSha = _fileHashes.ContainsKey(item.Path!) ? _fileHashes[item.Path!] : null;
+                            if (localSha != item.Sha)
                             {
-                                _downloadTasks.Add(DownloadFileAsync(downloadUrl!, localFilePath));
+                                lock (_downloadTasks)
+                                {
+                                    _downloadTasks.Add(DownloadFileAsync(item, localFilePath));
+                                }
+                            }
+                            else
+                            {
+                                // Move file manually if it's already downloaded, from the base path to the download path
+                                Debug.WriteLine($"Skipping unchanged file: {item.Name}");
+                                File.Copy(oldFilePath, localFilePath, true);
+                                lock (_lockDownloadedSize)
+                                {
+                                    _downloadedFileSize += (long)item.Size!;
+                                    OnProgressChanged(new ProgressEventArgs((int)(((double)_downloadedFileSize / _totalFileSize) * 100)));
+                                }
                             }
                             break;
                         case "dir":
@@ -135,6 +207,8 @@ namespace CS2_AutoAccept
                             break;
                     }
                 }
+
+                _currentFiles.UnionWith(contents.Where(c => c.Type == "file").Select(c => c.Path!));
             }
             else
             {
@@ -147,16 +221,20 @@ namespace CS2_AutoAccept
         /// </summary>
         /// <param name="downloadUrl">The URL of the file to download.</param>
         /// <param name="filePath">The local file path where the downloaded file will be saved.</param>
-        private async Task DownloadFileAsync(string downloadUrl, string filePath)
+        private async Task DownloadFileAsync(GitHubContent item, string filePath)
         {
+            Debug.WriteLine($"Downloading file: {item.Name}");
+
             try
             {
-                using HttpResponseMessage response = await _httpClient.GetAsync(downloadUrl);
-
+                using HttpResponseMessage response = await _httpClient.GetAsync(item.DownloadUrl!);
                 if (response.IsSuccessStatusCode)
                 {
                     using FileStream fileStream = File.Create(filePath);
                     await response.Content.CopyToAsync(fileStream);
+
+                    // After downloading, update the hash record
+                    _fileHashes[item.Path!] = item.Sha!;
 
                     lock (_lockDownloadedSize)
                     {
@@ -166,7 +244,7 @@ namespace CS2_AutoAccept
                 }
                 else
                 {
-                    Debug.WriteLine($"Failed to download a file: {response.Content}");
+                    Debug.WriteLine($"Failed to download file: {response.Content}");
                 }
             }
             catch (Exception ex)
@@ -176,6 +254,7 @@ namespace CS2_AutoAccept
                 Dispose();
             }
         }
+
         /// <summary>
         /// Raises the ProgressChanged event.
         /// </summary>
