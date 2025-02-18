@@ -1,4 +1,6 @@
-# CS2-AutoAccept
+![CS2-AutoAccept](https://socialify.git.ci/tsgsOFFICIAL/CS2-AutoAccept/image?description=1&font=Source%20Code%20Pro&forks=1&issues=1&language=1&name=1&owner=1&pattern=Transparent&pulls=1&stargazers=1&theme=Dark)
+
+# CS2-AutoAccept, by tsgsOFFICIAL
 A program to automatically find and press "ACCEPT" for you, when entering a competitive match in CS2.
 <br>
 The #1 AutoAccept solution since *May 16, 2021!*
