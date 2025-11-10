@@ -1,6 +1,6 @@
 ![CS2-AutoAccept](https://socialify.git.ci/tsgsOFFICIAL/CS2-AutoAccept/image?description=1&font=Source%20Code%20Pro&forks=1&issues=1&language=1&name=1&owner=1&pattern=Transparent&pulls=1&stargazers=1&theme=Dark)
 
-# CS2-AutoAccept
+# CS2-AutoAccept / Faceit AutoAccept
 
 **Automatically accept competitive matches in CS2 with zero game modifications.**  
 _The #1 AutoAccept solution since 2021!_
