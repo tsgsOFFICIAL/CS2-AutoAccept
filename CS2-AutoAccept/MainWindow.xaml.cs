@@ -2,6 +2,7 @@
 using System.IO;
 using Tesseract;
 using System.Linq;
+using OpenCvSharp;
 using GlobalHotKey;
 using CS2AutoAccept;
 using System.Windows;
@@ -22,6 +23,7 @@ using System.Collections.Generic;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 using Microsoft.Toolkit.Uwp.Notifications;
+using Window = System.Windows.Window;
 
 namespace CS2_AutoAccept
 {
@@ -42,7 +44,7 @@ namespace CS2_AutoAccept
 
         private HotKeyManager _hotKeyManager;
         private Dictionary<string, KeyGesture> _hotkeyMap;
-        private Updater? updater;
+        private readonly Updater? _updater;
         private Screen? _activeScreen;
         private Thread? _scannerThread;
         private CancellationTokenSource? _scannerCancellationTokenSource;
@@ -62,8 +64,8 @@ namespace CS2_AutoAccept
         private int _clickPosX;
         private int _clickPosY;
         private int _gameRunExtraDelay = 0; // Seconds
-        private string _basePath;
-        private string _updatePath;
+        private readonly string _basePath;
+        private readonly string _updatePath;
         private readonly bool debugMode = false;
         public ICommand ToggleWindowCommand { get; }
         public ICommand CloseCommand { get; }
@@ -112,8 +114,8 @@ namespace CS2_AutoAccept
             }
 
             _ = UpdateHeaderVersion();
-            updater = new Updater();
-            updater.DownloadProgress += Updater_ProgressUpdated!;
+            _updater = new Updater();
+            _updater.DownloadProgress += Updater_ProgressUpdated!;
 
             Thread UpdateThread = new Thread(CheckForUpdate);
             UpdateThread.Start();
@@ -488,8 +490,8 @@ namespace CS2_AutoAccept
             base.OnStateChanged(e);
 
             // Find context menu items and update texts based on WindowState
-            var menu = (System.Windows.Controls.ContextMenu)MyNotifyIcon.ContextMenu;
-            var toggleMenuItem = (System.Windows.Controls.MenuItem)MinimizeAndRestore;
+            System.Windows.Controls.ContextMenu menu = MyNotifyIcon.ContextMenu;
+            System.Windows.Controls.MenuItem toggleMenuItem = MinimizeAndRestore;
 
             if (WindowState == WindowState.Minimized)
             {
@@ -591,7 +593,7 @@ namespace CS2_AutoAccept
             // PrintToLog("{Button_Update_Click}");
             if (_updateAvailable)
             {
-                updater!.DownloadUpdate(_basePath, _updatePath);
+                _updater!.DownloadUpdate(_basePath, _updatePath);
 
                 _updateFailed = false;
                 Button_Update.IsEnabled = false;
@@ -1185,6 +1187,83 @@ namespace CS2_AutoAccept
                 return null!;
             }
         }
+        #region Faceit Specific
+        /// <summary>
+        /// Loads the embedded 'accept.png' template image from the assembly resources and decodes it as a color image.
+        /// </summary>
+        /// <remarks>The returned image is loaded in color mode using OpenCV. This method is intended for
+        /// use with embedded resources packaged within the assembly.</remarks>
+        /// <returns>A <see cref="Mat"/> object containing the decoded color image from the embedded resource.</returns>
+        /// <exception cref="FileNotFoundException">Thrown if the embedded resource 'CS2_AutoAccept.Resources.accept.png' cannot be found in the executing
+        /// assembly.</exception>
+        private static Mat LoadEmbeddedTemplate()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string resourceName = "CS2_AutoAccept.Resources.accept.png"; // Namespace.Folder.File
+
+            using Stream stream = assembly.GetManifestResourceStream(resourceName) ?? throw new FileNotFoundException($"Embedded resource not found: {resourceName}");
+
+            using MemoryStream ms = new MemoryStream();
+            stream.CopyTo(ms);
+            byte[] bytes = ms.ToArray();
+
+            return Cv2.ImDecode(bytes, ImreadModes.Color);
+        }
+        /// <summary>
+        /// Searches the current screen for a predefined embedded image template and returns the result of the match
+        /// operation.
+        /// </summary>
+        /// <remarks>This method captures the entire screen and attempts to locate an embedded image
+        /// template using template matching. The coordinates returned are relative to the top-left corner of the
+        /// primary screen. If the template is not found, the method returns (false, -1, -1).</remarks>
+        /// <param name="threshold">The minimum normalized correlation value required to consider the template found. Must be between 0.0 and
+        /// 1.0. Higher values require a closer match. The default is 0.999.</param>
+        /// <returns>A tuple containing a boolean indicating whether the template was found, and the X and Y coordinates of the
+        /// center of the matched region if found; otherwise, -1 for both coordinates.</returns>
+        public static (bool Found, int X, int Y) FindFaceitAccept(double threshold = 0.999)
+        {
+            using Mat screen = CaptureScreen();          // 8-bit BGR
+            using Mat template = LoadEmbeddedTemplate(); // 8-bit BGR
+
+            using Mat result = new Mat();
+            Cv2.MatchTemplate(screen, template, result, TemplateMatchModes.CCoeffNormed);
+
+            Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out OpenCvSharp.Point maxLoc);
+
+            if (maxVal >= threshold)
+            {
+                // CENTER = top-left + (width/2, height/2)
+                int centerX = maxLoc.X + template.Width / 2;
+                int centerY = maxLoc.Y + template.Height / 2;
+
+                return (true, centerX, centerY);
+            }
+
+            return (false, -1, -1);
+        }
+        /// <summary>
+        /// Captures the current contents of the primary screen and returns the image as an OpenCV matrix in BGR format.
+        /// </summary>
+        /// <remarks>The returned matrix represents the entire area of the primary display. The image is
+        /// suitable for further processing with OpenCV methods. This method does not capture secondary
+        /// monitors.</remarks>
+        /// <returns>A <see cref="Mat"/> object containing the captured screen image in 8-bit, 3-channel BGR format.</returns>
+        private static Mat CaptureScreen()
+        {
+            Rectangle bounds = Screen.PrimaryScreen!.Bounds;
+            using Bitmap bmp = new Bitmap(bounds.Width, bounds.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            using (Graphics g = Graphics.FromImage(bmp))
+                g.CopyFromScreen(bounds.X, bounds.Y, 0, 0, bounds.Size, CopyPixelOperation.SourceCopy);
+
+            Mat mat = OpenCvSharp.Extensions.BitmapConverter.ToMat(bmp);
+
+            // Convert from BGRA (32bpp) → BGR (8-bit)
+            Cv2.CvtColor(mat, mat, ColorConversionCodes.BGRA2BGR);
+            mat.ConvertTo(mat, MatType.CV_8UC3);
+
+            return mat;
+        }
+        #endregion
         /// <summary>
         /// Scanner thread method
         /// </summary>
@@ -1196,7 +1275,9 @@ namespace CS2_AutoAccept
                 return;
 
             double confidenceThreshold = 0.5;
+            double threshold = 0.95;
             System.Drawing.Color targetColor = System.Drawing.Color.FromArgb(255, 54, 183, 82);
+
 
             CancellationToken ct = (CancellationToken)obj;
             while (!ct.IsCancellationRequested)
@@ -1298,6 +1379,36 @@ namespace CS2_AutoAccept
                                 }
                             }
                         }
+                    }
+                }
+
+                // Check Faceit accept button
+                // Get the accept button position, or false if not found
+                (bool found, int x, int y) = FindFaceitAccept(threshold);
+
+                if (found)
+                {
+                    // Move the cursor and click the accept button
+                    System.Windows.Forms.Cursor.Position = new System.Drawing.Point(x, y);
+
+                    uint X = (uint)System.Windows.Forms.Cursor.Position.X;
+                    uint Y = (uint)System.Windows.Forms.Cursor.Position.Y;
+
+                    // Click the button
+                    mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+
+                    // Wait 30 seconds, to see if everyone accepted the match
+                    Thread.Sleep(30 * 1000);
+
+                    if (!_run_Continuously)
+                    {
+                        //Debug.WriteLine("Match was initiated");
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            Program_state.IsChecked = false;
+                        }));
+
+                        return;
                     }
                 }
 

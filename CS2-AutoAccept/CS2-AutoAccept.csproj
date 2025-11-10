@@ -29,6 +29,7 @@
     <None Remove="discord.png" />
     <None Remove="github.png" />
     <None Remove="logo.png" />
+    <None Remove="Resources\accept.png" />
     <None Remove="tsgs.png" />
   </ItemGroup>
 
@@ -36,6 +37,10 @@
     <Content Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\CS2-AutoAccept.deps.json" />
     <Content Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\CS2-AutoAccept.runtimeconfig.json" />
     <Content Include="logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\accept.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -563,8 +568,11 @@
   <ItemGroup>
     <PackageReference Include="GlobalHotKey" Version="1.1.0" />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
-    <PackageReference Include="LibGit2Sharp" Version="0.30.0" />
+    <PackageReference Include="LibGit2Sharp" Version="0.31.0" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
+    <PackageReference Include="OpenCvSharp4" Version="4.11.0.20250507" />
+    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.11.0.20250507" />
+    <PackageReference Include="OpenCvSharp4.Windows" Version="4.11.0.20250507" />
     <PackageReference Include="Tesseract" Version="5.2.0" />
     <PackageReference Include="Tesseract.Drawing" Version="5.2.0" />
   </ItemGroup>
