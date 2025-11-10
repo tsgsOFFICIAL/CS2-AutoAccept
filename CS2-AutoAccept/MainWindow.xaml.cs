@@ -46,6 +46,7 @@ namespace CS2_AutoAccept
         private Dictionary<string, KeyGesture> _hotkeyMap;
         private readonly Updater? _updater;
         private Screen? _activeScreen;
+        private Screen? _activeFaceitScreen;
         private Thread? _scannerThread;
         private CancellationTokenSource? _scannerCancellationTokenSource;
         private bool _scannerIsActive = false;
@@ -1015,7 +1016,7 @@ namespace CS2_AutoAccept
                     {
                         string input = _activeScreen.DeviceName;
                         int lastBackslashIndex = input.LastIndexOf('\\');
-                        string extractedString = input.Substring(lastBackslashIndex + 1).TrimStart('.');
+                        string extractedString = input[(lastBackslashIndex + 1)..].TrimStart('.');
                         string formattedString = extractedString.Insert(7, " ");
 
                         // Append the appropriate strings
@@ -1023,13 +1024,13 @@ namespace CS2_AutoAccept
                         Program_state.IsEnabled = true;
                         Program_state_continuously.IsEnabled = true;
                         TextBlock_Monitor.Text = $"CS2 is running on: {formattedString}";
-                        TextBlock_MonitorSize.Text = $"Display Size: {_activeScreen.Bounds.Width}x{_activeScreen.Bounds.Height} ({AspectRatio()})";
+                        TextBlock_MonitorSize.Text = $"Display Size: {_activeScreen.Bounds.Width}x{_activeScreen.Bounds.Height} ({AspectRatio(_activeScreen)})";
                         Button_LaunchCS.Visibility = Visibility.Collapsed;
                         Button_LaunchCS.Content = "Launch CS2";
                         StartCS2.Visibility = Visibility.Collapsed;
                     }));
 
-                    CalculateSizes(AspectRatio());
+                    CalculateSizes(AspectRatio(_activeScreen));
                 }
                 else
                 {
@@ -1066,6 +1067,48 @@ namespace CS2_AutoAccept
                 }));
             }
 
+            try
+            {
+                _activeFaceitScreen = WindowFinder.FindApplication("faceit"); // TODO: Figure out Faceit window name
+
+                if (_activeFaceitScreen != null)
+                {
+                    // PrintToLog("{IsGameRunning} Faceit is running");
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        string input = _activeFaceitScreen.DeviceName;
+                        int lastBackslashIndex = input.LastIndexOf('\\');
+                        string extractedString = input[(lastBackslashIndex + 1)..].TrimStart('.');
+                        string formattedString = extractedString.Insert(7, " ");
+
+                        // Append the appropriate strings
+                        TextBlock_FaceitMonitor.Foreground = new SolidColorBrush(Colors.GhostWhite);
+                        TextBlock_FaceitMonitor.Text = $"Faceit is running on: {formattedString} (Make sure it's visible)";
+                        TextBlock_FaceitMonitorSize.Text = $"Display Size: {_activeFaceitScreen.Bounds.Width}x{_activeFaceitScreen.Bounds.Height} ({AspectRatio(_activeFaceitScreen)})";
+                    }));
+                }
+                else
+                {
+                    // PrintToLog("{IsGameRunning} Faceit is not running");
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        TextBlock_FaceitMonitor.Foreground = new SolidColorBrush(Colors.Red);
+                        TextBlock_FaceitMonitor.Text = "Faceit is not running";
+                        TextBlock_FaceitMonitorSize.Text = "";
+                    }));
+                }
+            }
+            catch (Exception)
+            {
+                // PrintToLog("{IsGameRunning} EXCEPTION: " + ex.Message);
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    TextBlock_FaceitMonitor.Foreground = new SolidColorBrush(Colors.Red);
+                    TextBlock_FaceitMonitor.Text = "Faceit is not running";
+                    TextBlock_FaceitMonitorSize.Text = "";
+                }));
+            }
+
             Thread.Sleep(5 * 1000);
             Thread.Sleep(_gameRunExtraDelay * 1000);
             _gameRunExtraDelay = 0; // Reset the delay, in case it was changed somewhere else
@@ -1077,12 +1120,12 @@ namespace CS2_AutoAccept
         /// <param Name="x">Width</param>
         /// <param Name="y">Height</param>
         /// <returns>This method returns the aspect ratio</returns>
-        private string AspectRatio()
+        private static string AspectRatio(Screen screen)
         {
             // PrintToLog("{AspectRatio}");
             // double value = (double)_activeScreen!.Bounds.Width / _activeScreen.Bounds.Height;
-            int x = _activeScreen!.Bounds.Width;
-            int y = _activeScreen!.Bounds.Height;
+            int x = screen.Bounds.Width;
+            int y = screen.Bounds.Height;
 
             // We need to find Greatest Common Divisor, and divide both x and y by it.
             string aspectRatio = $"{x / GCD(x, y)}:{y / GCD(x, y)}";
@@ -1175,7 +1218,7 @@ namespace CS2_AutoAccept
                 Graphics captureGraphics = Graphics.FromImage(captureBitmap);
 
                 // Copying Image from The Screen
-                captureGraphics.CopyFromScreen(x, y, 0, 0, captureRectangle.Size);
+                captureGraphics.CopyFromScreen(x, y, 0, 0, captureRectangle.Size, CopyPixelOperation.SourceCopy);
 
                 // PrintToLog("{CaptureScreen} SUCCESS");
                 return captureBitmap;
@@ -1220,7 +1263,7 @@ namespace CS2_AutoAccept
         /// 1.0. Higher values require a closer match. The default is 0.999.</param>
         /// <returns>A tuple containing a boolean indicating whether the template was found, and the X and Y coordinates of the
         /// center of the matched region if found; otherwise, -1 for both coordinates.</returns>
-        public static (bool Found, int X, int Y) FindFaceitAccept(double threshold = 0.999)
+        public (bool Found, int X, int Y) FindFaceitAccept(double threshold = 0.999)
         {
             using Mat screen = CaptureScreen();          // 8-bit BGR
             using Mat template = LoadEmbeddedTemplate(); // 8-bit BGR
@@ -1248,9 +1291,9 @@ namespace CS2_AutoAccept
         /// suitable for further processing with OpenCV methods. This method does not capture secondary
         /// monitors.</remarks>
         /// <returns>A <see cref="Mat"/> object containing the captured screen image in 8-bit, 3-channel BGR format.</returns>
-        private static Mat CaptureScreen()
+        private Mat CaptureScreen()
         {
-            Rectangle bounds = Screen.PrimaryScreen!.Bounds;
+            Rectangle bounds = _activeScreen?.Bounds ?? Screen.PrimaryScreen!.Bounds;
             using Bitmap bmp = new Bitmap(bounds.Width, bounds.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             using (Graphics g = Graphics.FromImage(bmp))
                 g.CopyFromScreen(bounds.X, bounds.Y, 0, 0, bounds.Size, CopyPixelOperation.SourceCopy);
@@ -1399,6 +1442,9 @@ namespace CS2_AutoAccept
 
                     // Wait 30 seconds, to see if everyone accepted the match
                     Thread.Sleep(30 * 1000);
+                    // TODO: Check if the match was accepted or not
+                    // How do we check?
+                    // In regular CS2 we check for the "Cancel Search" button, but Faceit might be different, need to check once I'm home from work
 
                     if (!_run_Continuously)
                     {
