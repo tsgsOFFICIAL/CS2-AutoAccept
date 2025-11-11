@@ -1687,24 +1687,24 @@ namespace CS2_AutoAccept
             }
         }
         /// <summary>
-        /// Prints to the log
+        /// Prints to the msg
         /// </summary>
-        /// <param Name="log">Text to log</param>
-        private static async Task<bool> PrintToLog(string log)
+        /// <param Name="msg">Text to msg</param>
+        private static async Task<bool> PrintToLog(string msg)
         {
             try
             {
-                string logLocation = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CS2 AutoAccepter Log.txt";
-                log = $"{DateTime.Now.ToString("[HH:mm:ss]")} {log}{Environment.NewLine}";
-                await File.AppendAllTextAsync(logLocation, log);
+                string logLocation = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CS2 AutoAccept Log.txt";
+                msg = $"{DateTime.Now:[HH:mm:ss]} {msg}{Environment.NewLine}";
+                await File.AppendAllTextAsync(logLocation, msg);
             }
             catch (Exception)
             {
                 try
                 {
-                    string logLocation = Environment.ExpandEnvironmentVariables("%userprofile%") + "\\onedrive\\Desktop\\CS2 AutoAccepter Log.txt";
-                    log = $"{DateTime.Now.ToString("[HH:mm:ss]")} {log}{Environment.NewLine}";
-                    await File.AppendAllTextAsync(logLocation, log);
+                    string logLocation = Environment.ExpandEnvironmentVariables("%userprofile%") + "\\onedrive\\Desktop\\CS2 AutoAccept Log.txt";
+                    msg = $"{DateTime.Now.ToString("[HH:mm:ss]")} {msg}{Environment.NewLine}";
+                    await File.AppendAllTextAsync(logLocation, msg);
                 }
                 catch (Exception)
                 {
@@ -1775,7 +1775,7 @@ namespace CS2_AutoAccept
         }
     }
 
-    public class RelayCommand : ICommand
+    public partial class RelayCommand : ICommand
     {
         private readonly Action<object> _execute;
         private readonly Func<object, bool> _canExecute;
