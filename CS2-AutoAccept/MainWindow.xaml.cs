@@ -1007,7 +1007,7 @@ namespace CS2_AutoAccept
             // PrintToLog("{IsGameRunning}");
             try
             {
-                _activeScreen = WindowFinder.FindApplication("cs2");
+                _activeScreen = WindowFinder.FindApplicationScreen("cs2");
 
                 if (_activeScreen != null)
                 {
@@ -1069,7 +1069,7 @@ namespace CS2_AutoAccept
 
             try
             {
-                _activeFaceitScreen = WindowFinder.FindApplication("faceit"); // TODO: Figure out Faceit window name
+                _activeFaceitScreen = WindowFinder.FindApplicationScreen("faceit");
 
                 if (_activeFaceitScreen != null)
                 {
@@ -1203,7 +1203,7 @@ namespace CS2_AutoAccept
         /// <param Name="xstartpos">X Starting position in pixels</param>
         /// <param Name="ystartpos">Y Starting position in pixels</param>
         /// <returns>This method returns a bitmap of the area</returns>
-        private Bitmap CaptureScreen(int w, int h, int x = 0, int y = 0)
+        private Bitmap CaptureCS2Screen(int w, int h, int x = 0, int y = 0)
         {
             // PrintToLog("{CaptureScreen}");
             try
@@ -1239,10 +1239,10 @@ namespace CS2_AutoAccept
         /// <returns>A <see cref="Mat"/> object containing the decoded color image from the embedded resource.</returns>
         /// <exception cref="FileNotFoundException">Thrown if the embedded resource 'CS2_AutoAccept.Resources.accept.png' cannot be found in the executing
         /// assembly.</exception>
-        private static Mat LoadEmbeddedTemplate()
+        private static Mat LoadEmbeddedTemplate(string templateName)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
-            string resourceName = "CS2_AutoAccept.Resources.accept.png"; // Namespace.Folder.File
+            string resourceName = $"CS2_AutoAccept.Resources.{templateName}.png"; // Namespace.Folder.File
 
             using Stream stream = assembly.GetManifestResourceStream(resourceName) ?? throw new FileNotFoundException($"Embedded resource not found: {resourceName}");
 
@@ -1263,21 +1263,20 @@ namespace CS2_AutoAccept
         /// 1.0. Higher values require a closer match. The default is 0.999.</param>
         /// <returns>A tuple containing a boolean indicating whether the template was found, and the X and Y coordinates of the
         /// center of the matched region if found; otherwise, -1 for both coordinates.</returns>
-        public (bool Found, int X, int Y) FindFaceitAccept(double threshold = 0.999)
+        public static (bool Found, int X, int Y) FindFaceitTemplate(Mat screen, string templateName, double threshold = 0.999)
         {
-            using Mat screen = CaptureScreen();          // 8-bit BGR
-            using Mat template = LoadEmbeddedTemplate(); // 8-bit BGR
+            using Mat acceptTemplate = LoadEmbeddedTemplate(templateName); // 8-bit BGR
 
             using Mat result = new Mat();
-            Cv2.MatchTemplate(screen, template, result, TemplateMatchModes.CCoeffNormed);
+            Cv2.MatchTemplate(screen, acceptTemplate, result, TemplateMatchModes.CCoeffNormed);
 
             Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out OpenCvSharp.Point maxLoc);
 
             if (maxVal >= threshold)
             {
                 // CENTER = top-left + (width/2, height/2)
-                int centerX = maxLoc.X + template.Width / 2;
-                int centerY = maxLoc.Y + template.Height / 2;
+                int centerX = maxLoc.X + acceptTemplate.Width / 2;
+                int centerY = maxLoc.Y + acceptTemplate.Height / 2;
 
                 return (true, centerX, centerY);
             }
@@ -1291,7 +1290,7 @@ namespace CS2_AutoAccept
         /// suitable for further processing with OpenCV methods. This method does not capture secondary
         /// monitors.</remarks>
         /// <returns>A <see cref="Mat"/> object containing the captured screen image in 8-bit, 3-channel BGR format.</returns>
-        private Mat CaptureScreen()
+        private Mat CaptureFaceitScreen()
         {
             Rectangle bounds = _activeScreen?.Bounds ?? Screen.PrimaryScreen!.Bounds;
             using Bitmap bmp = new Bitmap(bounds.Width, bounds.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -1318,7 +1317,7 @@ namespace CS2_AutoAccept
                 return;
 
             double confidenceThreshold = 0.5;
-            double threshold = 0.95;
+            double threshold = 0.8;
             System.Drawing.Color targetColor = System.Drawing.Color.FromArgb(255, 54, 183, 82);
 
 
@@ -1327,7 +1326,7 @@ namespace CS2_AutoAccept
             {
                 // PrintToLog("{Scanner}");
                 // Take a screenshot of the accept button
-                Bitmap bitmap = CaptureScreen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
+                Bitmap bitmap = CaptureCS2Screen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
 
                 Bitmap greyBitmap = OptimiseImage(bitmap);
 
@@ -1355,7 +1354,7 @@ namespace CS2_AutoAccept
                         // Wait 30 seconds, to see if everyone accepted the match
                         Thread.Sleep(30 * 1000);
 
-                        bitmap = CaptureScreen(_cancelWidth, _cancelHeight, _cancelPosX, _cancelPosY); // "Cancel Search" button
+                        bitmap = CaptureCS2Screen(_cancelWidth, _cancelHeight, _cancelPosX, _cancelPosY); // "Cancel Search" button
 
                         // Adjust the contrast, then sharpen the image
                         greyBitmap = OptimiseImage(bitmap);
@@ -1397,7 +1396,7 @@ namespace CS2_AutoAccept
                         else
                         {
                             // Take a screenshot of the accept button
-                            bitmap = CaptureScreen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
+                            bitmap = CaptureCS2Screen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
                             greyBitmap = OptimiseImage(bitmap);
 
                             // Read the image using OCR
@@ -1427,8 +1426,10 @@ namespace CS2_AutoAccept
 
                 // Check Faceit accept button
                 // Get the accept button position, or false if not found
-                (bool found, int x, int y) = FindFaceitAccept(threshold);
+                Mat screen = CaptureFaceitScreen(); // 8-bit BGR
+                (bool found, int x, int y) = FindFaceitTemplate(screen, "accept", threshold);
 
+                // If accept button is found
                 if (found)
                 {
                     // Move the cursor and click the accept button
@@ -1442,19 +1443,61 @@ namespace CS2_AutoAccept
 
                     // Wait 30 seconds, to see if everyone accepted the match
                     Thread.Sleep(30 * 1000);
-                    // TODO: Check if the match was accepted or not
-                    // How do we check?
-                    // In regular CS2 we check for the "Cancel Search" button, but Faceit might be different, need to check once I'm home from work
 
-                    if (!_run_Continuously)
+                    // Check if the match was accepted or not
+                    (found, x, y) = FindFaceitTemplate(screen, "connect_to_server", threshold); // Capture "Connect to server" button, and check if it's there
+
+                    // If connect to server button is found
+                    if (found)
                     {
-                        //Debug.WriteLine("Match was initiated");
-                        Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            Program_state.IsChecked = false;
-                        }));
+                        // Click the connect button automatically
+                        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(x, y);
 
-                        return;
+                        X = (uint)System.Windows.Forms.Cursor.Position.X;
+                        Y = (uint)System.Windows.Forms.Cursor.Position.Y;
+
+                        // Click the button
+                        mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+
+                        if (!_run_Continuously)
+                        {
+                            //Debug.WriteLine("Match was initiated");
+                            Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                Program_state.IsChecked = false;
+                            }));
+
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    // Check if maybe the Connect to server button is here, and the accept happened manually
+                    (found, x, y) = FindFaceitTemplate(screen, "connect_to_server", threshold); // Capture "Connect to server" button, and check if it's there
+
+                    // If connect to server button is found
+                    if (found)
+                    {
+                        // Click the connect button automatically
+                        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(x, y);
+
+                        uint X = (uint)System.Windows.Forms.Cursor.Position.X;
+                        uint Y = (uint)System.Windows.Forms.Cursor.Position.Y;
+
+                        // Click the button
+                        mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+
+                        if (!_run_Continuously)
+                        {
+                            //Debug.WriteLine("Match was initiated");
+                            Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                Program_state.IsChecked = false;
+                            }));
+
+                            return;
+                        }
                     }
                 }
 
