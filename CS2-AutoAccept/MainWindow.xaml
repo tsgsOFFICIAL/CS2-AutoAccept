@@ -173,7 +173,7 @@
                 <Button x:Name="ClearHotkeyButton" Margin="10, 0, 0, 0" Style="{StaticResource CustomButtonStyle}" VerticalAlignment="Bottom" Click="ClearToggleOnOffHotkeyButton_Click" ToolTip="Clear the global hotkey to toggle ON/OFF">Clear Hotkey</Button>
             </StackPanel>
 
-            <CheckBox x:Name="Run_at_startup_state" Content="Run at startup (OFF)" ToolTip="Automatically start this app when your pc launches" IsChecked="False" Foreground="Red" FontWeight="Bold" Checked="Run_at_startup_state_Checked" Unchecked="Run_at_startup_state_Unchecked"/>
+            <CheckBox x:Name="Run_at_startup_state" Content="Run at startup (OFF)" ToolTip="Automatically start this app when your pc turns on" IsChecked="False" Foreground="Red" FontWeight="Bold" Checked="Run_at_startup_state_Checked" Unchecked="Run_at_startup_state_Unchecked"/>
             <CheckBox x:Name="Program_state_continuously" Content="Auto Accept Every Match (OFF)" ToolTip="Will find the ACCEPT button for all matches, this will consume more cpu power while in game!" IsChecked="False" Foreground="Red" FontWeight="Bold" Checked="Program_state_continuously_Checked" Unchecked="Program_state_continuously_Unchecked"/>
         </StackPanel>
 
@@ -183,6 +183,9 @@
                     <Setter Property="Margin" Value="10, 0, 0, 15"/>
                 </Style>
             </StackPanel.Resources>
+
+            <TextBlock x:Name="TextBlock_FaceitMonitor" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite"/>
+            <TextBlock x:Name="TextBlock_FaceitMonitorSize" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite"/>
 
             <TextBlock x:Name="TextBlock_Monitor" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite"/>
             <TextBlock x:Name="TextBlock_MonitorSize" FontFamily="Roboto" FontSize="16" Foreground="GhostWhite"/>
@@ -245,7 +248,7 @@
                             </Canvas>
                         </MenuItem.Icon>
                     </MenuItem>
-                    
+
                     <MenuItem x:Name="OpenGithub" Header="Open Github" Command="{Binding OpenGithubCommand}">
                         <MenuItem.Icon>
                             <Canvas Width="24" Height="24" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -253,7 +256,7 @@
                             </Canvas>
                         </MenuItem.Icon>
                     </MenuItem>
-                    
+
                     <MenuItem x:Name="MinimizeAndRestore" Header="Minimize" Command="{Binding ToggleWindowCommand}" />
                     <MenuItem Header="Exit" Command="{Binding CloseCommand}" />
 
@@ -314,7 +317,7 @@
                                             CornerRadius="6" 
                                             SnapsToDevicePixels="True" 
                                             Padding="10">
-                                            
+
                                             <Grid>
                                                 <ItemsPresenter/>
                                             </Grid>

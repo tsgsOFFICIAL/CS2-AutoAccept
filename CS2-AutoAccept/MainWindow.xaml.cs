@@ -2,6 +2,7 @@
 using System.IO;
 using Tesseract;
 using System.Linq;
+using OpenCvSharp;
 using GlobalHotKey;
 using CS2AutoAccept;
 using System.Windows;
@@ -22,6 +23,7 @@ using System.Collections.Generic;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 using Microsoft.Toolkit.Uwp.Notifications;
+using Window = System.Windows.Window;
 
 namespace CS2_AutoAccept
 {
@@ -42,8 +44,9 @@ namespace CS2_AutoAccept
 
         private HotKeyManager _hotKeyManager;
         private Dictionary<string, KeyGesture> _hotkeyMap;
-        private Updater? updater;
+        private readonly Updater? _updater;
         private Screen? _activeScreen;
+        private Screen? _activeFaceitScreen;
         private Thread? _scannerThread;
         private CancellationTokenSource? _scannerCancellationTokenSource;
         private bool _scannerIsActive = false;
@@ -62,8 +65,8 @@ namespace CS2_AutoAccept
         private int _clickPosX;
         private int _clickPosY;
         private int _gameRunExtraDelay = 0; // Seconds
-        private string _basePath;
-        private string _updatePath;
+        private readonly string _basePath;
+        private readonly string _updatePath;
         private readonly bool debugMode = false;
         public ICommand ToggleWindowCommand { get; }
         public ICommand CloseCommand { get; }
@@ -112,8 +115,8 @@ namespace CS2_AutoAccept
             }
 
             _ = UpdateHeaderVersion();
-            updater = new Updater();
-            updater.DownloadProgress += Updater_ProgressUpdated!;
+            _updater = new Updater();
+            _updater.DownloadProgress += Updater_ProgressUpdated!;
 
             Thread UpdateThread = new Thread(CheckForUpdate);
             UpdateThread.Start();
@@ -488,8 +491,8 @@ namespace CS2_AutoAccept
             base.OnStateChanged(e);
 
             // Find context menu items and update texts based on WindowState
-            var menu = (System.Windows.Controls.ContextMenu)MyNotifyIcon.ContextMenu;
-            var toggleMenuItem = (System.Windows.Controls.MenuItem)MinimizeAndRestore;
+            System.Windows.Controls.ContextMenu menu = MyNotifyIcon.ContextMenu;
+            System.Windows.Controls.MenuItem toggleMenuItem = MinimizeAndRestore;
 
             if (WindowState == WindowState.Minimized)
             {
@@ -591,7 +594,7 @@ namespace CS2_AutoAccept
             // PrintToLog("{Button_Update_Click}");
             if (_updateAvailable)
             {
-                updater!.DownloadUpdate(_basePath, _updatePath);
+                _updater!.DownloadUpdate(_basePath, _updatePath);
 
                 _updateFailed = false;
                 Button_Update.IsEnabled = false;
@@ -1004,7 +1007,7 @@ namespace CS2_AutoAccept
             // PrintToLog("{IsGameRunning}");
             try
             {
-                _activeScreen = WindowFinder.FindApplication("cs2");
+                _activeScreen = WindowFinder.FindApplicationScreen("cs2");
 
                 if (_activeScreen != null)
                 {
@@ -1013,7 +1016,7 @@ namespace CS2_AutoAccept
                     {
                         string input = _activeScreen.DeviceName;
                         int lastBackslashIndex = input.LastIndexOf('\\');
-                        string extractedString = input.Substring(lastBackslashIndex + 1).TrimStart('.');
+                        string extractedString = input[(lastBackslashIndex + 1)..].TrimStart('.');
                         string formattedString = extractedString.Insert(7, " ");
 
                         // Append the appropriate strings
@@ -1021,13 +1024,13 @@ namespace CS2_AutoAccept
                         Program_state.IsEnabled = true;
                         Program_state_continuously.IsEnabled = true;
                         TextBlock_Monitor.Text = $"CS2 is running on: {formattedString}";
-                        TextBlock_MonitorSize.Text = $"Display Size: {_activeScreen.Bounds.Width}x{_activeScreen.Bounds.Height} ({AspectRatio()})";
+                        TextBlock_MonitorSize.Text = $"Display Size: {_activeScreen.Bounds.Width}x{_activeScreen.Bounds.Height} ({AspectRatio(_activeScreen)})";
                         Button_LaunchCS.Visibility = Visibility.Collapsed;
                         Button_LaunchCS.Content = "Launch CS2";
                         StartCS2.Visibility = Visibility.Collapsed;
                     }));
 
-                    CalculateSizes(AspectRatio());
+                    CalculateSizes(AspectRatio(_activeScreen));
                 }
                 else
                 {
@@ -1064,6 +1067,48 @@ namespace CS2_AutoAccept
                 }));
             }
 
+            try
+            {
+                _activeFaceitScreen = WindowFinder.FindApplicationScreen("faceit");
+
+                if (_activeFaceitScreen != null)
+                {
+                    // PrintToLog("{IsGameRunning} Faceit is running");
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        string input = _activeFaceitScreen.DeviceName;
+                        int lastBackslashIndex = input.LastIndexOf('\\');
+                        string extractedString = input[(lastBackslashIndex + 1)..].TrimStart('.');
+                        string formattedString = extractedString.Insert(7, " ");
+
+                        // Append the appropriate strings
+                        TextBlock_FaceitMonitor.Foreground = new SolidColorBrush(Colors.GhostWhite);
+                        TextBlock_FaceitMonitor.Text = $"Faceit is running on: {formattedString} (Make sure it's visible)";
+                        TextBlock_FaceitMonitorSize.Text = $"Display Size: {_activeFaceitScreen.Bounds.Width}x{_activeFaceitScreen.Bounds.Height} ({AspectRatio(_activeFaceitScreen)})";
+                    }));
+                }
+                else
+                {
+                    // PrintToLog("{IsGameRunning} Faceit is not running");
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        TextBlock_FaceitMonitor.Foreground = new SolidColorBrush(Colors.Red);
+                        TextBlock_FaceitMonitor.Text = "Faceit is not running";
+                        TextBlock_FaceitMonitorSize.Text = "";
+                    }));
+                }
+            }
+            catch (Exception)
+            {
+                // PrintToLog("{IsGameRunning} EXCEPTION: " + ex.Message);
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    TextBlock_FaceitMonitor.Foreground = new SolidColorBrush(Colors.Red);
+                    TextBlock_FaceitMonitor.Text = "Faceit is not running";
+                    TextBlock_FaceitMonitorSize.Text = "";
+                }));
+            }
+
             Thread.Sleep(5 * 1000);
             Thread.Sleep(_gameRunExtraDelay * 1000);
             _gameRunExtraDelay = 0; // Reset the delay, in case it was changed somewhere else
@@ -1075,12 +1120,12 @@ namespace CS2_AutoAccept
         /// <param Name="x">Width</param>
         /// <param Name="y">Height</param>
         /// <returns>This method returns the aspect ratio</returns>
-        private string AspectRatio()
+        private static string AspectRatio(Screen screen)
         {
             // PrintToLog("{AspectRatio}");
             // double value = (double)_activeScreen!.Bounds.Width / _activeScreen.Bounds.Height;
-            int x = _activeScreen!.Bounds.Width;
-            int y = _activeScreen!.Bounds.Height;
+            int x = screen.Bounds.Width;
+            int y = screen.Bounds.Height;
 
             // We need to find Greatest Common Divisor, and divide both x and y by it.
             string aspectRatio = $"{x / GCD(x, y)}:{y / GCD(x, y)}";
@@ -1158,7 +1203,7 @@ namespace CS2_AutoAccept
         /// <param Name="xstartpos">X Starting position in pixels</param>
         /// <param Name="ystartpos">Y Starting position in pixels</param>
         /// <returns>This method returns a bitmap of the area</returns>
-        private Bitmap CaptureScreen(int w, int h, int x = 0, int y = 0)
+        private Bitmap CaptureCS2Screen(int w, int h, int x = 0, int y = 0)
         {
             // PrintToLog("{CaptureScreen}");
             try
@@ -1173,7 +1218,7 @@ namespace CS2_AutoAccept
                 Graphics captureGraphics = Graphics.FromImage(captureBitmap);
 
                 // Copying Image from The Screen
-                captureGraphics.CopyFromScreen(x, y, 0, 0, captureRectangle.Size);
+                captureGraphics.CopyFromScreen(x, y, 0, 0, captureRectangle.Size, CopyPixelOperation.SourceCopy);
 
                 // PrintToLog("{CaptureScreen} SUCCESS");
                 return captureBitmap;
@@ -1185,6 +1230,82 @@ namespace CS2_AutoAccept
                 return null!;
             }
         }
+        #region Faceit Specific
+        /// <summary>
+        /// Loads the embedded 'accept.png' template image from the assembly resources and decodes it as a color image.
+        /// </summary>
+        /// <remarks>The returned image is loaded in color mode using OpenCV. This method is intended for
+        /// use with embedded resources packaged within the assembly.</remarks>
+        /// <returns>A <see cref="Mat"/> object containing the decoded color image from the embedded resource.</returns>
+        /// <exception cref="FileNotFoundException">Thrown if the embedded resource 'CS2_AutoAccept.Resources.accept.png' cannot be found in the executing
+        /// assembly.</exception>
+        private static Mat LoadEmbeddedTemplate(string templateName)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string resourceName = $"CS2_AutoAccept.Resources.{templateName}.png"; // Namespace.Folder.File
+
+            using Stream stream = assembly.GetManifestResourceStream(resourceName) ?? throw new FileNotFoundException($"Embedded resource not found: {resourceName}");
+
+            using MemoryStream ms = new MemoryStream();
+            stream.CopyTo(ms);
+            byte[] bytes = ms.ToArray();
+
+            return Cv2.ImDecode(bytes, ImreadModes.Color);
+        }
+        /// <summary>
+        /// Searches the current screen for a predefined embedded image template and returns the result of the match
+        /// operation.
+        /// </summary>
+        /// <remarks>This method captures the entire screen and attempts to locate an embedded image
+        /// template using template matching. The coordinates returned are relative to the top-left corner of the
+        /// primary screen. If the template is not found, the method returns (false, -1, -1).</remarks>
+        /// <param name="threshold">The minimum normalized correlation value required to consider the template found. Must be between 0.0 and
+        /// 1.0. Higher values require a closer match. The default is 0.999.</param>
+        /// <returns>A tuple containing a boolean indicating whether the template was found, and the X and Y coordinates of the
+        /// center of the matched region if found; otherwise, -1 for both coordinates.</returns>
+        public static (bool Found, int X, int Y) FindFaceitTemplate(Mat screen, string templateName, double threshold = 0.999)
+        {
+            using Mat acceptTemplate = LoadEmbeddedTemplate(templateName); // 8-bit BGR
+
+            using Mat result = new Mat();
+            Cv2.MatchTemplate(screen, acceptTemplate, result, TemplateMatchModes.CCoeffNormed);
+
+            Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out OpenCvSharp.Point maxLoc);
+
+            if (maxVal >= threshold)
+            {
+                // CENTER = top-left + (width/2, height/2)
+                int centerX = maxLoc.X + acceptTemplate.Width / 2;
+                int centerY = maxLoc.Y + acceptTemplate.Height / 2;
+
+                return (true, centerX, centerY);
+            }
+
+            return (false, -1, -1);
+        }
+        /// <summary>
+        /// Captures the current contents of the primary screen and returns the image as an OpenCV matrix in BGR format.
+        /// </summary>
+        /// <remarks>The returned matrix represents the entire area of the primary display. The image is
+        /// suitable for further processing with OpenCV methods. This method does not capture secondary
+        /// monitors.</remarks>
+        /// <returns>A <see cref="Mat"/> object containing the captured screen image in 8-bit, 3-channel BGR format.</returns>
+        private Mat CaptureFaceitScreen()
+        {
+            Rectangle bounds = _activeScreen?.Bounds ?? Screen.PrimaryScreen!.Bounds;
+            using Bitmap bmp = new Bitmap(bounds.Width, bounds.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            using (Graphics g = Graphics.FromImage(bmp))
+                g.CopyFromScreen(bounds.X, bounds.Y, 0, 0, bounds.Size, CopyPixelOperation.SourceCopy);
+
+            Mat mat = OpenCvSharp.Extensions.BitmapConverter.ToMat(bmp);
+
+            // Convert from BGRA (32bpp) → BGR (8-bit)
+            Cv2.CvtColor(mat, mat, ColorConversionCodes.BGRA2BGR);
+            mat.ConvertTo(mat, MatType.CV_8UC3);
+
+            return mat;
+        }
+        #endregion
         /// <summary>
         /// Scanner thread method
         /// </summary>
@@ -1196,14 +1317,16 @@ namespace CS2_AutoAccept
                 return;
 
             double confidenceThreshold = 0.5;
+            double threshold = 0.8;
             System.Drawing.Color targetColor = System.Drawing.Color.FromArgb(255, 54, 183, 82);
+
 
             CancellationToken ct = (CancellationToken)obj;
             while (!ct.IsCancellationRequested)
             {
                 // PrintToLog("{Scanner}");
                 // Take a screenshot of the accept button
-                Bitmap bitmap = CaptureScreen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
+                Bitmap bitmap = CaptureCS2Screen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
 
                 Bitmap greyBitmap = OptimiseImage(bitmap);
 
@@ -1231,7 +1354,7 @@ namespace CS2_AutoAccept
                         // Wait 30 seconds, to see if everyone accepted the match
                         Thread.Sleep(30 * 1000);
 
-                        bitmap = CaptureScreen(_cancelWidth, _cancelHeight, _cancelPosX, _cancelPosY); // "Cancel Search" button
+                        bitmap = CaptureCS2Screen(_cancelWidth, _cancelHeight, _cancelPosX, _cancelPosY); // "Cancel Search" button
 
                         // Adjust the contrast, then sharpen the image
                         greyBitmap = OptimiseImage(bitmap);
@@ -1273,7 +1396,7 @@ namespace CS2_AutoAccept
                         else
                         {
                             // Take a screenshot of the accept button
-                            bitmap = CaptureScreen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
+                            bitmap = CaptureCS2Screen(_acceptWidth, _acceptHeight, _acceptPosX, _acceptPosY); // "Accept" button
                             greyBitmap = OptimiseImage(bitmap);
 
                             // Read the image using OCR
@@ -1297,6 +1420,83 @@ namespace CS2_AutoAccept
                                     mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
                                 }
                             }
+                        }
+                    }
+                }
+
+                // Check Faceit accept button
+                // Get the accept button position, or false if not found
+                Mat screen = CaptureFaceitScreen(); // 8-bit BGR
+                (bool found, int x, int y) = FindFaceitTemplate(screen, "accept", threshold);
+
+                // If accept button is found
+                if (found)
+                {
+                    // Move the cursor and click the accept button
+                    System.Windows.Forms.Cursor.Position = new System.Drawing.Point(x, y);
+
+                    uint X = (uint)System.Windows.Forms.Cursor.Position.X;
+                    uint Y = (uint)System.Windows.Forms.Cursor.Position.Y;
+
+                    // Click the button
+                    mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+
+                    // Wait 30 seconds, to see if everyone accepted the match
+                    Thread.Sleep(30 * 1000);
+
+                    // Check if the match was accepted or not
+                    (found, x, y) = FindFaceitTemplate(screen, "connect_to_server", threshold); // Capture "Connect to server" button, and check if it's there
+
+                    // If connect to server button is found
+                    if (found)
+                    {
+                        // Click the connect button automatically
+                        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(x, y);
+
+                        X = (uint)System.Windows.Forms.Cursor.Position.X;
+                        Y = (uint)System.Windows.Forms.Cursor.Position.Y;
+
+                        // Click the button
+                        mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+
+                        if (!_run_Continuously)
+                        {
+                            //Debug.WriteLine("Match was initiated");
+                            Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                Program_state.IsChecked = false;
+                            }));
+
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    // Check if maybe the Connect to server button is here, and the accept happened manually
+                    (found, x, y) = FindFaceitTemplate(screen, "connect_to_server", threshold); // Capture "Connect to server" button, and check if it's there
+
+                    // If connect to server button is found
+                    if (found)
+                    {
+                        // Click the connect button automatically
+                        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(x, y);
+
+                        uint X = (uint)System.Windows.Forms.Cursor.Position.X;
+                        uint Y = (uint)System.Windows.Forms.Cursor.Position.Y;
+
+                        // Click the button
+                        mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+
+                        if (!_run_Continuously)
+                        {
+                            //Debug.WriteLine("Match was initiated");
+                            Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                Program_state.IsChecked = false;
+                            }));
+
+                            return;
                         }
                     }
                 }
@@ -1530,24 +1730,24 @@ namespace CS2_AutoAccept
             }
         }
         /// <summary>
-        /// Prints to the log
+        /// Prints to the msg
         /// </summary>
-        /// <param Name="log">Text to log</param>
-        private static async Task<bool> PrintToLog(string log)
+        /// <param Name="msg">Text to msg</param>
+        private static async Task<bool> PrintToLog(string msg)
         {
             try
             {
-                string logLocation = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CS2 AutoAccepter Log.txt";
-                log = $"{DateTime.Now.ToString("[HH:mm:ss]")} {log}{Environment.NewLine}";
-                await File.AppendAllTextAsync(logLocation, log);
+                string logLocation = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\CS2 AutoAccept Log.txt";
+                msg = $"{DateTime.Now:[HH:mm:ss]} {msg}{Environment.NewLine}";
+                await File.AppendAllTextAsync(logLocation, msg);
             }
             catch (Exception)
             {
                 try
                 {
-                    string logLocation = Environment.ExpandEnvironmentVariables("%userprofile%") + "\\onedrive\\Desktop\\CS2 AutoAccepter Log.txt";
-                    log = $"{DateTime.Now.ToString("[HH:mm:ss]")} {log}{Environment.NewLine}";
-                    await File.AppendAllTextAsync(logLocation, log);
+                    string logLocation = Environment.ExpandEnvironmentVariables("%userprofile%") + "\\onedrive\\Desktop\\CS2 AutoAccept Log.txt";
+                    msg = $"{DateTime.Now.ToString("[HH:mm:ss]")} {msg}{Environment.NewLine}";
+                    await File.AppendAllTextAsync(logLocation, msg);
                 }
                 catch (Exception)
                 {
@@ -1618,7 +1818,7 @@ namespace CS2_AutoAccept
         }
     }
 
-    public class RelayCommand : ICommand
+    public partial class RelayCommand : ICommand
     {
         private readonly Action<object> _execute;
         private readonly Func<object, bool> _canExecute;
