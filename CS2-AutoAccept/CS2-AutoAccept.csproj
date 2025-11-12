@@ -12,7 +12,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Description>A program to automatically find and press "ACCEPT" for you, when entering a competitive match in CS2.</Description>
     <Copyright>©️ tsgsOFFICIAL - 2026</Copyright>
-    <FileVersion>5.2.1.0</FileVersion>
+    <FileVersion>5.2.1.1</FileVersion>
     <AssemblyName>CS2-AutoAccept</AssemblyName>
   </PropertyGroup>
 
@@ -76,7 +76,6 @@
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\api-ms-win-core-sysinfo-l1-1-0.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\api-ms-win-core-timezone-l1-1-0.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\api-ms-win-core-util-l1-1-0.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\API-MS-Win-core-xstate-l2-1-0.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\api-ms-win-crt-conio-l1-1-0.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\api-ms-win-crt-convert-l1-1-0.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\api-ms-win-crt-environment-l1-1-0.dll" />
@@ -171,7 +170,7 @@
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\fr\UIAutomationTypes.resources.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\fr\WindowsBase.resources.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\fr\WindowsFormsIntegration.resources.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\git2-a418d9d.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\git2-3f4182d.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\GlobalHotKey.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Hardcodet.NotifyIcon.Wpf.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\hostfxr.dll" />
@@ -229,7 +228,7 @@
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\ko\WindowsFormsIntegration.resources.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\LibGit2Sharp.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Microsoft.CSharp.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Microsoft.DiaSymReader.Native.x86.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Microsoft.DiaSymReader.Native.amd64.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Microsoft.Toolkit.Uwp.Notifications.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Microsoft.VisualBasic.Core.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Microsoft.VisualBasic.dll" />
@@ -240,12 +239,16 @@
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Microsoft.Win32.SystemEvents.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\Microsoft.Windows.SDK.NET.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\mscordaccore.dll" />
-    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\mscordaccore_x86_x86_6.0.3524.45918.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\mscordaccore_amd64_amd64_6.0.3624.51421.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\mscordbi.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\mscorlib.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\mscorrc.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\msquic.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\netstandard.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\OpenCvSharp.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\OpenCvSharp.Extensions.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\OpenCvSharpExtern.dll" />
+    <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\opencv_videoio_ffmpeg4110_64.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\PenImc_cor3.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\pl\Microsoft.VisualBasic.Forms.resources.dll" />
     <None Include="bin\Release\net6.0-windows10.0.17763.0\publish\win-x86\pl\PresentationCore.resources.dll" />
