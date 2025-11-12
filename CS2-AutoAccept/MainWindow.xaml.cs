@@ -1292,7 +1292,7 @@ namespace CS2_AutoAccept
         /// <returns>A <see cref="Mat"/> object containing the captured screen image in 8-bit, 3-channel BGR format.</returns>
         private Mat CaptureFaceitScreen()
         {
-            Rectangle bounds = _activeScreen?.Bounds ?? Screen.PrimaryScreen!.Bounds;
+            Rectangle bounds = _activeFaceitScreen?.Bounds ?? Screen.PrimaryScreen!.Bounds;
             using Bitmap bmp = new Bitmap(bounds.Width, bounds.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             using (Graphics g = Graphics.FromImage(bmp))
                 g.CopyFromScreen(bounds.X, bounds.Y, 0, 0, bounds.Size, CopyPixelOperation.SourceCopy);
@@ -1342,7 +1342,7 @@ namespace CS2_AutoAccept
                     {
                         // PrintToLog("{Scanner} Match found");
                         // Move the cursor and click the accept button
-                        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(_clickPosX, _clickPosY);
+                        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(_clickPosX + _activeScreen!.Bounds.X, _clickPosY + _activeScreen!.Bounds.Y);
 
                         uint X = (uint)System.Windows.Forms.Cursor.Position.X;
                         uint Y = (uint)System.Windows.Forms.Cursor.Position.Y;
@@ -1383,7 +1383,7 @@ namespace CS2_AutoAccept
                             int clickPosX = _cancelPosX + (_cancelWidth / 2);
                             int clickPosY = _cancelPosY + (_cancelHeight / 2);
 
-                            System.Windows.Forms.Cursor.Position = new System.Drawing.Point(clickPosX, clickPosY);
+                            System.Windows.Forms.Cursor.Position = new System.Drawing.Point(_clickPosX + _activeScreen!.Bounds.X, _clickPosY + _activeScreen!.Bounds.Y);
 
                             X = (uint)System.Windows.Forms.Cursor.Position.X;
                             Y = (uint)System.Windows.Forms.Cursor.Position.Y;
@@ -1412,7 +1412,7 @@ namespace CS2_AutoAccept
                                     //Debug.WriteLine("Accept conditions met");
 
                                     // Move the cursor and click the accept button
-                                    System.Windows.Forms.Cursor.Position = new System.Drawing.Point(_clickPosX, _clickPosY);
+                                    System.Windows.Forms.Cursor.Position = new System.Drawing.Point(_clickPosX + _activeScreen!.Bounds.X, _clickPosY + _activeScreen!.Bounds.Y);
 
                                     X = (uint)System.Windows.Forms.Cursor.Position.X;
                                     Y = (uint)System.Windows.Forms.Cursor.Position.Y;
@@ -1433,7 +1433,7 @@ namespace CS2_AutoAccept
                 if (found)
                 {
                     // Move the cursor and click the accept button
-                    System.Windows.Forms.Cursor.Position = new System.Drawing.Point(x, y);
+                    System.Windows.Forms.Cursor.Position = new System.Drawing.Point(x + _activeFaceitScreen!.Bounds.X, y + _activeFaceitScreen!.Bounds.Y);
 
                     uint X = (uint)System.Windows.Forms.Cursor.Position.X;
                     uint Y = (uint)System.Windows.Forms.Cursor.Position.Y;
@@ -1451,7 +1451,7 @@ namespace CS2_AutoAccept
                     if (found)
                     {
                         // Click the connect button automatically
-                        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(x, y);
+                        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(x + _activeFaceitScreen!.Bounds.X, y + _activeFaceitScreen!.Bounds.Y);
 
                         X = (uint)System.Windows.Forms.Cursor.Position.X;
                         Y = (uint)System.Windows.Forms.Cursor.Position.Y;
@@ -1480,7 +1480,7 @@ namespace CS2_AutoAccept
                     if (found)
                     {
                         // Click the connect button automatically
-                        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(x, y);
+                        System.Windows.Forms.Cursor.Position = new System.Drawing.Point(x + _activeFaceitScreen!.Bounds.X, y + _activeFaceitScreen!.Bounds.Y);
 
                         uint X = (uint)System.Windows.Forms.Cursor.Position.X;
                         uint Y = (uint)System.Windows.Forms.Cursor.Position.Y;

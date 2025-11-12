@@ -1,8 +1,13 @@
 {
-  "version": "5.2.1.1",
-  "type": "Hotfix",
-  "changelog": "HOTFIX, for version 5.2.1.0!",
+  "version": "5.2.1.2",
+  "type": "Bugfix",
+  "changelog": "Fixed a bug where faceit had to be on the main screen, now supporting multi monitor again.",
   "historic_versions": [
+    {
+      "version": "5.2.1.1",
+      "type": "Hotfix",
+      "changelog": "HOTFIX, for version 5.2.1.0!"
+    },
     {
       "version": "5.2.1.0",
       "type": "Feature",
