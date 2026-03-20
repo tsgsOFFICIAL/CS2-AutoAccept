@@ -4,7 +4,6 @@ using Tesseract;
 using System.Linq;
 using OpenCvSharp;
 using GlobalHotKey;
-using CS2AutoAccept;
 using System.Windows;
 using System.Drawing;
 using System.Net.Http;

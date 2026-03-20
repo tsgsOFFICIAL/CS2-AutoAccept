@@ -45,9 +45,7 @@ namespace CS2_AutoAccept
 
                 // Ensure mutex is released only if it was created successfully
                 if (createdNew)
-                {
-                    mutex.ReleaseMutex();
-                }
+                    mutex.ReleaseMutex();                
 
                 return;
             }

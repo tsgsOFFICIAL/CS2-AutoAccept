@@ -26,7 +26,7 @@ namespace CS2_AutoAccept
         internal static Screen? FindApplicationScreen(string processName)
         {
             // Find process
-            var proc = Process.GetProcessesByName(processName).FirstOrDefault();
+            Process? proc = Process.GetProcessesByName(processName).FirstOrDefault();
             if (proc == null || proc.MainWindowHandle == IntPtr.Zero)
                 return null;
 
@@ -49,7 +49,7 @@ namespace CS2_AutoAccept
             Screen bestScreen = Screen.AllScreens[0];
             int maxArea = 0;
 
-            foreach (var screen in Screen.AllScreens)
+            foreach (Screen? screen in Screen.AllScreens)
             {
                 Rectangle intersection = Rectangle.Intersect(bounds, screen.Bounds);
                 int area = intersection.Width * intersection.Height;

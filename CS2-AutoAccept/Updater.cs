@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics;
-using CS2_AutoAccept;
 using System.IO;
 using System;
 
-namespace CS2AutoAccept
+namespace CS2_AutoAccept
 {
     internal class Updater : IDisposable
     {
